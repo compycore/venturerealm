@@ -3,19 +3,19 @@ var map = [];
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var tiles = {
-	ns:"\u2551",
-	ew:"\u2550",
-	nesw:"\u256c",
+	ns:"\u2503",
+	ew:"\u2501",
+	nesw:"\u254B",
 
-	ne:"\u255A",
-	es:"\u2554",
-	sw:"\u2557",
-	wn:"\u255D",
+	ne:"\u2517",
+	es:"\u250F",
+	sw:"\u2513",
+	wn:"\u251B",
 
-	nes:"\u2560",
-	esw:"\u2566",
-	swn:"\u2563",
-	wne:"\u2569",
+	nes:"\u2523",
+	esw:"\u2533",
+	swn:"\u252B",
+	wne:"\u253B",
 
 	treasure:"T",
 	city:"C",
