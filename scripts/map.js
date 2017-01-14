@@ -37,7 +37,7 @@ function generate_map(callback) {
 				}
 			}
 		}
-	
+
 		if (callback) {
 			callback();
 		}
@@ -46,8 +46,12 @@ function generate_map(callback) {
 
 // Make an empty 2D array of size map_size
 function make_empty_map(callback) {
-	for (y=0;y<map_size;y++) {
-		map.push(new Array(map_size));
+	for (i=0;i<map_size;i++) {
+		map.push(new Array());
+
+		for (x=0;x<map_size;x++) {
+			map[map.length-1][x]=tiles.gray;
+		}
 	}
 
 	if (callback) {
@@ -56,7 +60,7 @@ function make_empty_map(callback) {
 }
 
 function find_path(callback) {
-	var grid = new PF.Grid(map_size, map_size); 
+	var grid = new PF.Grid(map_size, map_size);
 	var finder = new PF.AStarFinder();
 	var path = finder.findPath(1, 2, 4, 2, grid);
 
@@ -68,15 +72,9 @@ function find_path(callback) {
 }
 
 function draw_map() {
-	console.log(map);
-
-	/*
-	for (y=0;y<map_size;y++) {
-		for (x=0;x<map[y].length;x++) {
-			console.log(map[y][x]);
-		}
+	for (y=0;y<map.length;y++) {
+		console.log(map[y].join(""));
 	}
-	*/
 }
 
 function probability(percent) {
