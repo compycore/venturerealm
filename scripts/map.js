@@ -1,5 +1,10 @@
 var map_size = 25;
 var map = [];
+var grid = new PF.Grid(map_size, map_size); 
+var finder = new PF.AStarFinder();
+var path = finder.findPath(1, 2, 4, 2, grid);
+
+console.log(path);
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var tiles = {
@@ -19,10 +24,13 @@ var tiles = {
 
 	treasure:"T",
 	city:"C",
-	portal:"P"
+	portal:"P",
+
+	black:"\u2588",
+	gray:"\u2591"
 }
 
-var characters = [tiles.ns, tiles.ew, tiles.nesw, tiles.ne, tiles.es, tiles.sw, tiles.wn, tiles.nes, tiles.esw, tiles.swn, tiles.wne, tiles.treasure, tiles.city, tiles.portal];
+var characters = [tiles.ns, tiles.ew, tiles.nesw, tiles.ne, tiles.es, tiles.sw, tiles.wn, tiles.nes, tiles.esw, tiles.swn, tiles.wne, tiles.treasure, tiles.city, tiles.portal, tiles.gray];
 
 function generate_map(callback) {
 	for (y=0;y<map_size;y++) {
@@ -39,6 +47,6 @@ function generate_map(callback) {
 
 function draw_map() {
 	for (i=0;i<map_size;i++) {
-		console.log(map.slice(i*map_size, i*map_size+map_size).join(" "));
+		console.log(map.slice(i*map_size, i*map_size+map_size).join(""));
 	}
 }
