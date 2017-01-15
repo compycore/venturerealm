@@ -85,11 +85,11 @@ function find_path_length(point_a, point_b) {
 
 // Make an empty 2D array of size map_size
 function make_empty_map(callback) {
-	for (i=0;i<map_size;i++) {
+	for (y=0;y<map_size;y++) {
 		map.push(new Array());
 
 		for (x=0;x<map_size;x++) {
-			map[map.length-1][x]=tiles.gray; // Make all tiles wilderness
+			map[y][x]=make_tile({x:x, y:y}); // Make all tiles wilderness
 		}
 	}
 
@@ -185,10 +185,12 @@ function combine_arrays(a, b) {
 }
 
 // Make a tile object
-function make_tile(coords, tile_character) {
+function make_tile(coords, tile_character = tiles.gray) {
+	console.log(tile_character);
 	var tile = {
 		x: coords.x,
 		y: coords.y,
+		character: tile_character,
 		directions: [],
 		description: "The road extends to the north and the east."
 	}
@@ -257,7 +259,13 @@ function find_end_tile(a, b) {
 
 function draw_map() {
 	for (y=0;y<map.length;y++) {
-		document.getElementById("game_output").value+=map[y].join("")+"\n";
+		for (x=0;x<map_size;x++) {
+			document.getElementById("game_output").value+=map[y][x].character;
+
+			if (x==map_size-1) {
+				document.getElementById("game_output").value+="\n";
+			}
+		}
 	}
 }
 
