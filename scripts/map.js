@@ -172,7 +172,9 @@ function apply_tile(tile) {
 		tile_character=tiles.w;
 	}
 
-	map[tile.y][tile.x]=tile_character; // Apply the tile
+	tile.character = tile_character;
+
+	map[tile.y][tile.x]=tile; // Apply the tile
 }
 
 function combine_arrays(a, b) {
@@ -180,13 +182,11 @@ function combine_arrays(a, b) {
 			return a.indexOf(item) < 0;
 	}));
 
-	console.log(c);
 	return c;
 }
 
 // Make a tile object
 function make_tile(coords, tile_character = tiles.gray) {
-	console.log(tile_character);
 	var tile = {
 		x: coords.x,
 		y: coords.y,
