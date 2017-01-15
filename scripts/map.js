@@ -1,7 +1,7 @@
 var map_size = 25;
 var map = [];
 var paths = [];
-var min_path_length = 7;
+var min_path_length = 10;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var tiles = {
@@ -140,6 +140,12 @@ function apply_path(path) {
 function apply_tile(tile) {
 	var tile_character = tiles.gray;
 
+	// Do the tile "addition"
+	if (map[tile.y][tile.x].directions.length > 0) {
+		tile.directions = combine_arrays(map[tile.y][tile.x].directions, tile.directions);
+	}
+
+	// Set the tile character based on the directions array
 	if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
 		tile_character=tiles.nesw;
 	} else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
@@ -172,9 +178,9 @@ function apply_tile(tile) {
 		tile_character=tiles.w;
 	}
 
-	tile.character = tile_character;
+	tile.character = tile_character; // Apply the selected character
 
-	map[tile.y][tile.x]=tile; // Apply the tile
+	map[tile.y][tile.x]=tile; // Apply the tile to the map
 }
 
 function combine_arrays(a, b) {
