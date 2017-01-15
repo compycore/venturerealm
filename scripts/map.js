@@ -3,6 +3,11 @@ var map = [];
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var tiles = {
+	n: "\u2579",
+	e: "\u257A",
+	s: "\u257B",
+	w: "\u2578",
+
 	ns:"\u2503",
 	ew:"\u2501",
 	nesw:"\u254B",
@@ -66,31 +71,62 @@ function find_path(point_a, point_b) {
 function apply_path(path) {
 	for (i=0;i<path.length-1;i++) {
 		var tile=tiles.black;
-		var b = {x:path[i][0], y:path[i][1]}
+		var b = {x:path[i][0], y:path[i][1]} // Get the current tile
 
-		if (i<path.length-1) {
+		if (i>0) { // Get the previous tile
+			var a = {x:path[i-1][0], y:path[i-1][1]}
+		}
+
+		if (i<path.length-1) { // Get the next tile
 			var c = {x:path[i+1][0], y:path[i+1][1]}
 		}
 
-		if (i==0) {
-			// tile=tiles.black;
-		} else if (i<path.length-1) {
-			var a = {x:path[i-1][0], y:path[i-1][1]}
-
+		if (i==0) { // First tile in the path
+			tile=find_end_tile(b, c);
+		} else if (i<path.length-2) { // Path middle tiles
+			// Straightaway tiles
 			if (a.x==b.x && b.x==c.x) {
+				tile=tiles.ns;
+			} else if (a.y==b.y && b.y==c.y) {
 				tile=tiles.ew;
 			}
-		} else {
-			// tile=tiles.black;
+
+			if ((a.y<b.y && c.x>b.x) || (a.x>b.x && c.y<b.y)) {
+				tile=tiles.ne;
+			} else if ((a.x>b.x && c.y>b.y) || (a.y>b.y && c.x>b.x)) {
+				tile=tiles.es;
+			} else if ((a.y>b.y && c.x<b.x) || (a.x<b.x && c.y>b.y)) {
+				tile=tiles.sw;
+			} else if ((a.x<b.x && c.y<b.y) || (a.y<b.y && c.x<b.x)) {
+				tile=tiles.wn;
+			}
+		} else { // Last tile in the path
+			tile=find_end_tile(b, a);
 		}
 		
-		map[b.x][b.y]=tile;
+		map[b.y][b.x]=tile;
+	}
+}
+
+function find_end_tile(a, b) {
+	if (a.x==b.x) {
+		if (a.y<b.y) {
+			return tiles.s;
+		} else {
+			return tiles.n;
+		}
+	} else {
+		if (a.x<b.x) {
+			return tiles.e;
+		} else {
+			return tiles.w;
+		}
 	}
 }
 
 function draw_map() {
 	for (y=0;y<map.length;y++) {
-		console.log(map[y].join(""));
+		document.getElementById("game_output").value+=map[y].join("")+"\n";
 	}
 }
 
