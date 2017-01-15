@@ -25,18 +25,9 @@ var tiles = {
 	gray:"\u2591"
 }
 
-var characters = [tiles.ns, tiles.ew, tiles.nesw, tiles.ne, tiles.es, tiles.sw, tiles.wn, tiles.nes, tiles.esw, tiles.swn, tiles.wne, tiles.treasure, tiles.city, tiles.portal, tiles.gray];
-
 function generate_map(callback) {
 	make_empty_map(function() {
-		for (y=0;y<map_size;y++) {
-			for (x=0;x<map_size;x++) {
-				if (probability(10)) {
-					var i = Math.floor(Math.random() * characters.length)
-					map[y][x]=characters[i];
-				}
-			}
-		}
+		apply_path(find_path(random_point(), random_point()));
 
 		if (callback) {
 			callback();
@@ -59,16 +50,23 @@ function make_empty_map(callback) {
 	}
 }
 
-function find_path(callback) {
+function random_point() {
+	var x = Math.floor(Math.random() * map_size);
+	var y = Math.floor(Math.random() * map_size);
+
+	return [x,y];
+}
+
+function find_path(point_a, point_b) {
 	var grid = new PF.Grid(map_size, map_size);
 	var finder = new PF.AStarFinder();
-	var path = finder.findPath(1, 2, 4, 2, grid);
+	return finder.findPath(point_a[0], point_a[1], point_b[0], point_b[1], grid);
+}
 
-	console.log(path);
-
-	if (callback) {
-		callback();
-	}
+function apply_path(path) {
+	path.forEach(function(node) {
+		map[node[1]][node[0]]="#";
+	})
 }
 
 function draw_map() {
