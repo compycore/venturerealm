@@ -36,7 +36,7 @@ function generate_map(callback) {
 	make_empty_map(function() {
 		make_map_trunk();
 
-		for (i=0;i<2;i++) {
+		for (i=0;i<10;i++) {
 			make_map_branch();
 		}
 
