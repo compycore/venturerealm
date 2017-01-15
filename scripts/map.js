@@ -32,18 +32,6 @@ var tiles = {
 	gray:"\u2591"
 }
 
-/*
-var tile = {
-	x: 12,
-	y: 5,
-	type: "road",
-	directions: ["n", "e"],
-	description: "The road extends to the north and the east."
-	item: dime,
-	item_description: "There is a dime on the ground.",
-}
-*/
-
 function generate_map(callback) {
 	make_empty_map(function() {
 		make_map_trunk();
@@ -85,7 +73,6 @@ function make_map_branch() {
 	var point_b = random_point();
 
 	while (find_path_length(point_a, point_b) < min_path_length) {
-		point_a = random_point();
 		point_b = random_point();
 	}
 
@@ -140,28 +127,115 @@ function apply_path(path) {
 		if (i==0) { // First tile in the path
 			tile=find_end_tile(b, c);
 		} else if (i<path.length-2) { // Path middle tiles
-			// Straightaway tiles
-			if (a.x==b.x && b.x==c.x) {
-				tile=tiles.ns;
-			} else if (a.y==b.y && b.y==c.y) {
-				tile=tiles.ew;
-			}
-
-			// Turning tiles
-			if ((a.y<b.y && c.x>b.x) || (a.x>b.x && c.y<b.y)) {
-				tile=tiles.ne;
-			} else if ((a.x>b.x && c.y>b.y) || (a.y>b.y && c.x>b.x)) {
-				tile=tiles.es;
-			} else if ((a.y>b.y && c.x<b.x) || (a.x<b.x && c.y>b.y)) {
-				tile=tiles.sw;
-			} else if ((a.x<b.x && c.y<b.y) || (a.y<b.y && c.x<b.x)) {
-				tile=tiles.wn;
-			}
+			tile=find_middle_tile(a, b, c);
 		} else { // Last tile in the path
 			tile=find_end_tile(b, a);
 		}
 		
-		map[b.y][b.x]=tile;
+		apply_tile(make_tile(b, tile)); // Apply the tile
+	}
+}
+
+// Do some additive "math" so paths don't cut each other
+function apply_tile(tile) {
+	var tile_character = tiles.gray;
+
+	if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+		tile_character=tiles.nesw;
+	} else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
+		tile_character=tiles.nes;
+	} else if (tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+		tile_character=tiles.esw;
+	} else if (tile.directions.includes("s") && tile.directions.includes("w") && tile.directions.includes("n")) {
+		tile_character=tiles.swn;
+	} else if (tile.directions.includes("w") && tile.directions.includes("n") && tile.directions.includes("e")) {
+		tile_character=tiles.wne;
+	} else if (tile.directions.includes("n") && tile.directions.includes("s")) {
+		tile_character=tiles.ns;
+	} else if (tile.directions.includes("e") && tile.directions.includes("w")) {
+		tile_character=tiles.ew;
+	} else if (tile.directions.includes("n") && tile.directions.includes("e")) {
+		tile_character=tiles.ne;
+	} else if (tile.directions.includes("e") && tile.directions.includes("s")) {
+		tile_character=tiles.es;
+	} else if (tile.directions.includes("s") && tile.directions.includes("w")) {
+		tile_character=tiles.sw;
+	} else if (tile.directions.includes("w") && tile.directions.includes("n")) {
+		tile_character=tiles.wn;
+	} else if (tile.directions.includes("n")) {
+		tile_character=tiles.n;
+	} else if (tile.directions.includes("e")) {
+		tile_character=tiles.e;
+	} else if (tile.directions.includes("s")) {
+		tile_character=tiles.s;
+	} else if (tile.directions.includes("w")) {
+		tile_character=tiles.w;
+	}
+
+	map[tile.y][tile.x]=tile_character; // Apply the tile
+}
+
+function combine_arrays(a, b) {
+	var c = a.concat(b.filter(function (item) {
+			return a.indexOf(item) < 0;
+	}));
+
+	console.log(c);
+	return c;
+}
+
+// Make a tile object
+function make_tile(coords, tile_character) {
+	var tile = {
+		x: coords.x,
+		y: coords.y,
+		directions: [],
+		description: "The road extends to the north and the east."
+	}
+
+	// Set the directions array for path adding
+	if (tile_character==tiles.n) {
+		tile.directions = ["n"];
+	} else if (tile_character==tiles.e) {
+		tile.directions = ["e"];
+	} else if (tile_character==tiles.s) {
+		tile.directions = ["s"];
+	} else if (tile_character==tiles.w) {
+		tile.directions = ["w"];
+	} else if (tile_character==tiles.ns) {
+		tile.directions = ["n", "s"];
+	} else if (tile_character==tiles.ew) {
+		tile.directions = ["e", "w"];
+	} else if (tile_character==tiles.ne) {
+		tile.directions = ["n", "e"];
+	} else if (tile_character==tiles.es) {
+		tile.directions = ["e", "s"];
+	} else if (tile_character==tiles.sw) {
+		tile.directions = ["s", "w"];
+	} else if (tile_character==tiles.wn) {
+		tile.directions = ["w", "n"];
+	}
+
+	return tile
+}
+
+function find_middle_tile(a, b, c) {
+	// Straightaway tiles
+	if (a.x==b.x && b.x==c.x) {
+		return tiles.ns;
+	} else if (a.y==b.y && b.y==c.y) {
+		return tiles.ew;
+	}
+
+	// Turning tiles
+	if ((a.y<b.y && c.x>b.x) || (a.x>b.x && c.y<b.y)) {
+		return tiles.ne;
+	} else if ((a.x>b.x && c.y>b.y) || (a.y>b.y && c.x>b.x)) {
+		return tiles.es;
+	} else if ((a.y>b.y && c.x<b.x) || (a.x<b.x && c.y>b.y)) {
+		return tiles.sw;
+	} else if ((a.x<b.x && c.y<b.y) || (a.y<b.y && c.x<b.x)) {
+		return tiles.wn;
 	}
 }
 
