@@ -2,6 +2,7 @@ var map_size = 25;
 var map = [];
 var paths = [];
 var min_path_length = 10;
+var branch_count=10;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var characters = {
@@ -36,7 +37,7 @@ function generate_map(callback) {
 	make_empty_map(function() {
 		make_map_trunk();
 
-		for (i=0;i<10;i++) {
+		for (i=0;i<branch_count;i++) {
 			make_map_branch();
 		}
 
@@ -310,6 +311,8 @@ function find_end_tile(a, b) {
 }
 
 function draw_map() {
+	document.getElementById("game_output").value+=characters.city + " city " + characters.treasure + " treasure " + characters.portal + " portal\n";
+
 	for (y=0;y<map.length;y++) {
 		for (x=0;x<map_size;x++) {
 			document.getElementById("game_output").value+=map[y][x].character;
