@@ -323,17 +323,21 @@ function find_end_tile(a, b) {
 }
 
 function draw_map() {
-	document.getElementById("game_output").value+=characters.city + " city " + characters.treasure + " treasure " + characters.portal + " portal\n";
+	var message="";
+
+	message+=characters.city + " city " + characters.treasure + " treasure " + characters.portal + " portal\n";
 
 	for (y=0;y<map.length;y++) {
 		for (x=0;x<map_size;x++) {
-			document.getElementById("game_output").value+=map[y][x].character;
+			message+=map[y][x].character;
 
-			if (x==map_size-1) {
-				document.getElementById("game_output").value+="\n";
+			if (x==map_size-1 && y<map.length-1) {
+				message+="\n";
 			}
 		}
 	}
+
+	log(message);
 }
 
 function probability(percent) {
