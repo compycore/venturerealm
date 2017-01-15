@@ -1,5 +1,6 @@
 var map_size = 25;
 var map = [];
+var min_path_length = 7;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var tiles = {
@@ -30,14 +31,42 @@ var tiles = {
 	gray:"\u2591"
 }
 
+/*
+var tile = {
+	x: 12,
+	y: 5,
+	type: "road",
+	directions: ["n", "e"],
+	description: "The road extends to the north and the east."
+	item: dime,
+	item_description: "There is a dime on the ground.",
+}
+*/
+
 function generate_map(callback) {
 	make_empty_map(function() {
-		apply_path(find_path(random_point(), random_point()));
+		make_map_trunk();
 
 		if (callback) {
 			callback();
 		}
 	});
+}
+
+function make_map_trunk() {
+	var point_a = random_point();
+	var point_b = random_point();
+
+	while (find_path_length(point_a, point_b) < min_path_length) {
+		point_a = random_point();
+		point_b = random_point();
+	}
+
+	apply_path(find_path(point_a, point_b));
+}
+
+function find_path_length(point_a, point_b) {
+	return find_path(point_a, point_b).length
 }
 
 // Make an empty 2D array of size map_size
@@ -46,7 +75,7 @@ function make_empty_map(callback) {
 		map.push(new Array());
 
 		for (x=0;x<map_size;x++) {
-			map[map.length-1][x]=tiles.gray;
+			map[map.length-1][x]=tiles.gray; // Make all tiles wilderness
 		}
 	}
 
@@ -91,6 +120,7 @@ function apply_path(path) {
 				tile=tiles.ew;
 			}
 
+			// Turning tiles
 			if ((a.y<b.y && c.x>b.x) || (a.x>b.x && c.y<b.y)) {
 				tile=tiles.ne;
 			} else if ((a.x>b.x && c.y>b.y) || (a.y>b.y && c.x>b.x)) {
