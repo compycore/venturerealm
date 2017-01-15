@@ -64,9 +64,28 @@ function find_path(point_a, point_b) {
 }
 
 function apply_path(path) {
-	path.forEach(function(node) {
-		map[node[1]][node[0]]="#";
-	})
+	for (i=0;i<path.length-1;i++) {
+		var tile=tiles.black;
+		var b = {x:path[i][0], y:path[i][1]}
+
+		if (i<path.length-1) {
+			var c = {x:path[i+1][0], y:path[i+1][1]}
+		}
+
+		if (i==0) {
+			// tile=tiles.black;
+		} else if (i<path.length-1) {
+			var a = {x:path[i-1][0], y:path[i-1][1]}
+
+			if (a.x==b.x && b.x==c.x) {
+				tile=tiles.ew;
+			}
+		} else {
+			// tile=tiles.black;
+		}
+		
+		map[b.x][b.y]=tile;
+	}
 }
 
 function draw_map() {
