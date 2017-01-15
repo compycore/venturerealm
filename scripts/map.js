@@ -3,6 +3,8 @@ var map = [];
 var paths = [];
 var min_path_length = 10;
 var branch_count=10;
+var min_city_count=3;
+var min_treasure_count=3;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var characters = {
@@ -54,11 +56,16 @@ function generate_map(callback) {
 }
 
 function generate_cities() {
-	for (y=0;y<map_size;y++) {
-		for (x=0;x<map_size;x++) {
-			if (map[y][x].directions.length>0) {
-				if (probability(5)) {
-					map[y][x].character=characters.city;
+	var city_count=0;
+
+	while (city_count<min_city_count) {
+		for (y=0;y<map_size;y++) {
+			for (x=0;x<map_size;x++) {
+				if (map[y][x].directions.length>0) {
+					if (probability(5)) {
+						city_count++;
+						map[y][x].character=characters.city;
+					}
 				}
 			}
 		}
@@ -66,11 +73,16 @@ function generate_cities() {
 }
 
 function generate_treasure() {
-	for (y=0;y<map_size;y++) {
-		for (x=0;x<map_size;x++) {
-			if (map[y][x].directions.length>0) {
-				if (probability(2)) {
-					map[y][x].character=characters.treasure;
+	var treasure_count=0;
+	
+	while (treasure_count<min_treasure_count) {
+		for (y=0;y<map_size;y++) {
+			for (x=0;x<map_size;x++) {
+				if (map[y][x].directions.length>0) {
+					if (probability(2)) {
+						treasure_count++;
+						map[y][x].character=characters.treasure;
+					}
 				}
 			}
 		}
