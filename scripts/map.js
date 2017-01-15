@@ -24,9 +24,9 @@ var tiles = {
 	swn:"\u252B",
 	wne:"\u253B",
 
-	treasure:"T",
-	city:"C",
-	portal:"P",
+	treasure:"\u25D9",
+	city:"\u25C6",
+	portal:"\u25C9",
 
 	black:"\u2588",
 	gray:"\u2591"
@@ -42,10 +42,24 @@ function generate_map(callback) {
 
 		apply_paths();
 
+		generate_cities();
+
 		if (callback) {
 			callback();
 		}
 	});
+}
+
+function generate_cities() {
+	for (y=0;y<map_size;y++) {
+		for (x=0;x<map_size;x++) {
+			if (map[y][x].directions.length>0) {
+				if (probability(5)) {
+					map[y][x].character=tiles.city;
+				}
+			}
+		}
+	}
 }
 
 // Apply all paths in the paths array to the map
