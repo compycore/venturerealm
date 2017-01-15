@@ -1,5 +1,6 @@
 var map_size = 25;
 var map = [];
+var paths = [];
 var min_path_length = 7;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
@@ -47,12 +48,26 @@ function generate_map(callback) {
 	make_empty_map(function() {
 		make_map_trunk();
 
+		for (i=0;i<2;i++) {
+			make_map_branch();
+		}
+
+		apply_paths();
+
 		if (callback) {
 			callback();
 		}
 	});
 }
 
+// Apply all paths in the paths array to the map
+function apply_paths() {
+	paths.forEach(function(path) {
+		apply_path(path);
+	})
+}
+
+// Make the main path to start the path branching
 function make_map_trunk() {
 	var point_a = random_point();
 	var point_b = random_point();
@@ -62,7 +77,19 @@ function make_map_trunk() {
 		point_b = random_point();
 	}
 
-	apply_path(find_path(point_a, point_b));
+	paths.push(find_path(point_a, point_b)); // Add the path to the paths array
+}
+
+function make_map_branch() {
+	var point_a = paths[paths.length-1][Math.floor(Math.random() * (paths[paths.length-1].length-1))];
+	var point_b = random_point();
+
+	while (find_path_length(point_a, point_b) < min_path_length) {
+		point_a = random_point();
+		point_b = random_point();
+	}
+
+	paths.push(find_path(point_a, point_b)); // Add the path to the paths array
 }
 
 function find_path_length(point_a, point_b) {
