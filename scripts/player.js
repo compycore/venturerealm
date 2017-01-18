@@ -47,38 +47,23 @@ function player_spawn() {
 }
 
 function draw_player_map() {
-        var message = "";
+	var message = "";
 
-        message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+	message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
-		player_map = map;
+	player_map = map;
 
-		player_map[player.y][player.x].character = characters.player;
+	player_map[player.y][player.x].character = characters.player;
 
-        for (y = 0; y < player_map.length; y++) {
-                if (y == 0) {
-                        // Draw the top grid line
-                        for (i = 0; i < map_size + 1; i++) {
-                                message += ". ";
+	for (y = 0; y < player_map.length; y++) {
+		for (x = 0; x < map_size; x++) {
+			message += player_map[y][x].character;
 
-                                if (i == map_size) {
-                                        message += "\n";
-                                }
-                        }
-                }
+			if (x == map_size - 1 && y < player_map.length - 1) {
+				message += "\n";
+			}
+		}
+	}
 
-                for (x = 0; x < map_size; x++) {
-                        message += characters.grid + player_map[y][x].character;
-
-                        if (x == map_size - 1) {
-                                if (y == player_map.length - 1) {
-                                        message += characters.grid;
-                                } else {
-                                        message += characters.grid + "\n";
-                                }
-                        }
-                }
-        }
-
-        log(message);
+	log(message);
 }

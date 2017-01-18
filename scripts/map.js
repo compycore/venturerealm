@@ -8,34 +8,33 @@ var min_treasure_count = 3;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var characters = {
-	n: " ",
-	e: " ",
-	s: " ",
-	w: " ",
+	n: String.fromCharCode(9593),
+	e: String.fromCharCode(9594),
+	s: String.fromCharCode(9595),
+	w: String.fromCharCode(9592),
 
-	ns: " ",
-	ew: " ",
-	nesw: " ",
+	ns: String.fromCharCode(9475),
+	ew: String.fromCharCode(9473),
+	nesw: String.fromCharCode(9547),
 
-	ne: " ",
-	es: " ",
-	sw: " ",
-	wn: " ",
+	ne: String.fromCharCode(9495),
+	es: String.fromCharCode(9487),
+	sw: String.fromCharCode(9491),
+	wn: String.fromCharCode(9499),
 
-	nes: " ",
-	esw: " ",
-	swn: " ",
-	wne: " ",
+	nes: String.fromCharCode(9507),
+	esw: String.fromCharCode(9523),
+	swn: String.fromCharCode(9515),
+	wne: String.fromCharCode(9531),
 
-	city: "C",
-	treasure: "T",
-	portal: "P",
+	city: String.fromCharCode(9689),
+	treasure: String.fromCharCode(11045),
+	portal: String.fromCharCode(11044),
 
-	black: "#",
-	gray: "%",
-	grid: ".",
+	black: String.fromCharCode(9619),
+	gray: String.fromCharCode(9617),
 
-	player: "X"
+	player: String.fromCharCode(9673)
 }
 
 function generate_map(callback) {
@@ -340,29 +339,14 @@ function find_end_tile(a, b) {
 function draw_map() {
 	var message = "";
 
-	message += characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+	message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
 	for (y = 0; y < map.length; y++) {
-		if (y == 0) {
-			// Draw the top grid line
-			for (i = 0; i < map_size + 1; i++) {
-				message += ". ";
-
-				if (i == map_size) {
-					message += "\n";
-				}
-			}
-		}
-
 		for (x = 0; x < map_size; x++) {
-			message += characters.grid + map[y][x].character;
+			message += map[y][x].character;
 
-			if (x == map_size - 1) {
-				if (y == map.length - 1) {
-					message += characters.grid;
-				} else {
-					message += characters.grid + "\n";
-				}
+			if (x == map_size - 1 && y < map.length - 1) {
+				message += "\n";
 			}
 		}
 	}
