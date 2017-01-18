@@ -49,11 +49,11 @@ function player_spawn() {
 function draw_player_map() {
         var message = "";
 
-        message += characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+        message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
 		player_map = map;
 
-		player_map[player.y][player.x].character = "@";
+		player_map[player.y][player.x].character = characters.player;
 
         for (y = 0; y < player_map.length; y++) {
                 if (y == 0) {

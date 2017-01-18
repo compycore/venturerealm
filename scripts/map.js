@@ -33,7 +33,9 @@ var characters = {
 
 	black: "#",
 	gray: "%",
-	grid: "."
+	grid: ".",
+
+	player: "X"
 }
 
 function generate_map(callback) {
