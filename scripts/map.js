@@ -367,11 +367,3 @@ function draw_map() {
 
 	log(message);
 }
-
-function probability(percent) {
-	if (Math.random() * 100 < percent) {
-		return true
-	}
-
-	return false
-}
