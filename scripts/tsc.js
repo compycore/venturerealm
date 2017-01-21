@@ -67,7 +67,7 @@ var Map = (function () {
         for (var i = 0; i < config.map.count.branches; i++) {
             map = this.makeMapBranch(map);
         }
-        applyPaths();
+        this.applyPaths();
         this.generate(characters.city, config.map.count.cities);
         this.generate(characters.treasure, config.map.count.treasure);
         this.generate(characters.portal, 1);
@@ -88,39 +88,37 @@ var Map = (function () {
         }
     };
     Map.prototype.applyPaths = function () {
-        paths.forEach(function (path) {
+        this.paths.forEach(function (path) {
             this.applyPath(path);
         });
     };
     Map.prototype.makeMapTrunk = function () {
         var pointA = this.randomPoint();
         var pointB = this.randomPoint();
-        while (getPathLength(pointA, pointB) < config.map.minPathLength) {
+        while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
             pointA = this.randomPoint();
             pointB = this.randomPoint();
         }
-        paths.push(this.findPath(pointA, pointB));
+        this.paths.push(this.findPath(pointA, pointB));
     };
     Map.prototype.makeMapBranch = function () {
         var pointA = this.paths[this.paths.length - 1][Math.floor(Math.random() * (this.paths[this.paths.length - 1].length - 1))];
         var pointB = this.randomPoint();
-        while (getPathLength(pointA, pointB) < config.map.minPathLength) {
+        while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
             pointB = this.randomPoint();
         }
-        paths.push(this.findPath(pointA, pointB));
+        this.paths.push(this.findPath(pointA, pointB));
     };
     Map.prototype.getPathLength = function (pointA, pointB) {
         return this.findPath(pointA, pointB).length;
     };
     Map.prototype.makeEmptyMap = function () {
-        var map = [];
         for (var y = 0; y < config.map.size; y++) {
-            map.push(new Array());
+            this.grid.push(new Array());
             for (var x = 0; x < config.map.size; x++) {
-                map[y][x] = makeTile({ x: x, y: y });
+                this.grid[y][x] = this.makeTile({ x: x, y: y });
             }
         }
-        return map;
     };
     Map.prototype.randomPoint = function () {
         var x = Math.floor(Math.random() * config.map.size);
@@ -160,7 +158,7 @@ var Map = (function () {
             else {
                 tile = this.getPathCharacterEnd(b, a);
             }
-            this.applyTile(makeTile(b, tile));
+            this.applyTile(this.makeTile(b, tile));
         }
     };
     Map.prototype.applyTile = function (tile) {
@@ -168,49 +166,49 @@ var Map = (function () {
         if (map[tile.y][tile.x].directions.length > 0) {
             tile.directions = combineArrays(map[tile.y][tile.x].directions, tile.directions);
         }
-        if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+        if (tile.directions.n && tile.directions.e && tile.directions.s && tile.directions.w) {
             tileCharacter = characters.nesw;
         }
-        else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
+        else if (tile.directions.n && tile.directions.e && tile.directions.s) {
             tileCharacter = characters.nes;
         }
-        else if (tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+        else if (tile.directions.e && tile.directions.s && tile.directions.w) {
             tileCharacter = characters.esw;
         }
-        else if (tile.directions.includes("s") && tile.directions.includes("w") && tile.directions.includes("n")) {
+        else if (tile.directions.s && tile.directions.w && tile.directions.n) {
             tileCharacter = characters.swn;
         }
-        else if (tile.directions.includes("w") && tile.directions.includes("n") && tile.directions.includes("e")) {
+        else if (tile.directions.w && tile.directions.n && tile.directions.e) {
             tileCharacter = characters.wne;
         }
-        else if (tile.directions.includes("n") && tile.directions.includes("s")) {
+        else if (tile.directions.n && tile.directions.s) {
             tileCharacter = characters.ns;
         }
-        else if (tile.directions.includes("e") && tile.directions.includes("w")) {
+        else if (tile.directions.e && tile.directions.w) {
             tileCharacter = characters.ew;
         }
-        else if (tile.directions.includes("n") && tile.directions.includes("e")) {
+        else if (tile.directions.n && tile.directions.e) {
             tileCharacter = characters.ne;
         }
-        else if (tile.directions.includes("e") && tile.directions.includes("s")) {
+        else if (tile.directions.e && tile.directions.s) {
             tileCharacter = characters.es;
         }
-        else if (tile.directions.includes("s") && tile.directions.includes("w")) {
+        else if (tile.directions.s && tile.directions.w) {
             tileCharacter = characters.sw;
         }
-        else if (tile.directions.includes("w") && tile.directions.includes("n")) {
+        else if (tile.directions.w && tile.directions.n) {
             tileCharacter = characters.wn;
         }
-        else if (tile.directions.includes("n")) {
+        else if (tile.directions.n) {
             tileCharacter = characters.n;
         }
-        else if (tile.directions.includes("e")) {
+        else if (tile.directions.e) {
             tileCharacter = characters.e;
         }
-        else if (tile.directions.includes("s")) {
+        else if (tile.directions.s) {
             tileCharacter = characters.s;
         }
-        else if (tile.directions.includes("w")) {
+        else if (tile.directions.w) {
             tileCharacter = characters.w;
         }
         tile.character = tileCharacter;
@@ -332,11 +330,5 @@ function probability(percent) {
 }
 function log(message) {
     document.getElementById("game_output").value = message + "\n\n" + document.getElementById("game_output").value;
-}
-function combineArrays(a, b) {
-    var c = a.concat(b.filter(function (item) {
-        return a.indexOf(item) < 0;
-    }));
-    return c;
 }
 //# sourceMappingURL=tsc.js.map

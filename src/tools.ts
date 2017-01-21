@@ -10,11 +10,3 @@ function probability(percent: number) {
 function log(message: string) {
 	(<HTMLInputElement>document.getElementById("game_output")).value = message + "\n\n" + (<HTMLInputElement>document.getElementById("game_output")).value;
 }
-
-function combineArrays(a: any[], b: any[]) {
-	let c = a.concat(b.filter(function (item: any) {
-		return a.indexOf(item) < 0;
-	}));
-
-	return c;
-}

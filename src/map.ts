@@ -34,7 +34,12 @@ interface Tile {
 	x: number,
 	y: number,
 	character: string,
-	directions: string[],
+	directions: {
+		n: boolean,
+		e: boolean,
+		s: boolean,
+		w: boolean
+	},
 	description: string
 }
 
@@ -51,7 +56,7 @@ class Map {
 			map = this.makeMapBranch(map);
 		}
 
-		applyPaths();
+		this.applyPaths();
 
 		this.generate(characters.city, config.map.count.cities);
 		this.generate(characters.treasure, config.map.count.treasure);
@@ -77,7 +82,7 @@ class Map {
 
 	// Apply all paths in the paths array to the map
 	applyPaths() {
-		paths.forEach(function(path) {
+		this.paths.forEach(function(path) {
 			this.applyPath(path);
 		})
 	}
@@ -87,23 +92,23 @@ class Map {
 		let pointA = this.randomPoint();
 		let pointB = this.randomPoint();
 
-		while (getPathLength(pointA, pointB) < config.map.minPathLength) {
+		while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
 			pointA = this.randomPoint();
 			pointB = this.randomPoint();
 		}
 
-		paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
+		this.paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
 	}
 
 	makeMapBranch() {
 		let pointA = this.paths[this.paths.length - 1][Math.floor(Math.random() * (this.paths[this.paths.length - 1].length - 1))];
 		let pointB = this.randomPoint();
 
-		while (getPathLength(pointA, pointB) < config.map.minPathLength) {
+		while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
 			pointB = this.randomPoint();
 		}
 
-		paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
+		this.paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
 	}
 
 	getPathLength(pointA, pointB) {
@@ -112,17 +117,13 @@ class Map {
 
 	// Make an empty 2D array of size config.map.size
 	makeEmptyMap() {
-		let map = [];
-
 		for (let y=0;y<config.map.size;y++) {
-			map.push(new Array());
+			this.grid.push(new Array());
 
 			for (let x=0;x<config.map.size;x++) {
-				map[y][x]=makeTile({x:x, y:y}); // Make all tiles wilderness
+				this.grid[y][x]=this.makeTile({x:x, y:y}); // Make all tiles wilderness
 			}
 		}
-
-		return map;
 	}
 
 	randomPoint() {
@@ -168,12 +169,12 @@ class Map {
 				tile = this.getPathCharacterEnd(b, a);
 			}
 
-			this.applyTile(makeTile(b, tile)); // Apply the tile
+			this.applyTile(this.makeTile(b, tile)); // Apply the tile
 		}
 	}
 
 	// Do some additive "math" so paths don't cut each other
-	applyTile(tile) {
+	applyTile(tile: Tile) {
 		let tileCharacter = characters.gray;
 
 		// Do the tile "addition"
@@ -182,35 +183,35 @@ class Map {
 		}
 
 		// Set the tile character based on the directions array
-		if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+		if (tile.directions.n && tile.directions.e && tile.directions.s && tile.directions.w) {
 			tileCharacter = characters.nesw;
-		} else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
+		} else if (tile.directions.n && tile.directions.e && tile.directions.s) {
 			tileCharacter = characters.nes;
-		} else if (tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+		} else if (tile.directions.e && tile.directions.s && tile.directions.w) {
 			tileCharacter = characters.esw;
-		} else if (tile.directions.includes("s") && tile.directions.includes("w") && tile.directions.includes("n")) {
+		} else if (tile.directions.s && tile.directions.w && tile.directions.n) {
 			tileCharacter = characters.swn;
-		} else if (tile.directions.includes("w") && tile.directions.includes("n") && tile.directions.includes("e")) {
+		} else if (tile.directions.w && tile.directions.n && tile.directions.e) {
 			tileCharacter = characters.wne;
-		} else if (tile.directions.includes("n") && tile.directions.includes("s")) {
+		} else if (tile.directions.n && tile.directions.s) {
 			tileCharacter = characters.ns;
-		} else if (tile.directions.includes("e") && tile.directions.includes("w")) {
+		} else if (tile.directions.e && tile.directions.w) {
 			tileCharacter = characters.ew;
-		} else if (tile.directions.includes("n") && tile.directions.includes("e")) {
+		} else if (tile.directions.n && tile.directions.e) {
 			tileCharacter = characters.ne;
-		} else if (tile.directions.includes("e") && tile.directions.includes("s")) {
+		} else if (tile.directions.e && tile.directions.s) {
 			tileCharacter = characters.es;
-		} else if (tile.directions.includes("s") && tile.directions.includes("w")) {
+		} else if (tile.directions.s && tile.directions.w) {
 			tileCharacter = characters.sw;
-		} else if (tile.directions.includes("w") && tile.directions.includes("n")) {
+		} else if (tile.directions.w && tile.directions.n) {
 			tileCharacter = characters.wn;
-		} else if (tile.directions.includes("n")) {
+		} else if (tile.directions.n) {
 			tileCharacter = characters.n;
-		} else if (tile.directions.includes("e")) {
+		} else if (tile.directions.e) {
 			tileCharacter = characters.e;
-		} else if (tile.directions.includes("s")) {
+		} else if (tile.directions.s) {
 			tileCharacter = characters.s;
-		} else if (tile.directions.includes("w")) {
+		} else if (tile.directions.w) {
 			tileCharacter = characters.w;
 		}
 
