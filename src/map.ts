@@ -3,38 +3,40 @@ declare var PF:any; // Tell TypeScript that we'll manage the PF pathfinding libr
 var map_size = 25;
 var map = [];
 var paths = [];
-var min_path_length = 10;
-var branch_count=10;
-var min_city_count=3;
-var min_treasure_count=3;
+var min_path_length = 12;
+var branch_count = 5;
+var min_city_count = 3;
+var min_treasure_count = 3;
 
 // https://en.wikipedia.org/wiki/Box_Drawing
 var characters = {
-	n: "\u2579",
-	e: "\u257A",
-	s: "\u257B",
-	w: "\u2578",
+	n: String.fromCharCode(9593),
+	e: String.fromCharCode(9594),
+	s: String.fromCharCode(9595),
+	w: String.fromCharCode(9592),
 
-	ns:"\u2503",
-	ew:"\u2501",
-	nesw:"\u254B",
+	ns: String.fromCharCode(9475),
+	ew: String.fromCharCode(9473),
+	nesw: String.fromCharCode(9547),
 
-	ne:"\u2517",
-	es:"\u250F",
-	sw:"\u2513",
-	wn:"\u251B",
+	ne: String.fromCharCode(9495),
+	es: String.fromCharCode(9487),
+	sw: String.fromCharCode(9491),
+	wn: String.fromCharCode(9499),
 
-	nes:"\u2523",
-	esw:"\u2533",
-	swn:"\u252B",
-	wne:"\u253B",
+	nes: String.fromCharCode(9507),
+	esw: String.fromCharCode(9523),
+	swn: String.fromCharCode(9515),
+	wne: String.fromCharCode(9531),
 
-	city:"\u25D9",
-	treasure:"\u25C6",
-	portal:"\u25EF",
+	city: String.fromCharCode(9689),
+	treasure: String.fromCharCode(11045),
+	portal: String.fromCharCode(11044),
 
-	black:"\u2588",
-	gray:"\u2591"
+	black: String.fromCharCode(9619),
+	gray: String.fromCharCode(9617),
+
+	player: String.fromCharCode(9673)
 }
 
 function generate_map() {
@@ -53,15 +55,15 @@ function generate_map() {
 }
 
 function generate_cities() {
-	var city_count=0;
+	var city_count = 0;
 
-	while (city_count<min_city_count) {
-		for (var y=0;y<map_size;y++) {
-			for (var x=0;x<map_size;x++) {
-				if (map[y][x].directions.length>0) {
+	while (city_count < min_city_count) {
+		for (y = 0; y < map_size; y++) {
+			for (x = 0; x < map_size; x++) {
+				if (map[y][x].directions.length > 0) {
 					if (probability(5)) {
 						city_count++;
-						map[y][x].character=characters.city;
+						map[y][x].character = characters.city;
 					}
 				}
 			}
@@ -70,15 +72,15 @@ function generate_cities() {
 }
 
 function generate_treasure() {
-	var treasure_count=0;
+	var treasure_count = 0;
 
-	while (treasure_count<min_treasure_count) {
-		for (var y=0;y<map_size;y++) {
-			for (var x=0;x<map_size;x++) {
-				if (map[y][x].directions.length>0) {
+	while (treasure_count < min_treasure_count) {
+		for (y = 0; y < map_size; y++) {
+			for (x = 0; x < map_size; x++) {
+				if (map[y][x].directions.length > 0) {
 					if (probability(2)) {
 						treasure_count++;
-						map[y][x].character=characters.treasure;
+						map[y][x].character = characters.treasure;
 					}
 				}
 			}
@@ -87,15 +89,15 @@ function generate_treasure() {
 }
 
 function generate_portal() {
-	var portal=false;
+	var portal = false;
 
 	while (!portal) {
-		for (var y=0;y<map_size;y++) {
-			for (var x=0;x<map_size;x++) {
-				if (map[y][x].directions.length>0) {
+		for (y = 0; y < map_size; y++) {
+			for (x = 0; x < map_size; x++) {
+				if (map[y][x].directions.length > 0) {
 					if (probability(2)) {
-						map[y][x].character=characters.portal;
-						portal=true;
+						map[y][x].character = characters.portal;
+						portal = true;
 						return;
 					}
 				}
@@ -125,7 +127,7 @@ function make_map_trunk() {
 }
 
 function make_map_branch() {
-	var point_a = paths[paths.length-1][Math.floor(Math.random() * (paths[paths.length-1].length-1))];
+	var point_a = paths[paths.length - 1][Math.floor(Math.random() * (paths[paths.length - 1].length - 1))];
 	var point_b = random_point();
 
 	while (find_path_length(point_a, point_b) < min_path_length) {
@@ -154,7 +156,7 @@ function random_point() {
 	var x = Math.floor(Math.random() * map_size);
 	var y = Math.floor(Math.random() * map_size);
 
-	return [x,y];
+	return [x, y];
 }
 
 function find_path(point_a, point_b) {
@@ -164,24 +166,33 @@ function find_path(point_a, point_b) {
 }
 
 function apply_path(path) {
-	for (var i=0;i<path.length-1;i++) {
-		var tile=characters.black;
-		var b = {x:path[i][0], y:path[i][1]} // Get the current tile
+	for (i = 0; i < path.length - 1; i++) {
+		var tile = characters.black;
+		var b = {
+				x: path[i][0],
+				y: path[i][1]
+			} // Get the current tile
 
-		if (i>0) { // Get the previous tile
-			var a = {x:path[i-1][0], y:path[i-1][1]}
+		if (i > 0) { // Get the previous tile
+			var a = {
+				x: path[i - 1][0],
+				y: path[i - 1][1]
+			}
 		}
 
-		if (i<path.length-1) { // Get the next tile
-			var c = {x:path[i+1][0], y:path[i+1][1]}
+		if (i < path.length - 1) { // Get the next tile
+			var c = {
+				x: path[i + 1][0],
+				y: path[i + 1][1]
+			}
 		}
 
-		if (i==0) { // First tile in the path
-			tile=find_end_tile(b, c);
-		} else if (i<path.length-2) { // Path middle tiles
-			tile=find_middle_tile(a, b, c);
+		if (i == 0) { // First tile in the path
+			tile = find_end_tile(b, c);
+		} else if (i < path.length - 2) { // Path middle tiles
+			tile = find_middle_tile(a, b, c);
 		} else { // Last tile in the path
-			tile=find_end_tile(b, a);
+			tile = find_end_tile(b, a);
 		}
 
 		apply_tile(make_tile(b, tile)); // Apply the tile
@@ -199,40 +210,40 @@ function apply_tile(tile) {
 
 	// Set the tile character based on the directions array
 	if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
-		tile_character=characters.nesw;
+		tile_character = characters.nesw;
 	} else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
-		tile_character=characters.nes;
+		tile_character = characters.nes;
 	} else if (tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
-		tile_character=characters.esw;
+		tile_character = characters.esw;
 	} else if (tile.directions.includes("s") && tile.directions.includes("w") && tile.directions.includes("n")) {
-		tile_character=characters.swn;
+		tile_character = characters.swn;
 	} else if (tile.directions.includes("w") && tile.directions.includes("n") && tile.directions.includes("e")) {
-		tile_character=characters.wne;
+		tile_character = characters.wne;
 	} else if (tile.directions.includes("n") && tile.directions.includes("s")) {
-		tile_character=characters.ns;
+		tile_character = characters.ns;
 	} else if (tile.directions.includes("e") && tile.directions.includes("w")) {
-		tile_character=characters.ew;
+		tile_character = characters.ew;
 	} else if (tile.directions.includes("n") && tile.directions.includes("e")) {
-		tile_character=characters.ne;
+		tile_character = characters.ne;
 	} else if (tile.directions.includes("e") && tile.directions.includes("s")) {
-		tile_character=characters.es;
+		tile_character = characters.es;
 	} else if (tile.directions.includes("s") && tile.directions.includes("w")) {
-		tile_character=characters.sw;
+		tile_character = characters.sw;
 	} else if (tile.directions.includes("w") && tile.directions.includes("n")) {
-		tile_character=characters.wn;
+		tile_character = characters.wn;
 	} else if (tile.directions.includes("n")) {
-		tile_character=characters.n;
+		tile_character = characters.n;
 	} else if (tile.directions.includes("e")) {
-		tile_character=characters.e;
+		tile_character = characters.e;
 	} else if (tile.directions.includes("s")) {
-		tile_character=characters.s;
+		tile_character = characters.s;
 	} else if (tile.directions.includes("w")) {
-		tile_character=characters.w;
+		tile_character = characters.w;
 	}
 
 	tile.character = tile_character; // Apply the selected character
 
-	map[tile.y][tile.x]=tile; // Apply the tile to the map
+	map[tile.y][tile.x] = tile; // Apply the tile to the map
 }
 
 function combine_arrays(a, b) {
@@ -254,25 +265,25 @@ function make_tile(coords, tile_character = characters.gray) {
 	}
 
 	// Set the directions array for path adding
-	if (tile_character==characters.n) {
+	if (tile_character == characters.n) {
 		tile.directions = ["n"];
-	} else if (tile_character==characters.e) {
+	} else if (tile_character == characters.e) {
 		tile.directions = ["e"];
-	} else if (tile_character==characters.s) {
+	} else if (tile_character == characters.s) {
 		tile.directions = ["s"];
-	} else if (tile_character==characters.w) {
+	} else if (tile_character == characters.w) {
 		tile.directions = ["w"];
-	} else if (tile_character==characters.ns) {
+	} else if (tile_character == characters.ns) {
 		tile.directions = ["n", "s"];
-	} else if (tile_character==characters.ew) {
+	} else if (tile_character == characters.ew) {
 		tile.directions = ["e", "w"];
-	} else if (tile_character==characters.ne) {
+	} else if (tile_character == characters.ne) {
 		tile.directions = ["n", "e"];
-	} else if (tile_character==characters.es) {
+	} else if (tile_character == characters.es) {
 		tile.directions = ["e", "s"];
-	} else if (tile_character==characters.sw) {
+	} else if (tile_character == characters.sw) {
 		tile.directions = ["s", "w"];
-	} else if (tile_character==characters.wn) {
+	} else if (tile_character == characters.wn) {
 		tile.directions = ["w", "n"];
 	}
 
@@ -281,33 +292,33 @@ function make_tile(coords, tile_character = characters.gray) {
 
 function find_middle_tile(a, b, c) {
 	// Straightaway tiles
-	if (a.x==b.x && b.x==c.x) {
+	if (a.x == b.x && b.x == c.x) {
 		return characters.ns;
-	} else if (a.y==b.y && b.y==c.y) {
+	} else if (a.y == b.y && b.y == c.y) {
 		return characters.ew;
 	}
 
 	// Turning tiles
-	if ((a.y<b.y && c.x>b.x) || (a.x>b.x && c.y<b.y)) {
+	if ((a.y < b.y && c.x > b.x) || (a.x > b.x && c.y < b.y)) {
 		return characters.ne;
-	} else if ((a.x>b.x && c.y>b.y) || (a.y>b.y && c.x>b.x)) {
+	} else if ((a.x > b.x && c.y > b.y) || (a.y > b.y && c.x > b.x)) {
 		return characters.es;
-	} else if ((a.y>b.y && c.x<b.x) || (a.x<b.x && c.y>b.y)) {
+	} else if ((a.y > b.y && c.x < b.x) || (a.x < b.x && c.y > b.y)) {
 		return characters.sw;
-	} else if ((a.x<b.x && c.y<b.y) || (a.y<b.y && c.x<b.x)) {
+	} else if ((a.x < b.x && c.y < b.y) || (a.y < b.y && c.x < b.x)) {
 		return characters.wn;
 	}
 }
 
 function find_end_tile(a, b) {
-	if (a.x==b.x) {
-		if (a.y<b.y) {
+	if (a.x == b.x) {
+		if (a.y < b.y) {
 			return characters.s;
 		} else {
 			return characters.n;
 		}
 	} else {
-		if (a.x<b.x) {
+		if (a.x < b.x) {
 			return characters.e;
 		} else {
 			return characters.w;
@@ -316,27 +327,19 @@ function find_end_tile(a, b) {
 }
 
 function draw_map() {
-	var message="";
+	var message = "";
 
-	message+=characters.city + " city " + characters.treasure + " treasure " + characters.portal + " portal\n";
+	message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
-	for (var y=0;y<map.length;y++) {
-		for (var x=0;x<map_size;x++) {
-			message+=map[y][x].character;
+	for (y = 0; y < map.length; y++) {
+		for (x = 0; x < map_size; x++) {
+			message += map[y][x].character;
 
-			if (x==map_size-1 && y<map.length-1) {
-				message+="\n";
+			if (x == map_size - 1 && y < map.length - 1) {
+				message += "\n";
 			}
 		}
 	}
 
 	log(message);
-}
-
-function probability(percent) {
-	if (Math.random() * 100 < percent) {
-		return true
-	}
-
-	return false
 }
