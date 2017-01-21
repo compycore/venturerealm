@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"removeComments": true,
+		"noImplicitAny": true,
 		"outFile": "scripts/tsc.js",
 		"sourceMap": true
 	},

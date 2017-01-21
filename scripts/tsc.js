@@ -2,42 +2,44 @@ function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
     generate_map();
+    player_spawn();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 }
 var map_size = 25;
-var map = [];
-var paths = [];
-var min_path_length = 10;
-var branch_count = 10;
+var map;
+var paths;
+var min_path_length = 12;
+var branch_count = 5;
 var min_city_count = 3;
 var min_treasure_count = 3;
 var characters = {
-    n: "\u2579",
-    e: "\u257A",
-    s: "\u257B",
-    w: "\u2578",
-    ns: "\u2503",
-    ew: "\u2501",
-    nesw: "\u254B",
-    ne: "\u2517",
-    es: "\u250F",
-    sw: "\u2513",
-    wn: "\u251B",
-    nes: "\u2523",
-    esw: "\u2533",
-    swn: "\u252B",
-    wne: "\u253B",
-    city: "\u25D9",
-    treasure: "\u25C6",
-    portal: "\u25EF",
-    black: "\u2588",
-    gray: "\u2591"
+    n: String.fromCharCode(9593),
+    e: String.fromCharCode(9594),
+    s: String.fromCharCode(9595),
+    w: String.fromCharCode(9592),
+    ns: String.fromCharCode(9475),
+    ew: String.fromCharCode(9473),
+    nesw: String.fromCharCode(9547),
+    ne: String.fromCharCode(9495),
+    es: String.fromCharCode(9487),
+    sw: String.fromCharCode(9491),
+    wn: String.fromCharCode(9499),
+    nes: String.fromCharCode(9507),
+    esw: String.fromCharCode(9523),
+    swn: String.fromCharCode(9515),
+    wne: String.fromCharCode(9531),
+    city: String.fromCharCode(9689),
+    treasure: String.fromCharCode(11045),
+    portal: String.fromCharCode(11044),
+    black: String.fromCharCode(9619),
+    gray: String.fromCharCode(9617),
+    player: String.fromCharCode(9673)
 };
 function generate_map() {
-    make_empty_map();
+    var map = make_empty_map();
     make_map_trunk();
     for (var i = 0; i < branch_count; i++) {
-        make_map_branch();
+        map = make_map_branch(map);
     }
     apply_paths();
     generate_cities();
@@ -116,12 +118,14 @@ function find_path_length(point_a, point_b) {
     return find_path(point_a, point_b).length;
 }
 function make_empty_map() {
+    var map = [];
     for (var y = 0; y < map_size; y++) {
         map.push(new Array());
         for (var x = 0; x < map_size; x++) {
             map[y][x] = make_tile({ x: x, y: y });
         }
     }
+    return map;
 }
 function random_point() {
     var x = Math.floor(Math.random() * map_size);
@@ -136,12 +140,21 @@ function find_path(point_a, point_b) {
 function apply_path(path) {
     for (var i = 0; i < path.length - 1; i++) {
         var tile = characters.black;
-        var b = { x: path[i][0], y: path[i][1] };
+        var b = {
+            x: path[i][0],
+            y: path[i][1]
+        };
         if (i > 0) {
-            var a = { x: path[i - 1][0], y: path[i - 1][1] };
+            var a = {
+                x: path[i - 1][0],
+                y: path[i - 1][1]
+            };
         }
         if (i < path.length - 1) {
-            var c = { x: path[i + 1][0], y: path[i + 1][1] };
+            var c = {
+                x: path[i + 1][0],
+                y: path[i + 1][1]
+            };
         }
         if (i == 0) {
             tile = find_end_tile(b, c);
@@ -216,13 +229,7 @@ function combine_arrays(a, b) {
 }
 function make_tile(coords, tile_character) {
     if (tile_character === void 0) { tile_character = characters.gray; }
-    var tile = {
-        x: coords.x,
-        y: coords.y,
-        character: tile_character,
-        directions: [],
-        description: "The road extends to the north and the east."
-    };
+    var tile = {};
     if (tile_character == characters.n) {
         tile.directions = ["n"];
     }
@@ -295,7 +302,7 @@ function find_end_tile(a, b) {
 }
 function draw_map() {
     var message = "";
-    message += characters.city + " city " + characters.treasure + " treasure " + characters.portal + " portal\n";
+    message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
     for (var y = 0; y < map.length; y++) {
         for (var x = 0; x < map_size; x++) {
             message += map[y][x].character;
@@ -306,17 +313,15 @@ function draw_map() {
     }
     log(message);
 }
-function probability(percent) {
-    if (Math.random() * 100 < percent) {
-        return true;
-    }
-    return false;
-}
+var player = {
+    spawned: false,
+    x: 0,
+    y: 0
+};
+var player_map = [];
 document.getElementById("player_input").onkeypress = function (e) {
-    if (!e)
-        e = window.event;
     var keyCode = e.keyCode || e.which;
-    if (keyCode == '13') {
+    if (keyCode == 13) {
         input(document.getElementById("player_input").value);
         document.getElementById("player_input").value = "";
         return false;
@@ -329,11 +334,46 @@ function input(value) {
         log("Available commands are:\n'map'");
     }
     else if (value == "map") {
-        draw_map();
+        draw_player_map();
     }
     else {
         log("Unknown command.");
     }
+}
+function player_spawn() {
+    while (!player.spawned) {
+        for (var y = 0; y < map_size; y++) {
+            for (var x = 0; x < map_size; x++) {
+                if (probability(2) && map[y][x].directions.length > 0 && map[y][x].character != characters.city && map[y][x].character != characters.treasure && map[y][x].characters != characters.portal) {
+                    player.x = x;
+                    player.y = y;
+                    player.spawned = true;
+                    return;
+                }
+            }
+        }
+    }
+}
+function draw_player_map() {
+    var message = "";
+    message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+    player_map = map;
+    player_map[player.y][player.x].character = characters.player;
+    for (var y = 0; y < player_map.length; y++) {
+        for (var x = 0; x < map_size; x++) {
+            message += player_map[y][x].character;
+            if (x == map_size - 1 && y < player_map.length - 1) {
+                message += "\n";
+            }
+        }
+    }
+    log(message);
+}
+function probability(percent) {
+    if (Math.random() * 100 < percent) {
+        return true;
+    }
+    return false;
 }
 function log(message) {
     document.getElementById("game_output").value = message + "\n\n" + document.getElementById("game_output").value;

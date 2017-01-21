@@ -1,15 +1,23 @@
-declare var PF:any; // Tell TypeScript that we'll manage the PF pathfinding library ourselves
+declare let PF:any; // Tell TypeScript that we'll manage the PF pathfinding library ourselves
 
-var map_size = 25;
-var map = [];
-var paths = [];
-var min_path_length = 12;
-var branch_count = 5;
-var min_city_count = 3;
-var min_treasure_count = 3;
+let map_size = 25;
+let map : number[][];
+let paths : number[][];
+let min_path_length = 12;
+let branch_count = 5;
+let min_city_count = 3;
+let min_treasure_count = 3;
+
+interface Tile {
+	x: number,
+	y: number,
+	character: string,
+	directions: string[],
+	description: string
+}
 
 // https://en.wikipedia.org/wiki/Box_Drawing
-var characters = {
+let characters = {
 	n: String.fromCharCode(9593),
 	e: String.fromCharCode(9594),
 	s: String.fromCharCode(9595),
@@ -40,11 +48,11 @@ var characters = {
 }
 
 function generate_map() {
-	make_empty_map();
+	let map = make_empty_map();
 	make_map_trunk();
 
-	for (var i=0;i<branch_count;i++) {
-		make_map_branch();
+	for (let i=0;i<branch_count;i++) {
+		map = make_map_branch(map);
 	}
 
 	apply_paths();
@@ -55,11 +63,11 @@ function generate_map() {
 }
 
 function generate_cities() {
-	var city_count = 0;
+	let city_count = 0;
 
 	while (city_count < min_city_count) {
-		for (y = 0; y < map_size; y++) {
-			for (x = 0; x < map_size; x++) {
+		for (let y = 0; y < map_size; y++) {
+			for (let x = 0; x < map_size; x++) {
 				if (map[y][x].directions.length > 0) {
 					if (probability(5)) {
 						city_count++;
@@ -72,11 +80,11 @@ function generate_cities() {
 }
 
 function generate_treasure() {
-	var treasure_count = 0;
+	let treasure_count = 0;
 
 	while (treasure_count < min_treasure_count) {
-		for (y = 0; y < map_size; y++) {
-			for (x = 0; x < map_size; x++) {
+		for (let y = 0; y < map_size; y++) {
+			for (let x = 0; x < map_size; x++) {
 				if (map[y][x].directions.length > 0) {
 					if (probability(2)) {
 						treasure_count++;
@@ -89,11 +97,11 @@ function generate_treasure() {
 }
 
 function generate_portal() {
-	var portal = false;
+	let portal = false;
 
 	while (!portal) {
-		for (y = 0; y < map_size; y++) {
-			for (x = 0; x < map_size; x++) {
+		for (let y = 0; y < map_size; y++) {
+			for (let x = 0; x < map_size; x++) {
 				if (map[y][x].directions.length > 0) {
 					if (probability(2)) {
 						map[y][x].character = characters.portal;
@@ -115,8 +123,8 @@ function apply_paths() {
 
 // Make the main path to start the path branching
 function make_map_trunk() {
-	var point_a = random_point();
-	var point_b = random_point();
+	let point_a = random_point();
+	let point_b = random_point();
 
 	while (find_path_length(point_a, point_b) < min_path_length) {
 		point_a = random_point();
@@ -127,8 +135,8 @@ function make_map_trunk() {
 }
 
 function make_map_branch() {
-	var point_a = paths[paths.length - 1][Math.floor(Math.random() * (paths[paths.length - 1].length - 1))];
-	var point_b = random_point();
+	let point_a = paths[paths.length - 1][Math.floor(Math.random() * (paths[paths.length - 1].length - 1))];
+	let point_b = random_point();
 
 	while (find_path_length(point_a, point_b) < min_path_length) {
 		point_b = random_point();
@@ -143,45 +151,49 @@ function find_path_length(point_a, point_b) {
 
 // Make an empty 2D array of size map_size
 function make_empty_map() {
-	for (var y=0;y<map_size;y++) {
+	let map = [];
+
+	for (let y=0;y<map_size;y++) {
 		map.push(new Array());
 
-		for (var x=0;x<map_size;x++) {
+		for (let x=0;x<map_size;x++) {
 			map[y][x]=make_tile({x:x, y:y}); // Make all tiles wilderness
 		}
 	}
+
+	return map;
 }
 
 function random_point() {
-	var x = Math.floor(Math.random() * map_size);
-	var y = Math.floor(Math.random() * map_size);
+	let x = Math.floor(Math.random() * map_size);
+	let y = Math.floor(Math.random() * map_size);
 
 	return [x, y];
 }
 
 function find_path(point_a, point_b) {
-	var grid = new PF.Grid(map_size, map_size);
-	var finder = new PF.AStarFinder();
+	let grid = new PF.Grid(map_size, map_size);
+	let finder = new PF.AStarFinder();
 	return finder.findPath(point_a[0], point_a[1], point_b[0], point_b[1], grid);
 }
 
 function apply_path(path) {
-	for (i = 0; i < path.length - 1; i++) {
-		var tile = characters.black;
-		var b = {
-				x: path[i][0],
-				y: path[i][1]
-			} // Get the current tile
+	for (let i = 0; i < path.length - 1; i++) {
+		let tile = characters.black;
+		let b = {
+			x: path[i][0],
+			y: path[i][1]
+		} // Get the current tile
 
 		if (i > 0) { // Get the previous tile
-			var a = {
+			let a = {
 				x: path[i - 1][0],
 				y: path[i - 1][1]
 			}
 		}
 
 		if (i < path.length - 1) { // Get the next tile
-			var c = {
+			let c = {
 				x: path[i + 1][0],
 				y: path[i + 1][1]
 			}
@@ -201,7 +213,7 @@ function apply_path(path) {
 
 // Do some additive "math" so paths don't cut each other
 function apply_tile(tile) {
-	var tile_character = characters.gray;
+	let tile_character = characters.gray;
 
 	// Do the tile "addition"
 	if (map[tile.y][tile.x].directions.length > 0) {
@@ -247,7 +259,7 @@ function apply_tile(tile) {
 }
 
 function combine_arrays(a, b) {
-	var c = a.concat(b.filter(function (item) {
+	let c = a.concat(b.filter(function (item) {
 		return a.indexOf(item) < 0;
 	}));
 
@@ -256,12 +268,7 @@ function combine_arrays(a, b) {
 
 // Make a tile object
 function make_tile(coords, tile_character = characters.gray) {
-	var tile = {
-		x: coords.x,
-		y: coords.y,
-		character: tile_character,
-		directions: [],
-		description: "The road extends to the north and the east."
+	let tile = {
 	}
 
 	// Set the directions array for path adding
@@ -327,12 +334,12 @@ function find_end_tile(a, b) {
 }
 
 function draw_map() {
-	var message = "";
+	let message = "";
 
 	message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
-	for (y = 0; y < map.length; y++) {
-		for (x = 0; x < map_size; x++) {
+	for (let y = 0; y < map.length; y++) {
+		for (let x = 0; x < map_size; x++) {
 			message += map[y][x].character;
 
 			if (x == map_size - 1 && y < map.length - 1) {
