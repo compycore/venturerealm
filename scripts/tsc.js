@@ -1,17 +1,42 @@
+var config = {
+    map: {
+        size: 25,
+        minPathLength: 12,
+        count: {
+            branches: 5,
+            cities: 3,
+            treasure: 3
+        }
+    }
+};
+document.getElementById("player_input").onkeypress = function (e) {
+    var keyCode = e.keyCode || e.which;
+    if (keyCode == 13) {
+        input(document.getElementById("player_input").value);
+        document.getElementById("player_input").value = "";
+        return false;
+    }
+};
+function input(value) {
+    console.log(value);
+    value = value.toLowerCase();
+    if (value == "help") {
+        log("Available commands are:\n'map'");
+    }
+    else if (value == "map") {
+        map.draw();
+    }
+    else {
+        log("Unknown command.");
+    }
+}
+var map = new Map();
+var player = new Player(map);
 function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
-    generate_map();
-    player_spawn();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 }
-var map_size = 25;
-var map;
-var paths;
-var min_path_length = 12;
-var branch_count = 5;
-var min_city_count = 3;
-var min_treasure_count = 3;
 var characters = {
     n: String.fromCharCode(9593),
     e: String.fromCharCode(9594),
@@ -35,340 +60,270 @@ var characters = {
     gray: String.fromCharCode(9617),
     player: String.fromCharCode(9673)
 };
-function generate_map() {
-    var map = make_empty_map();
-    make_map_trunk();
-    for (var i = 0; i < branch_count; i++) {
-        map = make_map_branch(map);
+var Map = (function () {
+    function Map() {
+        this.makeEmptyMap();
+        this.makeMapTrunk();
+        for (var i = 0; i < config.map.count.branches; i++) {
+            map = this.makeMapBranch(map);
+        }
+        applyPaths();
+        this.generate(characters.city, config.map.count.cities);
+        this.generate(characters.treasure, config.map.count.treasure);
+        this.generate(characters.portal, 1);
     }
-    apply_paths();
-    generate_cities();
-    generate_treasure();
-    generate_portal();
-}
-function generate_cities() {
-    var city_count = 0;
-    while (city_count < min_city_count) {
-        for (var y = 0; y < map_size; y++) {
-            for (var x = 0; x < map_size; x++) {
-                if (map[y][x].directions.length > 0) {
-                    if (probability(5)) {
-                        city_count++;
-                        map[y][x].character = characters.city;
+    Map.prototype.generate = function (character, count) {
+        var currentCount = 0;
+        while (currentCount < count) {
+            for (var y = 0; y < config.map.size; y++) {
+                for (var x = 0; x < config.map.size; x++) {
+                    if (map[y][x].directions.length > 0) {
+                        if (probability(2)) {
+                            currentCount++;
+                            map[y][x].character = character;
+                        }
                     }
                 }
             }
         }
-    }
-}
-function generate_treasure() {
-    var treasure_count = 0;
-    while (treasure_count < min_treasure_count) {
-        for (var y = 0; y < map_size; y++) {
-            for (var x = 0; x < map_size; x++) {
-                if (map[y][x].directions.length > 0) {
-                    if (probability(2)) {
-                        treasure_count++;
-                        map[y][x].character = characters.treasure;
-                    }
+    };
+    Map.prototype.applyPaths = function () {
+        paths.forEach(function (path) {
+            this.applyPath(path);
+        });
+    };
+    Map.prototype.makeMapTrunk = function () {
+        var pointA = this.randomPoint();
+        var pointB = this.randomPoint();
+        while (getPathLength(pointA, pointB) < config.map.minPathLength) {
+            pointA = this.randomPoint();
+            pointB = this.randomPoint();
+        }
+        paths.push(this.findPath(pointA, pointB));
+    };
+    Map.prototype.makeMapBranch = function () {
+        var pointA = this.paths[this.paths.length - 1][Math.floor(Math.random() * (this.paths[this.paths.length - 1].length - 1))];
+        var pointB = this.randomPoint();
+        while (getPathLength(pointA, pointB) < config.map.minPathLength) {
+            pointB = this.randomPoint();
+        }
+        paths.push(this.findPath(pointA, pointB));
+    };
+    Map.prototype.getPathLength = function (pointA, pointB) {
+        return this.findPath(pointA, pointB).length;
+    };
+    Map.prototype.makeEmptyMap = function () {
+        var map = [];
+        for (var y = 0; y < config.map.size; y++) {
+            map.push(new Array());
+            for (var x = 0; x < config.map.size; x++) {
+                map[y][x] = makeTile({ x: x, y: y });
+            }
+        }
+        return map;
+    };
+    Map.prototype.randomPoint = function () {
+        var x = Math.floor(Math.random() * config.map.size);
+        var y = Math.floor(Math.random() * config.map.size);
+        return [x, y];
+    };
+    Map.prototype.findPath = function (pointA, pointB) {
+        var grid = new PF.Grid(config.map.size, config.map.size);
+        var finder = new PF.AStarFinder();
+        return finder.findPath(pointA[0], pointA[1], pointB[0], pointB[1], grid);
+    };
+    Map.prototype.applyPath = function (path) {
+        for (var i = 0; i < path.length - 1; i++) {
+            var tile = characters.black;
+            var b = {
+                x: path[i][0],
+                y: path[i][1]
+            };
+            if (i > 0) {
+                var a = {
+                    x: path[i - 1][0],
+                    y: path[i - 1][1]
+                };
+            }
+            if (i < path.length - 1) {
+                var c = {
+                    x: path[i + 1][0],
+                    y: path[i + 1][1]
+                };
+            }
+            if (i == 0) {
+                tile = this.getPathCharacterEnd(b, c);
+            }
+            else if (i < path.length - 2) {
+                tile = this.getPathCharacterMiddle(a, b, c);
+            }
+            else {
+                tile = this.getPathCharacterEnd(b, a);
+            }
+            this.applyTile(makeTile(b, tile));
+        }
+    };
+    Map.prototype.applyTile = function (tile) {
+        var tileCharacter = characters.gray;
+        if (map[tile.y][tile.x].directions.length > 0) {
+            tile.directions = combineArrays(map[tile.y][tile.x].directions, tile.directions);
+        }
+        if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+            tileCharacter = characters.nesw;
+        }
+        else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
+            tileCharacter = characters.nes;
+        }
+        else if (tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
+            tileCharacter = characters.esw;
+        }
+        else if (tile.directions.includes("s") && tile.directions.includes("w") && tile.directions.includes("n")) {
+            tileCharacter = characters.swn;
+        }
+        else if (tile.directions.includes("w") && tile.directions.includes("n") && tile.directions.includes("e")) {
+            tileCharacter = characters.wne;
+        }
+        else if (tile.directions.includes("n") && tile.directions.includes("s")) {
+            tileCharacter = characters.ns;
+        }
+        else if (tile.directions.includes("e") && tile.directions.includes("w")) {
+            tileCharacter = characters.ew;
+        }
+        else if (tile.directions.includes("n") && tile.directions.includes("e")) {
+            tileCharacter = characters.ne;
+        }
+        else if (tile.directions.includes("e") && tile.directions.includes("s")) {
+            tileCharacter = characters.es;
+        }
+        else if (tile.directions.includes("s") && tile.directions.includes("w")) {
+            tileCharacter = characters.sw;
+        }
+        else if (tile.directions.includes("w") && tile.directions.includes("n")) {
+            tileCharacter = characters.wn;
+        }
+        else if (tile.directions.includes("n")) {
+            tileCharacter = characters.n;
+        }
+        else if (tile.directions.includes("e")) {
+            tileCharacter = characters.e;
+        }
+        else if (tile.directions.includes("s")) {
+            tileCharacter = characters.s;
+        }
+        else if (tile.directions.includes("w")) {
+            tileCharacter = characters.w;
+        }
+        tile.character = tileCharacter;
+        map[tile.y][tile.x] = tile;
+    };
+    Map.prototype.makeTile = function (coords, tileCharacter) {
+        if (tileCharacter === void 0) { tileCharacter = characters.gray; }
+        if (tileCharacter == characters.n) {
+            tile.directions = ["n"];
+        }
+        else if (tileCharacter == characters.e) {
+            tile.directions = ["e"];
+        }
+        else if (tileCharacter == characters.s) {
+            tile.directions = ["s"];
+        }
+        else if (tileCharacter == characters.w) {
+            tile.directions = ["w"];
+        }
+        else if (tileCharacter == characters.ns) {
+            tile.directions = ["n", "s"];
+        }
+        else if (tileCharacter == characters.ew) {
+            tile.directions = ["e", "w"];
+        }
+        else if (tileCharacter == characters.ne) {
+            tile.directions = ["n", "e"];
+        }
+        else if (tileCharacter == characters.es) {
+            tile.directions = ["e", "s"];
+        }
+        else if (tileCharacter == characters.sw) {
+            tile.directions = ["s", "w"];
+        }
+        else if (tileCharacter == characters.wn) {
+            tile.directions = ["w", "n"];
+        }
+        return tile;
+    };
+    Map.prototype.getPathCharacterMiddle = function (a, b, c) {
+        if (a.x == b.x && b.x == c.x) {
+            return characters.ns;
+        }
+        else if (a.y == b.y && b.y == c.y) {
+            return characters.ew;
+        }
+        if ((a.y < b.y && c.x > b.x) || (a.x > b.x && c.y < b.y)) {
+            return characters.ne;
+        }
+        else if ((a.x > b.x && c.y > b.y) || (a.y > b.y && c.x > b.x)) {
+            return characters.es;
+        }
+        else if ((a.y > b.y && c.x < b.x) || (a.x < b.x && c.y > b.y)) {
+            return characters.sw;
+        }
+        else if ((a.x < b.x && c.y < b.y) || (a.y < b.y && c.x < b.x)) {
+            return characters.wn;
+        }
+    };
+    Map.prototype.getPathCharacterEnd = function (a, b) {
+        if (a.x == b.x) {
+            if (a.y < b.y) {
+                return characters.s;
+            }
+            else {
+                return characters.n;
+            }
+        }
+        else {
+            if (a.x < b.x) {
+                return characters.e;
+            }
+            else {
+                return characters.w;
+            }
+        }
+    };
+    Map.prototype.draw = function () {
+        var message = "";
+        message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+        for (var y = 0; y < map.length; y++) {
+            for (var x = 0; x < config.map.size; x++) {
+                message += map[y][x].character;
+                if (x == config.map.size - 1 && y < map.length - 1) {
+                    message += "\n";
                 }
             }
         }
+        log(message);
+    };
+    return Map;
+}());
+var Player = (function () {
+    function Player(map) {
+        this.spawned = false;
+        this.spawn(map);
     }
-}
-function generate_portal() {
-    var portal = false;
-    while (!portal) {
-        for (var y = 0; y < map_size; y++) {
-            for (var x = 0; x < map_size; x++) {
-                if (map[y][x].directions.length > 0) {
-                    if (probability(2)) {
-                        map[y][x].character = characters.portal;
-                        portal = true;
+    Player.prototype.spawn = function (map) {
+        while (!this.spawned) {
+            for (var y = 0; y < config.map.size; y++) {
+                for (var x = 0; x < config.map.size; x++) {
+                    if (probability(2) && map.grid[y][x].directions.length > 0 && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                        this.x = x;
+                        this.y = y;
+                        this.spawned = true;
                         return;
                     }
                 }
             }
         }
-    }
-}
-function apply_paths() {
-    paths.forEach(function (path) {
-        apply_path(path);
-    });
-}
-function make_map_trunk() {
-    var point_a = random_point();
-    var point_b = random_point();
-    while (find_path_length(point_a, point_b) < min_path_length) {
-        point_a = random_point();
-        point_b = random_point();
-    }
-    paths.push(find_path(point_a, point_b));
-}
-function make_map_branch() {
-    var point_a = paths[paths.length - 1][Math.floor(Math.random() * (paths[paths.length - 1].length - 1))];
-    var point_b = random_point();
-    while (find_path_length(point_a, point_b) < min_path_length) {
-        point_b = random_point();
-    }
-    paths.push(find_path(point_a, point_b));
-}
-function find_path_length(point_a, point_b) {
-    return find_path(point_a, point_b).length;
-}
-function make_empty_map() {
-    var map = [];
-    for (var y = 0; y < map_size; y++) {
-        map.push(new Array());
-        for (var x = 0; x < map_size; x++) {
-            map[y][x] = make_tile({ x: x, y: y });
-        }
-    }
-    return map;
-}
-function random_point() {
-    var x = Math.floor(Math.random() * map_size);
-    var y = Math.floor(Math.random() * map_size);
-    return [x, y];
-}
-function find_path(point_a, point_b) {
-    var grid = new PF.Grid(map_size, map_size);
-    var finder = new PF.AStarFinder();
-    return finder.findPath(point_a[0], point_a[1], point_b[0], point_b[1], grid);
-}
-function apply_path(path) {
-    for (var i = 0; i < path.length - 1; i++) {
-        var tile = characters.black;
-        var b = {
-            x: path[i][0],
-            y: path[i][1]
-        };
-        if (i > 0) {
-            var a = {
-                x: path[i - 1][0],
-                y: path[i - 1][1]
-            };
-        }
-        if (i < path.length - 1) {
-            var c = {
-                x: path[i + 1][0],
-                y: path[i + 1][1]
-            };
-        }
-        if (i == 0) {
-            tile = find_end_tile(b, c);
-        }
-        else if (i < path.length - 2) {
-            tile = find_middle_tile(a, b, c);
-        }
-        else {
-            tile = find_end_tile(b, a);
-        }
-        apply_tile(make_tile(b, tile));
-    }
-}
-function apply_tile(tile) {
-    var tile_character = characters.gray;
-    if (map[tile.y][tile.x].directions.length > 0) {
-        tile.directions = combine_arrays(map[tile.y][tile.x].directions, tile.directions);
-    }
-    if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
-        tile_character = characters.nesw;
-    }
-    else if (tile.directions.includes("n") && tile.directions.includes("e") && tile.directions.includes("s")) {
-        tile_character = characters.nes;
-    }
-    else if (tile.directions.includes("e") && tile.directions.includes("s") && tile.directions.includes("w")) {
-        tile_character = characters.esw;
-    }
-    else if (tile.directions.includes("s") && tile.directions.includes("w") && tile.directions.includes("n")) {
-        tile_character = characters.swn;
-    }
-    else if (tile.directions.includes("w") && tile.directions.includes("n") && tile.directions.includes("e")) {
-        tile_character = characters.wne;
-    }
-    else if (tile.directions.includes("n") && tile.directions.includes("s")) {
-        tile_character = characters.ns;
-    }
-    else if (tile.directions.includes("e") && tile.directions.includes("w")) {
-        tile_character = characters.ew;
-    }
-    else if (tile.directions.includes("n") && tile.directions.includes("e")) {
-        tile_character = characters.ne;
-    }
-    else if (tile.directions.includes("e") && tile.directions.includes("s")) {
-        tile_character = characters.es;
-    }
-    else if (tile.directions.includes("s") && tile.directions.includes("w")) {
-        tile_character = characters.sw;
-    }
-    else if (tile.directions.includes("w") && tile.directions.includes("n")) {
-        tile_character = characters.wn;
-    }
-    else if (tile.directions.includes("n")) {
-        tile_character = characters.n;
-    }
-    else if (tile.directions.includes("e")) {
-        tile_character = characters.e;
-    }
-    else if (tile.directions.includes("s")) {
-        tile_character = characters.s;
-    }
-    else if (tile.directions.includes("w")) {
-        tile_character = characters.w;
-    }
-    tile.character = tile_character;
-    map[tile.y][tile.x] = tile;
-}
-function combine_arrays(a, b) {
-    var c = a.concat(b.filter(function (item) {
-        return a.indexOf(item) < 0;
-    }));
-    return c;
-}
-function make_tile(coords, tile_character) {
-    if (tile_character === void 0) { tile_character = characters.gray; }
-    var tile = {};
-    if (tile_character == characters.n) {
-        tile.directions = ["n"];
-    }
-    else if (tile_character == characters.e) {
-        tile.directions = ["e"];
-    }
-    else if (tile_character == characters.s) {
-        tile.directions = ["s"];
-    }
-    else if (tile_character == characters.w) {
-        tile.directions = ["w"];
-    }
-    else if (tile_character == characters.ns) {
-        tile.directions = ["n", "s"];
-    }
-    else if (tile_character == characters.ew) {
-        tile.directions = ["e", "w"];
-    }
-    else if (tile_character == characters.ne) {
-        tile.directions = ["n", "e"];
-    }
-    else if (tile_character == characters.es) {
-        tile.directions = ["e", "s"];
-    }
-    else if (tile_character == characters.sw) {
-        tile.directions = ["s", "w"];
-    }
-    else if (tile_character == characters.wn) {
-        tile.directions = ["w", "n"];
-    }
-    return tile;
-}
-function find_middle_tile(a, b, c) {
-    if (a.x == b.x && b.x == c.x) {
-        return characters.ns;
-    }
-    else if (a.y == b.y && b.y == c.y) {
-        return characters.ew;
-    }
-    if ((a.y < b.y && c.x > b.x) || (a.x > b.x && c.y < b.y)) {
-        return characters.ne;
-    }
-    else if ((a.x > b.x && c.y > b.y) || (a.y > b.y && c.x > b.x)) {
-        return characters.es;
-    }
-    else if ((a.y > b.y && c.x < b.x) || (a.x < b.x && c.y > b.y)) {
-        return characters.sw;
-    }
-    else if ((a.x < b.x && c.y < b.y) || (a.y < b.y && c.x < b.x)) {
-        return characters.wn;
-    }
-}
-function find_end_tile(a, b) {
-    if (a.x == b.x) {
-        if (a.y < b.y) {
-            return characters.s;
-        }
-        else {
-            return characters.n;
-        }
-    }
-    else {
-        if (a.x < b.x) {
-            return characters.e;
-        }
-        else {
-            return characters.w;
-        }
-    }
-}
-function draw_map() {
-    var message = "";
-    message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
-    for (var y = 0; y < map.length; y++) {
-        for (var x = 0; x < map_size; x++) {
-            message += map[y][x].character;
-            if (x == map_size - 1 && y < map.length - 1) {
-                message += "\n";
-            }
-        }
-    }
-    log(message);
-}
-var player = {
-    spawned: false,
-    x: 0,
-    y: 0
-};
-var player_map = [];
-document.getElementById("player_input").onkeypress = function (e) {
-    var keyCode = e.keyCode || e.which;
-    if (keyCode == 13) {
-        input(document.getElementById("player_input").value);
-        document.getElementById("player_input").value = "";
-        return false;
-    }
-};
-function input(value) {
-    console.log(value);
-    value = value.toLowerCase();
-    if (value == "help") {
-        log("Available commands are:\n'map'");
-    }
-    else if (value == "map") {
-        draw_player_map();
-    }
-    else {
-        log("Unknown command.");
-    }
-}
-function player_spawn() {
-    while (!player.spawned) {
-        for (var y = 0; y < map_size; y++) {
-            for (var x = 0; x < map_size; x++) {
-                if (probability(2) && map[y][x].directions.length > 0 && map[y][x].character != characters.city && map[y][x].character != characters.treasure && map[y][x].characters != characters.portal) {
-                    player.x = x;
-                    player.y = y;
-                    player.spawned = true;
-                    return;
-                }
-            }
-        }
-    }
-}
-function draw_player_map() {
-    var message = "";
-    message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
-    player_map = map;
-    player_map[player.y][player.x].character = characters.player;
-    for (var y = 0; y < player_map.length; y++) {
-        for (var x = 0; x < map_size; x++) {
-            message += player_map[y][x].character;
-            if (x == map_size - 1 && y < player_map.length - 1) {
-                message += "\n";
-            }
-        }
-    }
-    log(message);
-}
+    };
+    return Player;
+}());
 function probability(percent) {
     if (Math.random() * 100 < percent) {
         return true;
@@ -377,5 +332,11 @@ function probability(percent) {
 }
 function log(message) {
     document.getElementById("game_output").value = message + "\n\n" + document.getElementById("game_output").value;
+}
+function combineArrays(a, b) {
+    var c = a.concat(b.filter(function (item) {
+        return a.indexOf(item) < 0;
+    }));
+    return c;
 }
 //# sourceMappingURL=tsc.js.map
