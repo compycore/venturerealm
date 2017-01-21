@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"removeComments": true,
+		"outFile": "scripts/tsc.js",
+		"sourceMap": true
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

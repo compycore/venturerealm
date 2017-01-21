@@ -4,8 +4,8 @@ document.getElementById("player_input").onkeypress = function(e) {
 
 	if (keyCode == '13'){
 		// Enter pressed
-		input(document.getElementById("player_input").value); // Call the input function with the input value
-		document.getElementById("player_input").value=""; // Wipe the input field
+		input((<HTMLInputElement>document.getElementById("player_input")).value); // Call the input function with the input value
+		(<HTMLInputElement>document.getElementById("player_input")).value=""; // Wipe the input field
 		return false;
 	}
 }
@@ -25,5 +25,5 @@ function input(value) {
 
 // Prepend a message to the text area
 function log(message) {
-	document.getElementById("game_output").value=message+"\n\n"+document.getElementById("game_output").value;
+	(<HTMLInputElement>document.getElementById("game_output")).value=message+"\n\n"+(<HTMLInputElement>document.getElementById("game_output")).value;
 }

@@ -1,3 +1,5 @@
+declare var PF:any; // Tell TypeScript that we'll manage the PF pathfinding library ourselves
+
 var map_size = 25;
 var map = [];
 var paths = [];
@@ -35,32 +37,27 @@ var characters = {
 	gray:"\u2591"
 }
 
-function generate_map(callback) {
-	make_empty_map(function() {
-		make_map_trunk();
+function generate_map() {
+	make_empty_map();
+	make_map_trunk();
 
-		for (i=0;i<branch_count;i++) {
-			make_map_branch();
-		}
+	for (var i=0;i<branch_count;i++) {
+		make_map_branch();
+	}
 
-		apply_paths();
+	apply_paths();
 
-		generate_cities();
-		generate_treasure();
-		generate_portal();
-
-		if (callback) {
-			callback();
-		}
-	});
+	generate_cities();
+	generate_treasure();
+	generate_portal();
 }
 
 function generate_cities() {
 	var city_count=0;
 
 	while (city_count<min_city_count) {
-		for (y=0;y<map_size;y++) {
-			for (x=0;x<map_size;x++) {
+		for (var y=0;y<map_size;y++) {
+			for (var x=0;x<map_size;x++) {
 				if (map[y][x].directions.length>0) {
 					if (probability(5)) {
 						city_count++;
@@ -74,10 +71,10 @@ function generate_cities() {
 
 function generate_treasure() {
 	var treasure_count=0;
-	
+
 	while (treasure_count<min_treasure_count) {
-		for (y=0;y<map_size;y++) {
-			for (x=0;x<map_size;x++) {
+		for (var y=0;y<map_size;y++) {
+			for (var x=0;x<map_size;x++) {
 				if (map[y][x].directions.length>0) {
 					if (probability(2)) {
 						treasure_count++;
@@ -93,8 +90,8 @@ function generate_portal() {
 	var portal=false;
 
 	while (!portal) {
-		for (y=0;y<map_size;y++) {
-			for (x=0;x<map_size;x++) {
+		for (var y=0;y<map_size;y++) {
+			for (var x=0;x<map_size;x++) {
 				if (map[y][x].directions.length>0) {
 					if (probability(2)) {
 						map[y][x].character=characters.portal;
@@ -143,17 +140,13 @@ function find_path_length(point_a, point_b) {
 }
 
 // Make an empty 2D array of size map_size
-function make_empty_map(callback) {
-	for (y=0;y<map_size;y++) {
+function make_empty_map() {
+	for (var y=0;y<map_size;y++) {
 		map.push(new Array());
 
-		for (x=0;x<map_size;x++) {
+		for (var x=0;x<map_size;x++) {
 			map[y][x]=make_tile({x:x, y:y}); // Make all tiles wilderness
 		}
-	}
-
-	if (callback) {
-		callback();
 	}
 }
 
@@ -171,7 +164,7 @@ function find_path(point_a, point_b) {
 }
 
 function apply_path(path) {
-	for (i=0;i<path.length-1;i++) {
+	for (var i=0;i<path.length-1;i++) {
 		var tile=characters.black;
 		var b = {x:path[i][0], y:path[i][1]} // Get the current tile
 
@@ -190,7 +183,7 @@ function apply_path(path) {
 		} else { // Last tile in the path
 			tile=find_end_tile(b, a);
 		}
-		
+
 		apply_tile(make_tile(b, tile)); // Apply the tile
 	}
 }
@@ -244,7 +237,7 @@ function apply_tile(tile) {
 
 function combine_arrays(a, b) {
 	var c = a.concat(b.filter(function (item) {
-			return a.indexOf(item) < 0;
+		return a.indexOf(item) < 0;
 	}));
 
 	return c;
@@ -327,8 +320,8 @@ function draw_map() {
 
 	message+=characters.city + " city " + characters.treasure + " treasure " + characters.portal + " portal\n";
 
-	for (y=0;y<map.length;y++) {
-		for (x=0;x<map_size;x++) {
+	for (var y=0;y<map.length;y++) {
+		for (var x=0;x<map_size;x++) {
 			message+=map[y][x].character;
 
 			if (x==map_size-1 && y<map.length-1) {
