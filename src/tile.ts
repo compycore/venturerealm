@@ -105,8 +105,8 @@ class Tile implements ITile {
 	}
 
 	// Do some additive "math" so paths don't cut each other
-	apply() {
-		let tileCharacter = characters.gray;
+	apply(grid: Tile[][]) {
+		let character = characters.gray;
 
 		// Do the tile "addition"
 		this.direction.n = combineBools(map.grid[this.y][this.x].direction.n, this.direction.n);
@@ -116,39 +116,41 @@ class Tile implements ITile {
 
 		// Set the tile character based on the direction array
 		if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
-			tileCharacter = characters.nesw;
+			character = characters.nesw;
 		} else if (this.direction.n && this.direction.e && this.direction.s) {
-			tileCharacter = characters.nes;
+			character = characters.nes;
 		} else if (this.direction.e && this.direction.s && this.direction.w) {
-			tileCharacter = characters.esw;
+			character = characters.esw;
 		} else if (this.direction.s && this.direction.w && this.direction.n) {
-			tileCharacter = characters.swn;
+			character = characters.swn;
 		} else if (this.direction.w && this.direction.n && this.direction.e) {
-			tileCharacter = characters.wne;
+			character = characters.wne;
 		} else if (this.direction.n && this.direction.s) {
-			tileCharacter = characters.ns;
+			character = characters.ns;
 		} else if (this.direction.e && this.direction.w) {
-			tileCharacter = characters.ew;
+			character = characters.ew;
 		} else if (this.direction.n && this.direction.e) {
-			tileCharacter = characters.ne;
+			character = characters.ne;
 		} else if (this.direction.e && this.direction.s) {
-			tileCharacter = characters.es;
+			character = characters.es;
 		} else if (this.direction.s && this.direction.w) {
-			tileCharacter = characters.sw;
+			character = characters.sw;
 		} else if (this.direction.w && this.direction.n) {
-			tileCharacter = characters.wn;
+			character = characters.wn;
 		} else if (this.direction.n) {
-			tileCharacter = characters.n;
+			character = characters.n;
 		} else if (this.direction.e) {
-			tileCharacter = characters.e;
+			character = characters.e;
 		} else if (this.direction.s) {
-			tileCharacter = characters.s;
+			character = characters.s;
 		} else if (this.direction.w) {
-			tileCharacter = characters.w;
+			character = characters.w;
 		}
 
-		this.character = tileCharacter; // Apply the selected character
+		this.character = character; // Apply the selected character
 
-		map.grid[this.y][this.x] = this; // Apply the tile to the map
+		grid[this.y][this.x] = this; // Apply the tile to the map
+
+		return grid;
 	}
 }

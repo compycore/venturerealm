@@ -38,6 +38,15 @@ function init() {
     document.getElementById("player_input").focus();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 }
+var Point = (function () {
+    function Point(xValue, yValue) {
+        if (xValue === void 0) { xValue = 0; }
+        if (yValue === void 0) { yValue = 0; }
+        this.x = xValue;
+        this.y = yValue;
+    }
+    return Point;
+}());
 var Map = (function () {
     function Map() {
         this.makeEmptyMap();
@@ -111,29 +120,16 @@ var Map = (function () {
     Map.prototype.applyPath = function (path) {
         for (var i = 0; i < path.length - 1; i++) {
             var character = characters.black;
-            var a = {
-                x: 0,
-                y: 0
-            };
-            var b = {
-                x: path[i][0],
-                y: path[i][1]
-            };
-            var c = {
-                x: 0,
-                y: 0
-            };
+            var a = new Point();
+            var b = new Point(path[i][0], path[i][1]);
+            var c = new Point();
             if (i > 0) {
-                a = {
-                    x: path[i - 1][0],
-                    y: path[i - 1][1]
-                };
+                a.x = path[i - 1][0];
+                a.y = path[i - 1][1];
             }
             if (i < path.length - 1) {
-                c = {
-                    x: path[i + 1][0],
-                    y: path[i + 1][1]
-                };
+                c.x = path[i + 1][0];
+                c.y = path[i + 1][1];
             }
             if (i == 0) {
                 character = this.getPathCharacterEnd(b, c);
@@ -144,7 +140,7 @@ var Map = (function () {
             else {
                 character = this.getPathCharacterEnd(b, a);
             }
-            new Tile(b.x, b.y, character).apply();
+            this.grid = new Tile(b.x, b.y, character).apply(this.grid);
         }
     };
     Map.prototype.getPathCharacterMiddle = function (a, b, c) {
@@ -297,59 +293,60 @@ var Tile = (function () {
             this.direction.n = true;
         }
     }
-    Tile.prototype.apply = function () {
-        var tileCharacter = characters.gray;
+    Tile.prototype.apply = function (grid) {
+        var character = characters.gray;
         this.direction.n = combineBools(map.grid[this.y][this.x].direction.n, this.direction.n);
         this.direction.e = combineBools(map.grid[this.y][this.x].direction.e, this.direction.e);
         this.direction.s = combineBools(map.grid[this.y][this.x].direction.s, this.direction.s);
         this.direction.w = combineBools(map.grid[this.y][this.x].direction.w, this.direction.w);
         if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
-            tileCharacter = characters.nesw;
+            character = characters.nesw;
         }
         else if (this.direction.n && this.direction.e && this.direction.s) {
-            tileCharacter = characters.nes;
+            character = characters.nes;
         }
         else if (this.direction.e && this.direction.s && this.direction.w) {
-            tileCharacter = characters.esw;
+            character = characters.esw;
         }
         else if (this.direction.s && this.direction.w && this.direction.n) {
-            tileCharacter = characters.swn;
+            character = characters.swn;
         }
         else if (this.direction.w && this.direction.n && this.direction.e) {
-            tileCharacter = characters.wne;
+            character = characters.wne;
         }
         else if (this.direction.n && this.direction.s) {
-            tileCharacter = characters.ns;
+            character = characters.ns;
         }
         else if (this.direction.e && this.direction.w) {
-            tileCharacter = characters.ew;
+            character = characters.ew;
         }
         else if (this.direction.n && this.direction.e) {
-            tileCharacter = characters.ne;
+            character = characters.ne;
         }
         else if (this.direction.e && this.direction.s) {
-            tileCharacter = characters.es;
+            character = characters.es;
         }
         else if (this.direction.s && this.direction.w) {
-            tileCharacter = characters.sw;
+            character = characters.sw;
         }
         else if (this.direction.w && this.direction.n) {
-            tileCharacter = characters.wn;
+            character = characters.wn;
         }
         else if (this.direction.n) {
-            tileCharacter = characters.n;
+            character = characters.n;
         }
         else if (this.direction.e) {
-            tileCharacter = characters.e;
+            character = characters.e;
         }
         else if (this.direction.s) {
-            tileCharacter = characters.s;
+            character = characters.s;
         }
         else if (this.direction.w) {
-            tileCharacter = characters.w;
+            character = characters.w;
         }
-        this.character = tileCharacter;
-        map.grid[this.y][this.x] = this;
+        this.character = character;
+        grid[this.y][this.x] = this;
+        return grid;
     };
     return Tile;
 }());

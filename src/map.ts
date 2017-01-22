@@ -1,13 +1,23 @@
 declare let PF:any; // Tell TypeScript that we'll manage the PF pathfinding library ourselves
 
-interface Point {
+interface IPoint {
 	x: number;
 	y: number;
 }
 
+class Point implements IPoint {
+	x: number;
+	y: number;
+
+	constructor(xValue = 0, yValue = 0) {
+		this.x = xValue;
+		this.y = yValue;
+	}
+}
+
 class Map {
 	grid: Tile[][];
-	paths: number[][];
+	paths: number[][][];
 
 	constructor() {
 		this.makeEmptyMap();
@@ -30,10 +40,10 @@ class Map {
 		while (currentCount < count) {
 			for (let y = 0; y < config.map.size; y++) {
 				for (let x = 0; x < config.map.size; x++) {
-					if (map.grid[y][x].road) {
+					if (map.grid[y][x].road) { // Only place generated artifacts on road tiles
 						if (probability(2)) { // Arbitrary probability value
 							currentCount++;
-							map.grid[y][x].character = character;
+							map.grid[y][x].character = character; // Change the tile's character
 						}
 					}
 				}
@@ -43,7 +53,7 @@ class Map {
 
 	// Apply all paths in the paths array to the map
 	applyPaths() {
-		this.paths.forEach(function(path: number[]) {
+		this.paths.forEach(function(path: number[][]) {
 			this.applyPath(path);
 		})
 	}
@@ -104,33 +114,18 @@ class Map {
 		for (let i = 0; i < path.length - 1; i++) {
 			let character = characters.black;
 
-			let a = {
-				x: 0,
-				y: 0
-			}
-
-			let b = {
-				x: path[i][0],
-				y: path[i][1]
-			} // Get the current tile
-
-			let c = {
-				x: 0,
-				y: 0
-			}
+			let a = new Point();
+			let b = new Point(path[i][0], path[i][1]);
+			let c = new Point();
 
 			if (i > 0) { // Get the previous tile
-				a = {
-					x: path[i - 1][0],
-					y: path[i - 1][1]
-				}
+				a.x= path[i - 1][0];
+				a.y= path[i - 1][1];
 			}
 
 			if (i < path.length - 1) { // Get the next tile
-				c = {
-					x: path[i + 1][0],
-					y: path[i + 1][1]
-				}
+				c.x= path[i + 1][0];
+				c.y= path[i + 1][1];
 			}
 
 			if (i == 0) { // First tile in the path
@@ -141,11 +136,11 @@ class Map {
 				character = this.getPathCharacterEnd(b, a);
 			}
 
-			new Tile(b.x, b.y, character).apply(); // Make and apply the tile
+			this.grid = new Tile(b.x, b.y, character).apply(this.grid); // Make and apply the tile
 		}
 	}
 
-	getPathCharacterMiddle(a: Point, b: Point, c: Point) {
+	getPathCharacterMiddle(a: IPoint, b: IPoint, c: IPoint) {
 		// Straightaway tiles
 		if (a.x == b.x && b.x == c.x) {
 			return characters.ns;
@@ -165,7 +160,7 @@ class Map {
 		}
 	}
 
-	getPathCharacterEnd(a: Point, b: Point) {
+	getPathCharacterEnd(a: IPoint, b: IPoint) {
 		if (a.x == b.x) {
 			if (a.y < b.y) {
 				return characters.s;
