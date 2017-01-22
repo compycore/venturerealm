@@ -1,12 +1,14 @@
-let map : Map;
-let player : Player;
+// Create variables
+let map: Map;
+let player: Player;
 
 function init() {
-	console.log("Loaded");
-	document.getElementById("player_input").focus();
+    console.log("Loaded");
+    document.getElementById("player_input").focus();
 
-	log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
+    log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 
-	map = new Map();
-	player = new Player(map);
+    // Set variables
+    map = new Map();
+    player = new Player(map);
 }
