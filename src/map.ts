@@ -1,46 +1,8 @@
 declare let PF:any; // Tell TypeScript that we'll manage the PF pathfinding library ourselves
 
-let characters = {
-	n : String.fromCharCode(9593),
-	e : String.fromCharCode(9594),
-	s : String.fromCharCode(9595),
-	w : String.fromCharCode(9592),
-
-	ns : String.fromCharCode(9475),
-	ew : String.fromCharCode(9473),
-	nesw : String.fromCharCode(9547),
-
-	ne : String.fromCharCode(9495),
-	es : String.fromCharCode(9487),
-	sw : String.fromCharCode(9491),
-	wn : String.fromCharCode(9499),
-
-	nes : String.fromCharCode(9507),
-	esw : String.fromCharCode(9523),
-	swn : String.fromCharCode(9515),
-	wne : String.fromCharCode(9531),
-
-	city : String.fromCharCode(9689),
-	treasure : String.fromCharCode(11045),
-	portal : String.fromCharCode(11044),
-
-	black : String.fromCharCode(9619),
-	gray : String.fromCharCode(9617),
-
-	player : String.fromCharCode(9673)
-}
-
-interface Tile {
-	x: number,
-	y: number,
-	character: string,
-	directions: {
-		n: boolean,
-		e: boolean,
-		s: boolean,
-		w: boolean
-	},
-	description: string
+interface Point {
+	x: number;
+	y: number;
 }
 
 class Map {
@@ -111,7 +73,7 @@ class Map {
 		this.paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
 	}
 
-	getPathLength(pointA, pointB) {
+	getPathLength(pointA: number[], pointB: number[]) {
 		return this.findPath(pointA, pointB).length
 	}
 
@@ -133,7 +95,7 @@ class Map {
 		return [x, y];
 	}
 
-	findPath(pointA, pointB) {
+	findPath(pointA: number[], pointB: number[]) {
 		let grid = new PF.Grid(config.map.size, config.map.size);
 		let finder = new PF.AStarFinder();
 		return finder.findPath(pointA[0], pointA[1], pointB[0], pointB[1], grid);
@@ -142,20 +104,28 @@ class Map {
 	applyPath(path) {
 		for (let i = 0; i < path.length - 1; i++) {
 			let tile = characters.black;
+			let a = {
+				x: 0,
+				y: 0
+			}
 			let b = {
 				x: path[i][0],
 				y: path[i][1]
 			} // Get the current tile
+			let c = {
+				x: 0,
+				y: 0
+			}
 
 			if (i > 0) { // Get the previous tile
-				let a = {
+				a = {
 					x: path[i - 1][0],
 					y: path[i - 1][1]
 				}
 			}
 
 			if (i < path.length - 1) { // Get the next tile
-				let c = {
+				c = {
 					x: path[i + 1][0],
 					y: path[i + 1][1]
 				}
@@ -173,82 +143,7 @@ class Map {
 		}
 	}
 
-	// Do some additive "math" so paths don't cut each other
-	applyTile(tile: Tile) {
-		let tileCharacter = characters.gray;
-
-		// Do the tile "addition"
-		if (map[tile.y][tile.x].directions.length > 0) {
-			tile.directions = combineArrays(map[tile.y][tile.x].directions, tile.directions);
-		}
-
-		// Set the tile character based on the directions array
-		if (tile.directions.n && tile.directions.e && tile.directions.s && tile.directions.w) {
-			tileCharacter = characters.nesw;
-		} else if (tile.directions.n && tile.directions.e && tile.directions.s) {
-			tileCharacter = characters.nes;
-		} else if (tile.directions.e && tile.directions.s && tile.directions.w) {
-			tileCharacter = characters.esw;
-		} else if (tile.directions.s && tile.directions.w && tile.directions.n) {
-			tileCharacter = characters.swn;
-		} else if (tile.directions.w && tile.directions.n && tile.directions.e) {
-			tileCharacter = characters.wne;
-		} else if (tile.directions.n && tile.directions.s) {
-			tileCharacter = characters.ns;
-		} else if (tile.directions.e && tile.directions.w) {
-			tileCharacter = characters.ew;
-		} else if (tile.directions.n && tile.directions.e) {
-			tileCharacter = characters.ne;
-		} else if (tile.directions.e && tile.directions.s) {
-			tileCharacter = characters.es;
-		} else if (tile.directions.s && tile.directions.w) {
-			tileCharacter = characters.sw;
-		} else if (tile.directions.w && tile.directions.n) {
-			tileCharacter = characters.wn;
-		} else if (tile.directions.n) {
-			tileCharacter = characters.n;
-		} else if (tile.directions.e) {
-			tileCharacter = characters.e;
-		} else if (tile.directions.s) {
-			tileCharacter = characters.s;
-		} else if (tile.directions.w) {
-			tileCharacter = characters.w;
-		}
-
-		tile.character = tileCharacter; // Apply the selected character
-
-		map[tile.y][tile.x] = tile; // Apply the tile to the map
-	}
-
-	// Make a tile object
-	makeTile(coords, tileCharacter = characters.gray) {
-		// Set the directions array for path adding
-		if (tileCharacter == characters.n) {
-			tile.directions = ["n"];
-		} else if (tileCharacter == characters.e) {
-			tile.directions = ["e"];
-		} else if (tileCharacter == characters.s) {
-			tile.directions = ["s"];
-		} else if (tileCharacter == characters.w) {
-			tile.directions = ["w"];
-		} else if (tileCharacter == characters.ns) {
-			tile.directions = ["n", "s"];
-		} else if (tileCharacter == characters.ew) {
-			tile.directions = ["e", "w"];
-		} else if (tileCharacter == characters.ne) {
-			tile.directions = ["n", "e"];
-		} else if (tileCharacter == characters.es) {
-			tile.directions = ["e", "s"];
-		} else if (tileCharacter == characters.sw) {
-			tile.directions = ["s", "w"];
-		} else if (tileCharacter == characters.wn) {
-			tile.directions = ["w", "n"];
-		}
-
-		return tile
-	}
-
-	getPathCharacterMiddle(a, b, c) {
+	getPathCharacterMiddle(a: Point, b: Point, c: Point) {
 		// Straightaway tiles
 		if (a.x == b.x && b.x == c.x) {
 			return characters.ns;
@@ -268,7 +163,7 @@ class Map {
 		}
 	}
 
-	getPathCharacterEnd(a, b) {
+	getPathCharacterEnd(a: Point, b: Point) {
 		if (a.x == b.x) {
 			if (a.y < b.y) {
 				return characters.s;
@@ -289,7 +184,7 @@ class Map {
 
 		message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
-		for (let y = 0; y < map.length; y++) {
+		for (let y = 0; y < map.grid.length; y++) {
 			for (let x = 0; x < config.map.size; x++) {
 				message += map[y][x].character;
 

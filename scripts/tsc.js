@@ -37,29 +37,6 @@ function init() {
     document.getElementById("player_input").focus();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 }
-var characters = {
-    n: String.fromCharCode(9593),
-    e: String.fromCharCode(9594),
-    s: String.fromCharCode(9595),
-    w: String.fromCharCode(9592),
-    ns: String.fromCharCode(9475),
-    ew: String.fromCharCode(9473),
-    nesw: String.fromCharCode(9547),
-    ne: String.fromCharCode(9495),
-    es: String.fromCharCode(9487),
-    sw: String.fromCharCode(9491),
-    wn: String.fromCharCode(9499),
-    nes: String.fromCharCode(9507),
-    esw: String.fromCharCode(9523),
-    swn: String.fromCharCode(9515),
-    wne: String.fromCharCode(9531),
-    city: String.fromCharCode(9689),
-    treasure: String.fromCharCode(11045),
-    portal: String.fromCharCode(11044),
-    black: String.fromCharCode(9619),
-    gray: String.fromCharCode(9617),
-    player: String.fromCharCode(9673)
-};
 var Map = (function () {
     function Map() {
         this.makeEmptyMap();
@@ -133,18 +110,26 @@ var Map = (function () {
     Map.prototype.applyPath = function (path) {
         for (var i = 0; i < path.length - 1; i++) {
             var tile = characters.black;
+            var a = {
+                x: 0,
+                y: 0
+            };
             var b = {
                 x: path[i][0],
                 y: path[i][1]
             };
+            var c = {
+                x: 0,
+                y: 0
+            };
             if (i > 0) {
-                var a = {
+                a = {
                     x: path[i - 1][0],
                     y: path[i - 1][1]
                 };
             }
             if (i < path.length - 1) {
-                var c = {
+                c = {
                     x: path[i + 1][0],
                     y: path[i + 1][1]
                 };
@@ -160,93 +145,6 @@ var Map = (function () {
             }
             this.applyTile(this.makeTile(b, tile));
         }
-    };
-    Map.prototype.applyTile = function (tile) {
-        var tileCharacter = characters.gray;
-        if (map[tile.y][tile.x].directions.length > 0) {
-            tile.directions = combineArrays(map[tile.y][tile.x].directions, tile.directions);
-        }
-        if (tile.directions.n && tile.directions.e && tile.directions.s && tile.directions.w) {
-            tileCharacter = characters.nesw;
-        }
-        else if (tile.directions.n && tile.directions.e && tile.directions.s) {
-            tileCharacter = characters.nes;
-        }
-        else if (tile.directions.e && tile.directions.s && tile.directions.w) {
-            tileCharacter = characters.esw;
-        }
-        else if (tile.directions.s && tile.directions.w && tile.directions.n) {
-            tileCharacter = characters.swn;
-        }
-        else if (tile.directions.w && tile.directions.n && tile.directions.e) {
-            tileCharacter = characters.wne;
-        }
-        else if (tile.directions.n && tile.directions.s) {
-            tileCharacter = characters.ns;
-        }
-        else if (tile.directions.e && tile.directions.w) {
-            tileCharacter = characters.ew;
-        }
-        else if (tile.directions.n && tile.directions.e) {
-            tileCharacter = characters.ne;
-        }
-        else if (tile.directions.e && tile.directions.s) {
-            tileCharacter = characters.es;
-        }
-        else if (tile.directions.s && tile.directions.w) {
-            tileCharacter = characters.sw;
-        }
-        else if (tile.directions.w && tile.directions.n) {
-            tileCharacter = characters.wn;
-        }
-        else if (tile.directions.n) {
-            tileCharacter = characters.n;
-        }
-        else if (tile.directions.e) {
-            tileCharacter = characters.e;
-        }
-        else if (tile.directions.s) {
-            tileCharacter = characters.s;
-        }
-        else if (tile.directions.w) {
-            tileCharacter = characters.w;
-        }
-        tile.character = tileCharacter;
-        map[tile.y][tile.x] = tile;
-    };
-    Map.prototype.makeTile = function (coords, tileCharacter) {
-        if (tileCharacter === void 0) { tileCharacter = characters.gray; }
-        if (tileCharacter == characters.n) {
-            tile.directions = ["n"];
-        }
-        else if (tileCharacter == characters.e) {
-            tile.directions = ["e"];
-        }
-        else if (tileCharacter == characters.s) {
-            tile.directions = ["s"];
-        }
-        else if (tileCharacter == characters.w) {
-            tile.directions = ["w"];
-        }
-        else if (tileCharacter == characters.ns) {
-            tile.directions = ["n", "s"];
-        }
-        else if (tileCharacter == characters.ew) {
-            tile.directions = ["e", "w"];
-        }
-        else if (tileCharacter == characters.ne) {
-            tile.directions = ["n", "e"];
-        }
-        else if (tileCharacter == characters.es) {
-            tile.directions = ["e", "s"];
-        }
-        else if (tileCharacter == characters.sw) {
-            tile.directions = ["s", "w"];
-        }
-        else if (tileCharacter == characters.wn) {
-            tile.directions = ["w", "n"];
-        }
-        return tile;
     };
     Map.prototype.getPathCharacterMiddle = function (a, b, c) {
         if (a.x == b.x && b.x == c.x) {
@@ -289,7 +187,7 @@ var Map = (function () {
     Map.prototype.draw = function () {
         var message = "";
         message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
-        for (var y = 0; y < map.length; y++) {
+        for (var y = 0; y < map.grid.length; y++) {
             for (var x = 0; x < config.map.size; x++) {
                 message += map[y][x].character;
                 if (x == config.map.size - 1 && y < map.length - 1) {
@@ -321,6 +219,128 @@ var Player = (function () {
         }
     };
     return Player;
+}());
+var characters = {
+    n: String.fromCharCode(9593),
+    e: String.fromCharCode(9594),
+    s: String.fromCharCode(9595),
+    w: String.fromCharCode(9592),
+    ns: String.fromCharCode(9475),
+    ew: String.fromCharCode(9473),
+    nesw: String.fromCharCode(9547),
+    ne: String.fromCharCode(9495),
+    es: String.fromCharCode(9487),
+    sw: String.fromCharCode(9491),
+    wn: String.fromCharCode(9499),
+    nes: String.fromCharCode(9507),
+    esw: String.fromCharCode(9523),
+    swn: String.fromCharCode(9515),
+    wne: String.fromCharCode(9531),
+    city: String.fromCharCode(9689),
+    treasure: String.fromCharCode(11045),
+    portal: String.fromCharCode(11044),
+    black: String.fromCharCode(9619),
+    gray: String.fromCharCode(9617),
+    player: String.fromCharCode(9673)
+};
+var Tile = (function () {
+    function Tile(coords, tileCharacter) {
+        if (tileCharacter === void 0) { tileCharacter = characters.gray; }
+        this.direction.n = false;
+        this.direction.e = false;
+        this.direction.s = false;
+        this.direction.w = false;
+        if (tileCharacter == characters.n) {
+            this.direction.n;
+        }
+        else if (tileCharacter == characters.e) {
+            this.direction.e;
+        }
+        else if (tileCharacter == characters.s) {
+            this.direction.s;
+        }
+        else if (tileCharacter == characters.w) {
+            this.direction.w;
+        }
+        else if (tileCharacter == characters.ns) {
+            this.direction.n;
+            this.direction.s;
+        }
+        else if (tileCharacter == characters.ew) {
+            this.direction.e;
+            this.direction.w;
+        }
+        else if (tileCharacter == characters.ne) {
+            this.direction.n;
+            this.direction.e;
+        }
+        else if (tileCharacter == characters.es) {
+            this.direction.e;
+            this.direction.s;
+        }
+        else if (tileCharacter == characters.sw) {
+            this.direction.s;
+            this.direction.w;
+        }
+        else if (tileCharacter == characters.wn) {
+            this.direction.w;
+            this.direction.n;
+        }
+    }
+    Tile.prototype.apply = function () {
+        var tileCharacter = characters.gray;
+        if (map[this.y][this.x].direction.length > 0) {
+            this.direction = combineArrays(map[this.y][this.x].direction, this.direction);
+        }
+        if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
+            tileCharacter = characters.nesw;
+        }
+        else if (this.direction.n && this.direction.e && this.direction.s) {
+            tileCharacter = characters.nes;
+        }
+        else if (this.direction.e && this.direction.s && this.direction.w) {
+            tileCharacter = characters.esw;
+        }
+        else if (this.direction.s && this.direction.w && this.direction.n) {
+            tileCharacter = characters.swn;
+        }
+        else if (this.direction.w && this.direction.n && this.direction.e) {
+            tileCharacter = characters.wne;
+        }
+        else if (this.direction.n && this.direction.s) {
+            tileCharacter = characters.ns;
+        }
+        else if (this.direction.e && this.direction.w) {
+            tileCharacter = characters.ew;
+        }
+        else if (this.direction.n && this.direction.e) {
+            tileCharacter = characters.ne;
+        }
+        else if (this.direction.e && this.direction.s) {
+            tileCharacter = characters.es;
+        }
+        else if (this.direction.s && this.direction.w) {
+            tileCharacter = characters.sw;
+        }
+        else if (this.direction.w && this.direction.n) {
+            tileCharacter = characters.wn;
+        }
+        else if (this.direction.n) {
+            tileCharacter = characters.n;
+        }
+        else if (this.direction.e) {
+            tileCharacter = characters.e;
+        }
+        else if (this.direction.s) {
+            tileCharacter = characters.s;
+        }
+        else if (this.direction.w) {
+            tileCharacter = characters.w;
+        }
+        this.character = tileCharacter;
+        map[this.y][this.x] = tile;
+    };
+    return Tile;
 }());
 function probability(percent) {
     if (Math.random() * 100 < percent) {
