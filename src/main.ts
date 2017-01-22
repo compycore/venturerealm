@@ -1,5 +1,5 @@
-let map = new Map();
-let player = new Player(map);
+let map:Map = new Map();
+// let player = new Player(map);
 
 function init() {
 	console.log("Loaded");

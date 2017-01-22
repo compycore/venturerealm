@@ -32,7 +32,6 @@ function input(value) {
     }
 }
 var map = new Map();
-var player = new Player(map);
 function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
