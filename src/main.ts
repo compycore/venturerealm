@@ -1,4 +1,5 @@
 let map : Map;
+let player : Player;
 
 function init() {
 	console.log("Loaded");
@@ -7,6 +8,5 @@ function init() {
 	log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 
 	map = new Map();
-	map.test();
-	// let player = new Player(map);
+	player = new Player(map);
 }

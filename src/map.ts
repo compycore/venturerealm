@@ -36,10 +36,6 @@ class Map {
 		this.generate(characters.portal, 1);
 	}
 
-	test() {
-		console.log("Hello");
-	}
-
 	generate(character: string, count: number) {
 		let currentCount = 0;
 

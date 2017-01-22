@@ -30,12 +30,13 @@ function input(value) {
     }
 }
 var map;
+var player;
 function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     map = new Map();
-    map.test();
+    player = new Player(map);
 }
 var Point = (function () {
     function Point(xValue, yValue) {
@@ -60,9 +61,6 @@ var Map = (function () {
         this.generate(characters.treasure, config.map.count.treasure);
         this.generate(characters.portal, 1);
     }
-    Map.prototype.test = function () {
-        console.log("Hello");
-    };
     Map.prototype.generate = function (character, count) {
         var currentCount = 0;
         while (currentCount < count) {
@@ -245,8 +243,16 @@ var characters = {
 var Tile = (function () {
     function Tile(x, y, character) {
         if (character === void 0) { character = characters.gray; }
+        this.x = x;
+        this.y = y;
         this.road = false;
         this.character = character;
+        this.direction = {
+            n: false,
+            e: false,
+            s: false,
+            w: false
+        };
         if (this.character == characters.n) {
             this.road = true;
             this.direction.n = true;

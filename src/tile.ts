@@ -58,12 +58,16 @@ class Tile implements ITile {
 
 	constructor(x: number, y: number, character = characters.gray) {
 		// Default values
+		this.x = x;
+		this.y = y;
 		this.road=false;
 		this.character = character;
-		// this.direction.n = false;
-		// this.direction.e = false;
-		// this.direction.s = false;
-		// this.direction.w = false;
+		this.direction = {
+			n : false,
+			e : false,
+			s : false,
+			w : false
+		};
 
 		// Set the direction array for path adding
 		if (this.character == characters.n) {
