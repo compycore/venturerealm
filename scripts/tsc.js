@@ -14,6 +14,7 @@ document.getElementById("player_input").onkeypress = function (e) {
     if (keyCode == 13) {
         input(document.getElementById("player_input").value);
         document.getElementById("player_input").value = "";
+        document.getElementById("game_output").scrollTop = 0;
         return false;
     }
 };
