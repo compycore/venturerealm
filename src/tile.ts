@@ -58,11 +58,12 @@ class Tile implements ITile {
 
 	constructor(x: number, y: number, character = characters.gray) {
 		// Default values
+		this.road=false;
 		this.character = character;
-		this.direction.n = false;
-		this.direction.e = false;
-		this.direction.s = false;
-		this.direction.w = false;
+		// this.direction.n = false;
+		// this.direction.e = false;
+		// this.direction.s = false;
+		// this.direction.w = false;
 
 		// Set the direction array for path adding
 		if (this.character == characters.n) {
@@ -109,10 +110,10 @@ class Tile implements ITile {
 		let character = characters.gray;
 
 		// Do the tile "addition"
-		this.direction.n = combineBools(map.grid[this.y][this.x].direction.n, this.direction.n);
-		this.direction.e = combineBools(map.grid[this.y][this.x].direction.e, this.direction.e);
-		this.direction.s = combineBools(map.grid[this.y][this.x].direction.s, this.direction.s);
-		this.direction.w = combineBools(map.grid[this.y][this.x].direction.w, this.direction.w);
+		this.direction.n = combineBools(grid[this.y][this.x].direction.n, this.direction.n);
+		this.direction.e = combineBools(grid[this.y][this.x].direction.e, this.direction.e);
+		this.direction.s = combineBools(grid[this.y][this.x].direction.s, this.direction.s);
+		this.direction.w = combineBools(grid[this.y][this.x].direction.w, this.direction.w);
 
 		// Set the tile character based on the direction array
 		if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {

@@ -10,8 +10,6 @@ document.getElementById("player_input").onkeypress = function(e) {
 }
 
 function input(value: string) {
-	console.log(value);
-	console.log(map);
 	value = value.toLowerCase();
 
 	if (value == "help") {

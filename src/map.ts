@@ -16,10 +16,12 @@ class Point implements IPoint {
 }
 
 class Map {
-	grid: Tile[][];
+	grid: Tile[][]; // The 2D grid array
 	paths: number[][][];
 
 	constructor() {
+		this.grid=[];
+		this.paths=[];
 		this.makeEmptyMap();
 		this.makeMapTrunk();
 
@@ -34,16 +36,20 @@ class Map {
 		this.generate(characters.portal, 1);
 	}
 
+	test() {
+		console.log("Hello");
+	}
+
 	generate(character: string, count: number) {
 		let currentCount = 0;
 
 		while (currentCount < count) {
 			for (let y = 0; y < config.map.size; y++) {
 				for (let x = 0; x < config.map.size; x++) {
-					if (map.grid[y][x].road) { // Only place generated artifacts on road tiles
+					if (this.grid[y][x].road) { // Only place generated artifacts on road tiles
 						if (probability(2)) { // Arbitrary probability value
 							currentCount++;
-							map.grid[y][x].character = character; // Change the tile's character
+							this.grid[y][x].character = character; // Change the tile's character
 						}
 					}
 				}
@@ -53,9 +59,9 @@ class Map {
 
 	// Apply all paths in the paths array to the map
 	applyPaths() {
-		this.paths.forEach(function(path: number[][]) {
-			this.applyPath(path);
-		})
+		for (let i=0; i< this.paths.length; i++) {
+			this.applyPath(this.paths[i]);
+		}
 	}
 
 	// Make the main path to start the path branching
@@ -89,7 +95,7 @@ class Map {
 	// Make an empty 2D array of size config.map.size
 	makeEmptyMap() {
 		for (let y=0;y<config.map.size;y++) {
-			this.grid.push(new Array());
+			this.grid[y]=[];
 
 			for (let x=0;x<config.map.size;x++) {
 				this.grid[y][x]= new Tile(x, y);
@@ -177,13 +183,11 @@ class Map {
 	}
 
 	draw() {
-		let message = "";
+		let message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
 
-		message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
-
-		for (let y = 0; y < map.grid.length; y++) {
+		for (let y = 0; y < config.map.size; y++) {
 			for (let x = 0; x < config.map.size; x++) {
-				message += map.grid[y][x].character;
+				message += this.grid[y][x].character;
 
 				if (x == config.map.size - 1 && y < config.map.size - 1) {
 					message += "\n";

@@ -14,7 +14,7 @@ class Player implements IPlayer {
 	constructor(map: Map) {
 		this.spawned = false;
 
-		// this.spawn(map);
+		this.spawn(map);
 	}
 
 	spawn(map: Map) {

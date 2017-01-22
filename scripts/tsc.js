@@ -18,8 +18,6 @@ document.getElementById("player_input").onkeypress = function (e) {
     }
 };
 function input(value) {
-    console.log(value);
-    console.log(map);
     value = value.toLowerCase();
     if (value == "help") {
         log("Available commands are:\n'map'");
@@ -31,11 +29,13 @@ function input(value) {
         log("Unknown command.");
     }
 }
-var map = new Map();
+var map;
 function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
+    map = new Map();
+    map.test();
 }
 var Point = (function () {
     function Point(xValue, yValue) {
@@ -48,6 +48,8 @@ var Point = (function () {
 }());
 var Map = (function () {
     function Map() {
+        this.grid = [];
+        this.paths = [];
         this.makeEmptyMap();
         this.makeMapTrunk();
         for (var i = 0; i < config.map.count.branches; i++) {
@@ -58,15 +60,18 @@ var Map = (function () {
         this.generate(characters.treasure, config.map.count.treasure);
         this.generate(characters.portal, 1);
     }
+    Map.prototype.test = function () {
+        console.log("Hello");
+    };
     Map.prototype.generate = function (character, count) {
         var currentCount = 0;
         while (currentCount < count) {
             for (var y = 0; y < config.map.size; y++) {
                 for (var x = 0; x < config.map.size; x++) {
-                    if (map.grid[y][x].road) {
+                    if (this.grid[y][x].road) {
                         if (probability(2)) {
                             currentCount++;
-                            map.grid[y][x].character = character;
+                            this.grid[y][x].character = character;
                         }
                     }
                 }
@@ -74,9 +79,9 @@ var Map = (function () {
         }
     };
     Map.prototype.applyPaths = function () {
-        this.paths.forEach(function (path) {
-            this.applyPath(path);
-        });
+        for (var i = 0; i < this.paths.length; i++) {
+            this.applyPath(this.paths[i]);
+        }
     };
     Map.prototype.makeMapTrunk = function () {
         var pointA = this.randomPoint();
@@ -100,7 +105,7 @@ var Map = (function () {
     };
     Map.prototype.makeEmptyMap = function () {
         for (var y = 0; y < config.map.size; y++) {
-            this.grid.push(new Array());
+            this.grid[y] = [];
             for (var x = 0; x < config.map.size; x++) {
                 this.grid[y][x] = new Tile(x, y);
             }
@@ -181,11 +186,10 @@ var Map = (function () {
         }
     };
     Map.prototype.draw = function () {
-        var message = "";
-        message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
-        for (var y = 0; y < map.grid.length; y++) {
+        var message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+        for (var y = 0; y < config.map.size; y++) {
             for (var x = 0; x < config.map.size; x++) {
-                message += map.grid[y][x].character;
+                message += this.grid[y][x].character;
                 if (x == config.map.size - 1 && y < config.map.size - 1) {
                     message += "\n";
                 }
@@ -198,6 +202,7 @@ var Map = (function () {
 var Player = (function () {
     function Player(map) {
         this.spawned = false;
+        this.spawn(map);
     }
     Player.prototype.spawn = function (map) {
         while (!this.spawned) {
@@ -240,11 +245,8 @@ var characters = {
 var Tile = (function () {
     function Tile(x, y, character) {
         if (character === void 0) { character = characters.gray; }
+        this.road = false;
         this.character = character;
-        this.direction.n = false;
-        this.direction.e = false;
-        this.direction.s = false;
-        this.direction.w = false;
         if (this.character == characters.n) {
             this.road = true;
             this.direction.n = true;
@@ -294,10 +296,10 @@ var Tile = (function () {
     }
     Tile.prototype.apply = function (grid) {
         var character = characters.gray;
-        this.direction.n = combineBools(map.grid[this.y][this.x].direction.n, this.direction.n);
-        this.direction.e = combineBools(map.grid[this.y][this.x].direction.e, this.direction.e);
-        this.direction.s = combineBools(map.grid[this.y][this.x].direction.s, this.direction.s);
-        this.direction.w = combineBools(map.grid[this.y][this.x].direction.w, this.direction.w);
+        this.direction.n = combineBools(grid[this.y][this.x].direction.n, this.direction.n);
+        this.direction.e = combineBools(grid[this.y][this.x].direction.e, this.direction.e);
+        this.direction.s = combineBools(grid[this.y][this.x].direction.s, this.direction.s);
+        this.direction.w = combineBools(grid[this.y][this.x].direction.w, this.direction.w);
         if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
             character = characters.nesw;
         }
