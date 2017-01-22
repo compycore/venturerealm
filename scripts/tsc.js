@@ -19,6 +19,7 @@ document.getElementById("player_input").onkeypress = function (e) {
 };
 function input(value) {
     console.log(value);
+    console.log(map);
     value = value.toLowerCase();
     if (value == "help") {
         log("Available commands are:\n'map'");
@@ -42,7 +43,7 @@ var Map = (function () {
         this.makeEmptyMap();
         this.makeMapTrunk();
         for (var i = 0; i < config.map.count.branches; i++) {
-            map = this.makeMapBranch(map);
+            this.makeMapBranch();
         }
         this.applyPaths();
         this.generate(characters.city, config.map.count.cities);
@@ -54,10 +55,10 @@ var Map = (function () {
         while (currentCount < count) {
             for (var y = 0; y < config.map.size; y++) {
                 for (var x = 0; x < config.map.size; x++) {
-                    if (map[y][x].directions.length > 0) {
+                    if (map.grid[y][x].road) {
                         if (probability(2)) {
                             currentCount++;
-                            map[y][x].character = character;
+                            map.grid[y][x].character = character;
                         }
                     }
                 }
@@ -93,7 +94,7 @@ var Map = (function () {
         for (var y = 0; y < config.map.size; y++) {
             this.grid.push(new Array());
             for (var x = 0; x < config.map.size; x++) {
-                this.grid[y][x] = this.makeTile({ x: x, y: y });
+                this.grid[y][x] = new Tile(x, y);
             }
         }
     };
@@ -109,7 +110,7 @@ var Map = (function () {
     };
     Map.prototype.applyPath = function (path) {
         for (var i = 0; i < path.length - 1; i++) {
-            var tile = characters.black;
+            var character = characters.black;
             var a = {
                 x: 0,
                 y: 0
@@ -135,15 +136,15 @@ var Map = (function () {
                 };
             }
             if (i == 0) {
-                tile = this.getPathCharacterEnd(b, c);
+                character = this.getPathCharacterEnd(b, c);
             }
             else if (i < path.length - 2) {
-                tile = this.getPathCharacterMiddle(a, b, c);
+                character = this.getPathCharacterMiddle(a, b, c);
             }
             else {
-                tile = this.getPathCharacterEnd(b, a);
+                character = this.getPathCharacterEnd(b, a);
             }
-            this.applyTile(this.makeTile(b, tile));
+            new Tile(b.x, b.y, character).apply();
         }
     };
     Map.prototype.getPathCharacterMiddle = function (a, b, c) {
@@ -189,8 +190,8 @@ var Map = (function () {
         message += characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
         for (var y = 0; y < map.grid.length; y++) {
             for (var x = 0; x < config.map.size; x++) {
-                message += map[y][x].character;
-                if (x == config.map.size - 1 && y < map.length - 1) {
+                message += map.grid[y][x].character;
+                if (x == config.map.size - 1 && y < config.map.size - 1) {
                     message += "\n";
                 }
             }
@@ -202,17 +203,15 @@ var Map = (function () {
 var Player = (function () {
     function Player(map) {
         this.spawned = false;
-        this.spawn(map);
     }
     Player.prototype.spawn = function (map) {
         while (!this.spawned) {
             for (var y = 0; y < config.map.size; y++) {
                 for (var x = 0; x < config.map.size; x++) {
-                    if (probability(2) && map.grid[y][x].directions.length > 0 && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
-                        return;
                     }
                 }
             }
@@ -244,54 +243,66 @@ var characters = {
     player: String.fromCharCode(9673)
 };
 var Tile = (function () {
-    function Tile(coords, tileCharacter) {
-        if (tileCharacter === void 0) { tileCharacter = characters.gray; }
+    function Tile(x, y, character) {
+        if (character === void 0) { character = characters.gray; }
+        this.character = character;
         this.direction.n = false;
         this.direction.e = false;
         this.direction.s = false;
         this.direction.w = false;
-        if (tileCharacter == characters.n) {
-            this.direction.n;
+        if (this.character == characters.n) {
+            this.road = true;
+            this.direction.n = true;
         }
-        else if (tileCharacter == characters.e) {
-            this.direction.e;
+        else if (this.character == characters.e) {
+            this.road = true;
+            this.direction.e = true;
         }
-        else if (tileCharacter == characters.s) {
-            this.direction.s;
+        else if (this.character == characters.s) {
+            this.road = true;
+            this.direction.s = true;
         }
-        else if (tileCharacter == characters.w) {
-            this.direction.w;
+        else if (this.character == characters.w) {
+            this.road = true;
+            this.direction.w = true;
         }
-        else if (tileCharacter == characters.ns) {
-            this.direction.n;
-            this.direction.s;
+        else if (this.character == characters.ns) {
+            this.road = true;
+            this.direction.n = true;
+            this.direction.s = true;
         }
-        else if (tileCharacter == characters.ew) {
-            this.direction.e;
-            this.direction.w;
+        else if (this.character == characters.ew) {
+            this.road = true;
+            this.direction.e = true;
+            this.direction.w = true;
         }
-        else if (tileCharacter == characters.ne) {
-            this.direction.n;
-            this.direction.e;
+        else if (this.character == characters.ne) {
+            this.road = true;
+            this.direction.n = true;
+            this.direction.e = true;
         }
-        else if (tileCharacter == characters.es) {
-            this.direction.e;
-            this.direction.s;
+        else if (this.character == characters.es) {
+            this.road = true;
+            this.direction.e = true;
+            this.direction.s = true;
         }
-        else if (tileCharacter == characters.sw) {
-            this.direction.s;
-            this.direction.w;
+        else if (this.character == characters.sw) {
+            this.road = true;
+            this.direction.s = true;
+            this.direction.w = true;
         }
-        else if (tileCharacter == characters.wn) {
-            this.direction.w;
-            this.direction.n;
+        else if (this.character == characters.wn) {
+            this.road = true;
+            this.direction.w = true;
+            this.direction.n = true;
         }
     }
     Tile.prototype.apply = function () {
         var tileCharacter = characters.gray;
-        if (map[this.y][this.x].direction.length > 0) {
-            this.direction = combineArrays(map[this.y][this.x].direction, this.direction);
-        }
+        this.direction.n = combineBools(map.grid[this.y][this.x].direction.n, this.direction.n);
+        this.direction.e = combineBools(map.grid[this.y][this.x].direction.e, this.direction.e);
+        this.direction.s = combineBools(map.grid[this.y][this.x].direction.s, this.direction.s);
+        this.direction.w = combineBools(map.grid[this.y][this.x].direction.w, this.direction.w);
         if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
             tileCharacter = characters.nesw;
         }
@@ -338,7 +349,7 @@ var Tile = (function () {
             tileCharacter = characters.w;
         }
         this.character = tileCharacter;
-        map[this.y][this.x] = tile;
+        map.grid[this.y][this.x] = this;
     };
     return Tile;
 }());
@@ -350,5 +361,13 @@ function probability(percent) {
 }
 function log(message) {
     document.getElementById("game_output").value = message + "\n\n" + document.getElementById("game_output").value;
+}
+function combineBools(a, b) {
+    if (a || b) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 //# sourceMappingURL=tsc.js.map

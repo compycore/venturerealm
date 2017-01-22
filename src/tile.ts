@@ -32,6 +32,7 @@ interface ITile {
 	x: number;
 	y: number;
 	character: string;
+	road: boolean;
 	direction: {
 		n: boolean,
 		e: boolean,
@@ -42,10 +43,11 @@ interface ITile {
 }
 
 class Tile implements ITile {
-	// Copypasta of the above ITile interface
+	// Copypasta of ITile
 	x: number;
 	y: number;
 	character: string;
+	road: boolean;
 	direction: {
 		n: boolean,
 		e: boolean,
@@ -54,40 +56,51 @@ class Tile implements ITile {
 	};
 	description: string;
 
-	constructor(coords, tileCharacter = characters.gray) {
+	constructor(x: number, y: number, character = characters.gray) {
 		// Default values
+		this.character = character;
 		this.direction.n = false;
 		this.direction.e = false;
 		this.direction.s = false;
 		this.direction.w = false;
 
 		// Set the direction array for path adding
-		if (tileCharacter == characters.n) {
-			this.direction.n;
-		} else if (tileCharacter == characters.e) {
-			this.direction.e;
-		} else if (tileCharacter == characters.s) {
-			this.direction.s;
-		} else if (tileCharacter == characters.w) {
-			this.direction.w;
-		} else if (tileCharacter == characters.ns) {
-			this.direction.n;
-			this.direction.s;
-		} else if (tileCharacter == characters.ew) {
-			this.direction.e;
-			this.direction.w;
-		} else if (tileCharacter == characters.ne) {
-			this.direction.n;
-			this.direction.e;
-		} else if (tileCharacter == characters.es) {
-			this.direction.e;
-			this.direction.s;
-		} else if (tileCharacter == characters.sw) {
-			this.direction.s;
-			this.direction.w;
-		} else if (tileCharacter == characters.wn) {
-			this.direction.w;
-			this.direction.n;
+		if (this.character == characters.n) {
+			this.road = true;
+			this.direction.n = true;
+		} else if (this.character == characters.e) {
+			this.road = true;
+			this.direction.e = true;
+		} else if (this.character == characters.s) {
+			this.road = true;
+			this.direction.s = true;
+		} else if (this.character == characters.w) {
+			this.road = true;
+			this.direction.w = true;
+		} else if (this.character == characters.ns) {
+			this.road = true;
+			this.direction.n = true;
+			this.direction.s = true;
+		} else if (this.character == characters.ew) {
+			this.road = true;
+			this.direction.e = true;
+			this.direction.w = true;
+		} else if (this.character == characters.ne) {
+			this.road = true;
+			this.direction.n = true;
+			this.direction.e = true;
+		} else if (this.character == characters.es) {
+			this.road = true;
+			this.direction.e = true;
+			this.direction.s = true;
+		} else if (this.character == characters.sw) {
+			this.road = true;
+			this.direction.s = true;
+			this.direction.w = true;
+		} else if (this.character == characters.wn) {
+			this.road = true;
+			this.direction.w = true;
+			this.direction.n = true;
 		}
 	}
 
@@ -96,9 +109,10 @@ class Tile implements ITile {
 		let tileCharacter = characters.gray;
 
 		// Do the tile "addition"
-		if (map[this.y][this.x].direction.length > 0) {
-			this.direction = combineArrays(map[this.y][this.x].direction, this.direction);
-		}
+		this.direction.n = combineBools(map.grid[this.y][this.x].direction.n, this.direction.n);
+		this.direction.e = combineBools(map.grid[this.y][this.x].direction.e, this.direction.e);
+		this.direction.s = combineBools(map.grid[this.y][this.x].direction.s, this.direction.s);
+		this.direction.w = combineBools(map.grid[this.y][this.x].direction.w, this.direction.w);
 
 		// Set the tile character based on the direction array
 		if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
@@ -135,6 +149,6 @@ class Tile implements ITile {
 
 		this.character = tileCharacter; // Apply the selected character
 
-		map[this.y][this.x] = tile; // Apply the tile to the map
+		map.grid[this.y][this.x] = this; // Apply the tile to the map
 	}
 }

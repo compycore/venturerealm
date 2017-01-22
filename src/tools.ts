@@ -10,3 +10,11 @@ function probability(percent: number) {
 function log(message: string) {
 	(<HTMLInputElement>document.getElementById("game_output")).value = message + "\n\n" + (<HTMLInputElement>document.getElementById("game_output")).value;
 }
+
+function combineBools(a: boolean, b: boolean) {
+	if (a || b) {
+		return true;
+	} else {
+		return false;
+	}
+}

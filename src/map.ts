@@ -8,14 +8,13 @@ interface Point {
 class Map {
 	grid: Tile[][];
 	paths: number[][];
-	tiles: Tile[];
 
 	constructor() {
 		this.makeEmptyMap();
 		this.makeMapTrunk();
 
 		for (let i=0;i<config.map.count.branches;i++) {
-			map = this.makeMapBranch(map);
+			this.makeMapBranch();
 		}
 
 		this.applyPaths();
@@ -31,10 +30,10 @@ class Map {
 		while (currentCount < count) {
 			for (let y = 0; y < config.map.size; y++) {
 				for (let x = 0; x < config.map.size; x++) {
-					if (map[y][x].directions.length > 0) {
-						if (probability(2)) {
+					if (map.grid[y][x].road) {
+						if (probability(2)) { // Arbitrary probability value
 							currentCount++;
-							map[y][x].character = character;
+							map.grid[y][x].character = character;
 						}
 					}
 				}
@@ -44,7 +43,7 @@ class Map {
 
 	// Apply all paths in the paths array to the map
 	applyPaths() {
-		this.paths.forEach(function(path) {
+		this.paths.forEach(function(path: number[]) {
 			this.applyPath(path);
 		})
 	}
@@ -83,7 +82,7 @@ class Map {
 			this.grid.push(new Array());
 
 			for (let x=0;x<config.map.size;x++) {
-				this.grid[y][x]=this.makeTile({x:x, y:y}); // Make all tiles wilderness
+				this.grid[y][x]= new Tile(x, y);
 			}
 		}
 	}
@@ -101,17 +100,20 @@ class Map {
 		return finder.findPath(pointA[0], pointA[1], pointB[0], pointB[1], grid);
 	}
 
-	applyPath(path) {
+	applyPath(path: number[][]) {
 		for (let i = 0; i < path.length - 1; i++) {
-			let tile = characters.black;
+			let character = characters.black;
+
 			let a = {
 				x: 0,
 				y: 0
 			}
+
 			let b = {
 				x: path[i][0],
 				y: path[i][1]
 			} // Get the current tile
+
 			let c = {
 				x: 0,
 				y: 0
@@ -132,14 +134,14 @@ class Map {
 			}
 
 			if (i == 0) { // First tile in the path
-				tile = this.getPathCharacterEnd(b, c);
+				character = this.getPathCharacterEnd(b, c);
 			} else if (i < path.length - 2) { // Path middle tiles
-				tile = this.getPathCharacterMiddle(a, b, c);
+				character = this.getPathCharacterMiddle(a, b, c);
 			} else { // Last tile in the path
-				tile = this.getPathCharacterEnd(b, a);
+				character = this.getPathCharacterEnd(b, a);
 			}
 
-			this.applyTile(this.makeTile(b, tile)); // Apply the tile
+			new Tile(b.x, b.y, character).apply(); // Make and apply the tile
 		}
 	}
 
@@ -186,9 +188,9 @@ class Map {
 
 		for (let y = 0; y < map.grid.length; y++) {
 			for (let x = 0; x < config.map.size; x++) {
-				message += map[y][x].character;
+				message += map.grid[y][x].character;
 
-				if (x == config.map.size - 1 && y < map.length - 1) {
+				if (x == config.map.size - 1 && y < config.map.size - 1) {
 					message += "\n";
 				}
 			}
