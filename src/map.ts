@@ -183,7 +183,11 @@ class Map {
 
         for (let y = 0; y < config.map.size; y++) {
             for (let x = 0; x < config.map.size; x++) {
-                message += this.grid[y][x].character;
+                if (x == player.x && y == player.y) {
+                    message += characters.player;
+                } else {
+                    message += this.grid[y][x].character;
+                }
 
                 if (x == config.map.size - 1 && y < config.map.size - 1) {
                     message += "\n";

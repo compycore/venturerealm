@@ -188,7 +188,12 @@ var Map = (function () {
         var message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
         for (var y = 0; y < config.map.size; y++) {
             for (var x = 0; x < config.map.size; x++) {
-                message += this.grid[y][x].character;
+                if (x == player.x && y == player.y) {
+                    message += characters.player;
+                }
+                else {
+                    message += this.grid[y][x].character;
+                }
                 if (x == config.map.size - 1 && y < config.map.size - 1) {
                     message += "\n";
                 }
