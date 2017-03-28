@@ -30,14 +30,26 @@ function input(value) {
         log("Unknown command.");
     }
 }
+var Logo = (function () {
+    function Logo() {
+        this.ascii = "\nOOOOOOOO OOOOOOOO O      O OOOOOOOO O      O OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OOOOOOOO OO    OO OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOO       OO    OO OOO  OOO       OO OOO  OOO OO       OO    OO       OO        \nOO       OO    OO OOOOOOOO OOOOOOOO  OOOOOO  OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OOOOOOOO OOOOOOOO   OOOO   OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OO OO OO OO          OO    OO       OO    OO OO OOO          \nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO  OOO  OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO   OOO OOOOOOOO\n                           OO                                                   \n                           O\n";
+    }
+    Logo.prototype.draw = function () {
+        log(this.ascii.replace(/O/g, characters.black));
+    };
+    return Logo;
+}());
 var map;
 var player;
+var logo;
 function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
-    log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     map = new Map();
     player = new Player(map);
+    logo = new Logo();
+    logo.draw();
+    log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 }
 var Point = (function () {
     function Point(xValue, yValue) {
