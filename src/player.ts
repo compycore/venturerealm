@@ -32,7 +32,6 @@ class Player implements IPlayer {
     }
 
 	move(direction: string) {
-
 		if (direction == "n" || direction == "north") {
 			if (map.grid[this.y][this.x].direction.n){
 				this.y--;
@@ -60,5 +59,7 @@ class Player implements IPlayer {
 				map.draw();
 			}
 		}
+
+		map.grid[this.y][this.x].describe();
 	}
 }

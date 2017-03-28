@@ -57,11 +57,11 @@ class Tile implements ITile {
     description: string;
 
     constructor(x: number, y: number, character = characters.gray) {
-        // Default values
         this.x = x;
         this.y = y;
         this.road = false;
         this.character = character;
+        this.description = "Darkness overwhelms all your senses. You are lost.";
         this.direction = {
             n: false,
             e: false,
@@ -106,7 +106,33 @@ class Tile implements ITile {
             this.road = true;
             this.direction.w = true;
             this.direction.n = true;
-        }
+		} else if (this.character == characters.nes) {
+			this.road = true;
+			this.direction.n = true;
+			this.direction.e = true;
+			this.direction.s = true;
+		} else if (this.character == characters.esw) {
+			this.road = true;
+			this.direction.e = true;
+			this.direction.s = true;
+			this.direction.w = true;
+		} else if (this.character == characters.swn) {
+			this.road = true;
+			this.direction.s = true;
+			this.direction.w = true;
+			this.direction.n = true;
+		} else if (this.character == characters.wne) {
+			this.road = true;
+			this.direction.w = true;
+			this.direction.n = true;
+			this.direction.e = true;
+		} else if (this.character == characters.nesw) {
+			this.road = true;
+			this.direction.n = true;
+			this.direction.e = true;
+			this.direction.s = true;
+			this.direction.w = true;
+		}
     }
 
     // Do some additive "math" so paths don't cut each other
@@ -122,34 +148,49 @@ class Tile implements ITile {
         // Set the tile character based on the direction array
         if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
             character = characters.nesw;
+			this.description = "You find yourself at a crossroads. The path stretches in all directions.";
         } else if (this.direction.n && this.direction.e && this.direction.s) {
             character = characters.nes;
+			this.description = "You find yourself at a crossroads. The path extends to the north, east, and south.";
         } else if (this.direction.e && this.direction.s && this.direction.w) {
             character = characters.esw;
+			this.description = "You find yourself at a crossroads. The path extends to the ease, south, and west.";
         } else if (this.direction.s && this.direction.w && this.direction.n) {
             character = characters.swn;
+			this.description = "You find yourself at a crossroads. The path extends to the south, west, and north.";
         } else if (this.direction.w && this.direction.n && this.direction.e) {
             character = characters.wne;
+			this.description = "You find yourself at a crossroads. The path extends to the west, north, and east.";
         } else if (this.direction.n && this.direction.s) {
             character = characters.ns;
+            this.description = "The road extends north and south.";
         } else if (this.direction.e && this.direction.w) {
             character = characters.ew;
+            this.description = "The road extends east and west.";
         } else if (this.direction.n && this.direction.e) {
             character = characters.ne;
+            this.description = "The road extends north and east.";
         } else if (this.direction.e && this.direction.s) {
             character = characters.es;
+            this.description = "The road extends east and south.";
         } else if (this.direction.s && this.direction.w) {
             character = characters.sw;
+            this.description = "The road extends south and west.";
         } else if (this.direction.w && this.direction.n) {
             character = characters.wn;
+            this.description = "The road extends north and west.";
         } else if (this.direction.n) {
             character = characters.n;
+            this.description = "The road ends and continues back north.";
         } else if (this.direction.e) {
             character = characters.e;
+            this.description = "The road ends and continues back east.";
         } else if (this.direction.s) {
             character = characters.s;
+            this.description = "The road ends and continues back south.";
         } else if (this.direction.w) {
             character = characters.w;
+            this.description = "The road ends and continues back west.";
         }
 
         this.character = character; // Apply the selected character
@@ -157,5 +198,10 @@ class Tile implements ITile {
         grid[this.y][this.x] = this; // Apply the tile to the map
 
         return grid;
+    }
+
+    describe() {
+		console.log(this.road, this.direction);
+        log(this.description);
     }
 }
