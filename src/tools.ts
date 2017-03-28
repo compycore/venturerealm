@@ -1,3 +1,7 @@
+function random(array: any[]) {
+    return Math.floor(Math.random() * array.length)
+}
+
 function probability(percent: number) {
     if (Math.random() * 100 < percent) {
         return true
