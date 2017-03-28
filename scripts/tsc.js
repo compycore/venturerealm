@@ -21,10 +21,13 @@ document.getElementById("player_input").onkeypress = function (e) {
 function input(value) {
     value = value.toLowerCase();
     if (value == "help") {
-        log("Available commands are:\n'map'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'");
     }
     else if (value == "map") {
         map.draw();
+    }
+    else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) {
+        player.move(value);
     }
     else {
         log("Unknown command.");
@@ -230,6 +233,32 @@ var Player = (function () {
                         this.spawned = true;
                     }
                 }
+            }
+        }
+    };
+    Player.prototype.move = function (direction) {
+        if (direction == "n" || direction == "north") {
+            if (map.grid[this.y][this.x].direction.n) {
+                this.y--;
+                map.draw();
+            }
+        }
+        if (direction == "s" || direction == "south") {
+            if (map.grid[this.y][this.x].direction.s) {
+                this.y++;
+                map.draw();
+            }
+        }
+        if (direction == "e" || direction == "east") {
+            if (map.grid[this.y][this.x].direction.e) {
+                this.x++;
+                map.draw();
+            }
+        }
+        if (direction == "w" || direction == "west") {
+            if (map.grid[this.y][this.x].direction.w) {
+                this.x--;
+                map.draw();
             }
         }
     };
