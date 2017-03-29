@@ -14,11 +14,13 @@ function input(value: string) {
     value = value.toLowerCase();
 
     if (value == "help") {
-		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'");
+		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'");
     } else if (value == "map") {
         map.draw();
     } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) { // Allow for player movement
         player.move(value);
+	} else if (value == inventory) {
+		player.describe();
     } else {
         log("Unknown command.");
     }

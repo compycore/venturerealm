@@ -31,35 +31,43 @@ class Player implements IPlayer {
         }
     }
 
-	move(direction: string) {
-		if (direction == "n" || direction == "north") {
-			if (map.grid[this.y][this.x].direction.n){
-				this.y--;
-				map.draw();
-			}
-		}
+    move(direction: string) {
+        if (direction == "n" || direction == "north") {
+            if (map.grid[this.y][this.x].direction.n) {
+                this.y--;
+                map.draw();
+            }
+        }
 
-		if (direction == "s" || direction == "south") {
-			if (map.grid[this.y][this.x].direction.s){
-				this.y++;
-				map.draw();
-			}
-		}
+        if (direction == "s" || direction == "south") {
+            if (map.grid[this.y][this.x].direction.s) {
+                this.y++;
+                map.draw();
+            }
+        }
 
-		if (direction == "e" || direction == "east") {
-			if (map.grid[this.y][this.x].direction.e){
-				this.x++;
-				map.draw();
-			}
-		}
+        if (direction == "e" || direction == "east") {
+            if (map.grid[this.y][this.x].direction.e) {
+                this.x++;
+                map.draw();
+            }
+        }
 
-		if (direction == "w" || direction == "west") {
-			if (map.grid[this.y][this.x].direction.w){
-				this.x--;
-				map.draw();
-			}
-		}
+        if (direction == "w" || direction == "west") {
+            if (map.grid[this.y][this.x].direction.w) {
+                this.x--;
+                map.draw();
+            }
+        }
 
-		map.grid[this.y][this.x].describe();
-	}
+        map.grid[this.y][this.x].describe();
+    }
+
+    describe() {
+        if (this.inventory.length == 0) {
+            log("Your inventory is empty.");
+        } else {
+            log(this.inventory.join(", ");
+        }
+    }
 }
