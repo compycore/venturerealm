@@ -86,6 +86,15 @@ var Map = (function () {
                         if (probability(2)) {
                             currentCount++;
                             this.grid[y][x].character = character;
+                            if (character == characters.city) {
+                                this.grid[y][x].description.interest = descriptions.cities[random(descriptions.cities)];
+                            }
+                            else if (character == characters.portal) {
+                                this.grid[y][x].description.interest = descriptions.portals[random(descriptions.portals)];
+                            }
+                            else if (character == characters.treasure) {
+                                this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
+                            }
                         }
                     }
                 }
@@ -317,7 +326,10 @@ var Tile = (function () {
             s: false,
             w: false
         };
-        this.description = "";
+        this.description = {
+            direction: "",
+            interest: ""
+        };
         if (this.character == characters.n) {
             this.road = true;
             this.direction.n = true;
@@ -396,16 +408,7 @@ var Tile = (function () {
             this.direction.w = true;
         }
         if (this.road) {
-            this.description += descriptions.roads[random(descriptions.roads)];
-        }
-        if (this.character == characters.city) {
-            this.description += descriptions.cities[random(descriptions.cities)];
-        }
-        else if (this.character == characters.portal) {
-            this.description += descriptions.portals[random(descriptions.portals)];
-        }
-        else if (this.character == characters.treasure) {
-            this.description += descriptions.treasure[random(descriptions.treasure)];
+            this.description.interest = descriptions.roads[random(descriptions.roads)];
         }
     }
     Tile.prototype.apply = function (grid) {
@@ -416,70 +419,70 @@ var Tile = (function () {
         this.direction.w = combineBools(grid[this.y][this.x].direction.w, this.direction.w);
         if (this.direction.n && this.direction.e && this.direction.s && this.direction.w) {
             character = characters.nesw;
-            this.description += "You find yourself at a crossroads. The path stretches in all directions. ";
+            this.description.direction = "You find yourself at a crossroads. The path stretches in all directions. ";
         }
         else if (this.direction.n && this.direction.e && this.direction.s) {
             character = characters.nes;
-            this.description += "You find yourself at a crossroads. The path extends to the north, east, and south. ";
+            this.description.direction = "You find yourself at a crossroads. The path extends to the north, east, and south. ";
         }
         else if (this.direction.e && this.direction.s && this.direction.w) {
             character = characters.esw;
-            this.description += "You find yourself at a crossroads. The path extends to the ease, south, and west. ";
+            this.description.direction = "You find yourself at a crossroads. The path extends to the ease, south, and west. ";
         }
         else if (this.direction.s && this.direction.w && this.direction.n) {
             character = characters.swn;
-            this.description += "You find yourself at a crossroads. The path extends to the south, west, and north. ";
+            this.description.direction = "You find yourself at a crossroads. The path extends to the south, west, and north. ";
         }
         else if (this.direction.w && this.direction.n && this.direction.e) {
             character = characters.wne;
-            this.description += "You find yourself at a crossroads. The path extends to the west, north, and east. ";
+            this.description.direction = "You find yourself at a crossroads. The path extends to the west, north, and east. ";
         }
         else if (this.direction.n && this.direction.s) {
             character = characters.ns;
-            this.description += "The road extends north and south. ";
+            this.description.direction = "The road extends north and south. ";
         }
         else if (this.direction.e && this.direction.w) {
             character = characters.ew;
-            this.description += "The road extends east and west. ";
+            this.description.direction = "The road extends east and west. ";
         }
         else if (this.direction.n && this.direction.e) {
             character = characters.ne;
-            this.description += "The road extends north and east. ";
+            this.description.direction = "The road extends north and east. ";
         }
         else if (this.direction.e && this.direction.s) {
             character = characters.es;
-            this.description += "The road extends east and south. ";
+            this.description.direction = "The road extends east and south. ";
         }
         else if (this.direction.s && this.direction.w) {
             character = characters.sw;
-            this.description += "The road extends south and west. ";
+            this.description.direction = "The road extends south and west. ";
         }
         else if (this.direction.w && this.direction.n) {
             character = characters.wn;
-            this.description += "The road extends north and west. ";
+            this.description.direction = "The road extends north and west. ";
         }
         else if (this.direction.n) {
             character = characters.n;
-            this.description += "The road ends and continues back north. ";
+            this.description.direction = "The road ends and continues back north. ";
         }
         else if (this.direction.e) {
             character = characters.e;
-            this.description += "The road ends and continues back east. ";
+            this.description.direction = "The road ends and continues back east. ";
         }
         else if (this.direction.s) {
             character = characters.s;
-            this.description += "The road ends and continues back south. ";
+            this.description.direction = "The road ends and continues back south. ";
         }
         else if (this.direction.w) {
             character = characters.w;
-            this.description += "The road ends and continues back west. ";
+            this.description.direction = "The road ends and continues back west. ";
         }
         this.character = character;
         grid[this.y][this.x] = this;
         return grid;
     };
     Tile.prototype.describe = function () {
-        log(this.description);
+        log(this.description.interest + this.description.direction);
     };
     return Tile;
 }());

@@ -46,6 +46,15 @@ class Map {
                         if (probability(2)) { // Arbitrary probability value
                             currentCount++;
                             this.grid[y][x].character = character; // Change the tile's character
+
+                            // Apply a randomized, non-directional description based on tile type
+                            if (character == characters.city) {
+                                this.grid[y][x].description.interest = descriptions.cities[random(descriptions.cities)];
+                            } else if (character == characters.portal) {
+                                this.grid[y][x].description.interest = descriptions.portals[random(descriptions.portals)];
+                            } else if (character == characters.treasure) {
+                                this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
+                            }
                         }
                     }
                 }
