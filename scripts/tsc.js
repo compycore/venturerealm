@@ -9,6 +9,22 @@ var config = {
         }
     }
 };
+var descriptions = {
+    roads: [
+        "The road is barren with a solitary blade of grass growing in the center of the path. ",
+    ],
+    cities: [
+        "The city stretches majestically in all directions, colors and sounds filling your senses. Street vendors shout at passersby advertising their wares. Police forces are seen walking leisurly through the crowd. ",
+        "You find yourself in a small village. On one side of the main road lies a blacksmith, on the other you find an inn. ",
+    ],
+    portals: [
+        "Before you floats a shimmering orb. You inch closer and notice faces warping in and out of focus as the orb shimmers and deforms, always maintaining a loosely-spherical shape. ",
+        "A cube lies on the earth. You hear an electric crackle that increases in intensity as you approach. ",
+    ],
+    treasure: [
+        "A battered chest lies just off the road, most likely the result of a wagon accident. ",
+    ]
+};
 document.getElementById("player_input").onkeypress = function (e) {
     var keyCode = e.keyCode || e.which;
     if (keyCode == 13) {
@@ -36,6 +52,7 @@ function input(value) {
         log("Unknown command.");
     }
 }
+var items = [];
 var Logo = (function () {
     function Logo() {
         this.ascii = "\nOOOOOOOO OOOOOOOO O      O OOOOOOOO O      O OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OOOOOOOO OO    OO OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOO       OO    OO OOO  OOO       OO OOO  OOO OO       OO    OO       OO        \nOO       OO    OO OOOOOOOO OOOOOOOO  OOOOOO  OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OOOOOOOO OOOOOOOO   OOOO   OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OO OO OO OO          OO    OO       OO    OO OO OOO          \nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO  OOO  OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO   OOO OOOOOOOO\n                           OO                                                   \n                           O\n";
@@ -277,7 +294,6 @@ var Player = (function () {
         map.grid[this.y][this.x].describe();
     };
     Player.prototype.describe = function () {
-        console.log(this);
         if (this.inventory.length == 0) {
             log("Your inventory is empty.");
         }
@@ -309,22 +325,6 @@ var characters = {
     black: String.fromCharCode(9619),
     gray: String.fromCharCode(9617),
     player: String.fromCharCode(9673)
-};
-var descriptions = {
-    roads: [
-        "The road is barren with a solitary blade of grass growing in the center of the path. ",
-    ],
-    cities: [
-        "The city stretches majestically in all directions, colors and sounds filling your senses. Street vendors shout at passersby advertising their wares. Police forces are seen walking leisurly through the crowd. ",
-        "You find yourself in a small village. On one side of the main road lies a blacksmith, on the other you find an inn. ",
-    ],
-    portals: [
-        "Before you floats a shimmering orb. You inch closer and notice faces warping in and out of focus as the orb shimmers and deforms, always maintaining a loosely-spherical shape. ",
-        "A cube lies on the earth. You hear an electric crackle that increases in intensity as you approach. ",
-    ],
-    treasure: [
-        "A battered chest lies just off the road, most likely the result of a wagon accident. ",
-    ]
 };
 var Tile = (function () {
     function Tile(x, y, character) {
