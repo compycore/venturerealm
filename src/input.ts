@@ -19,7 +19,7 @@ function input(value: string) {
         map.draw();
     } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) { // Allow for player movement
         player.move(value);
-	} else if (value == inventory) {
+	} else if (value == "inventory") {
 		player.describe();
     } else {
         log("Unknown command.");

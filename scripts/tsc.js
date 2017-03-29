@@ -21,13 +21,16 @@ document.getElementById("player_input").onkeypress = function (e) {
 function input(value) {
     value = value.toLowerCase();
     if (value == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'");
     }
     else if (value == "map") {
         map.draw();
     }
     else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) {
         player.move(value);
+    }
+    else if (value == "inventory") {
+        player.describe();
     }
     else {
         log("Unknown command.");
@@ -230,6 +233,7 @@ var Map = (function () {
 var Player = (function () {
     function Player(map) {
         this.spawned = false;
+        this.inventory = [];
         this.spawn(map);
     }
     Player.prototype.spawn = function (map) {
@@ -271,6 +275,15 @@ var Player = (function () {
             }
         }
         map.grid[this.y][this.x].describe();
+    };
+    Player.prototype.describe = function () {
+        console.log(this);
+        if (this.inventory.length == 0) {
+            log("Your inventory is empty.");
+        }
+        else {
+            log(this.inventory.join(", "));
+        }
     };
     return Player;
 }());
