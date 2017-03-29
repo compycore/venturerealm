@@ -2,14 +2,14 @@ interface IPlayer {
     x: number;
     y: number;
     spawned: boolean;
-    inventory: Item[];
+    inventory: IItem[];
 }
 
 class Player implements IPlayer {
     x: number;
     y: number;
     spawned: boolean;
-    inventory: Item[];
+    inventory: IItem[];
 
     constructor(map: Map) {
         this.spawned = false;

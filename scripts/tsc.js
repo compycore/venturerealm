@@ -52,7 +52,18 @@ function input(value) {
         log("Unknown command.");
     }
 }
-var items = [];
+var items = [
+    new Item("A roughly-hewn wooden sword.")
+];
+var Item = (function () {
+    function Item(description, attack, defense, healing) {
+        if (attack === void 0) { attack = 1; }
+        if (defense === void 0) { defense = 1; }
+        if (healing === void 0) { healing = 0; }
+        this.description = description;
+    }
+    return Item;
+}());
 var Logo = (function () {
     function Logo() {
         this.ascii = "\nOOOOOOOO OOOOOOOO O      O OOOOOOOO O      O OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OOOOOOOO OO    OO OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOO       OO    OO OOO  OOO       OO OOO  OOO OO       OO    OO       OO        \nOO       OO    OO OOOOOOOO OOOOOOOO  OOOOOO  OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OOOOOOOO OOOOOOOO   OOOO   OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OO OO OO OO          OO    OO       OO    OO OO OOO          \nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO  OOO  OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO   OOO OOOOOOOO\n                           OO                                                   \n                           O\n";
