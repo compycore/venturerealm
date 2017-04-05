@@ -55,9 +55,6 @@ function input(value) {
         log("Unknown command.");
     }
 }
-var items = [
-    new Item("A roughly-hewn wooden sword. ")
-];
 var Item = (function () {
     function Item(description, attack, defense, healing) {
         if (attack === void 0) { attack = 1; }
@@ -540,4 +537,7 @@ function combineBools(a, b) {
         return false;
     }
 }
+var items = [
+    new Item("A roughly-hewn wooden sword. ")
+];
 //# sourceMappingURL=tsc.js.map
