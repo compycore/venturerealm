@@ -2,14 +2,14 @@ interface IPlayer {
     x: number;
     y: number;
     spawned: boolean;
-    inventory: IItem[];
+    inventory: Item[];
 }
 
 class Player implements IPlayer {
     x: number;
     y: number;
     spawned: boolean;
-    inventory: IItem[];
+    inventory: Item[];
 
     constructor(map: Map) {
         this.spawned = false;
@@ -68,7 +68,13 @@ class Player implements IPlayer {
         if (this.inventory.length == 0) {
             log("Your inventory is empty.");
         } else {
-            log(this.inventory.join(", "));
+			let message = "";
+
+			for (var i = 0; i < this.inventory.length; i++) {
+				message += this.inventory[i].describe() + "\n";
+			}
+
+            log(message);
         }
     }
 }

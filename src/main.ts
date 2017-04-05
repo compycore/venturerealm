@@ -14,5 +14,4 @@ function init() {
 
 	logo.draw();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
-
 }

@@ -37,7 +37,7 @@ document.getElementById("player_input").onkeypress = function (e) {
 function input(value) {
     value = value.toLowerCase();
     if (value == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'");
     }
     else if (value == "map") {
         map.draw();
@@ -48,12 +48,15 @@ function input(value) {
     else if (value == "inventory") {
         player.describe();
     }
+    else if (value == "look") {
+        map.grid[player.y][player.x].describe();
+    }
     else {
         log("Unknown command.");
     }
 }
 var items = [
-    new Item("A roughly-hewn wooden sword.")
+    new Item("A roughly-hewn wooden sword. ")
 ];
 var Item = (function () {
     function Item(description, attack, defense, healing) {
@@ -62,6 +65,9 @@ var Item = (function () {
         if (healing === void 0) { healing = 0; }
         this.description = description;
     }
+    Item.prototype.describe = function () {
+        log(this.description + "Attack: " + this.attack + " Defense: " + this.defense + " Healing: " + this.healing);
+    };
     return Item;
 }());
 var Logo = (function () {
@@ -309,7 +315,11 @@ var Player = (function () {
             log("Your inventory is empty.");
         }
         else {
-            log(this.inventory.join(", "));
+            var message = "";
+            for (var i = 0; i < this.inventory.length; i++) {
+                message += this.inventory[i].describe() + "\n";
+            }
+            log(message);
         }
     };
     return Player;
