@@ -12,7 +12,7 @@ function probability(percent: number) {
 
 // Prepend a message to the text area
 function log(message: string) {
-    (<HTMLInputElement>document.getElementById("game_output")).value = message + "\n\n\n" + (<HTMLInputElement>document.getElementById("game_output")).value;
+    (<HTMLInputElement>document.getElementById("game_output")).value = message + "\n\n" + (<HTMLInputElement>document.getElementById("game_output")).value;
 }
 
 function combineBools(a: boolean, b: boolean) {

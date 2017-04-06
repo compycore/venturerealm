@@ -7,82 +7,27 @@
 
 html,
 body {
-    color: #000000;
+    color: #fff;
     background: #008080;
-    font-family: 'freemonoregular', monospace;
 }
 
 textarea,
+input,
 input[type="text"] {
     font-family: 'freemonoregular', monospace;
     font-size: 12px;
+	font-weight: bold;
     line-height: 12px;
-}
-
-textarea,
-input {
     outline: none;
-    background-color: #fff1e8;
     border: none;
-}
-
-#terminal {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 600px;
-    height: 550px;
-    margin-left: -300px;
-    margin-top: -275px;
-    background-color: #fff1e8;
-    border: solid 4px #83769c;
-    box-shadow: 12px 12px;
-}
-
-#terminal_bar {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 40px;
-    background-color: #83769c;
-}
-
-#terminal_title {
-    position: absolute;
-    left: 8px;
-    top: 4px;
-    font-size: 20px;
-}
-
-#input_bracket {
-    position: absolute;
-    left: 0px;
-    top: 50px;
-    width: 30px;
-    font-size: 12px;
-    text-align: center;
-}
-
-#player_input {
-    position: absolute;
-    left: 30px;
-    top: 45px;
-    width: 565px;
-    height: 25px;
-}
-
-#game_output {
-    position: absolute;
-    left: 5px;
-    top: 75px;
-    width: 590px;
-    height: 470px;
+	background-color: #000;
+	color: #fff;
 }
 
 .window {
     width: 500px;
-    font-family: 'Arial', sans-serif;
+	font-family: 'Arial',sans-serif;
+	font-weight: bold;
     background: #c0c0c0;
     border: 1px solid;
     border-top-color: #dfdfdf;
@@ -120,7 +65,8 @@ input {
 }
 
 .window_content_inner {
-    background: #fff;
+    font-family: 'freemonoregular', monospace;
+    background: #000;
     border: 1px solid;
     border-top-color: #000;
     border-left-color: #000;
@@ -129,6 +75,29 @@ input {
     padding: 10px;
 }
 
-p {
-    margin: 0;
+#game_output {
+	position: relative;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#input_bracket {
+    position: relative;
+    left: 0;
+    bottom: 0;
+    width: 30px;
+	height: 25px;
+    font-size: 12px;
+	font-weight: bold;
+    text-align: center;
+}
+
+#player_input {
+    position: relative;
+    left: 30px;
+    bottom: 45px;
+    width: calc(100%-30px);
+    height: 25px;
 }

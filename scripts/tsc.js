@@ -82,7 +82,7 @@ var Item = (function () {
 }());
 var Logo = (function () {
     function Logo() {
-        this.ascii = "\nOOOOOOOO OOOOOOOO O      O OOOOOOOO O      O OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OOOOOOOO OO    OO OOOOOOOO OOOOOOOO OOOOOOOO OOOOOOOO\nOO       OO    OO OOO  OOO       OO OOO  OOO OO       OO    OO       OO        \nOO       OO    OO OOOOOOOO OOOOOOOO  OOOOOO  OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OOOOOOOO OOOOOOOO   OOOO   OO       OO    OO OOOOOOOO OOOOOOOO\nOO       OO    OO OO OO OO OO          OO    OO       OO    OO OO OOO          \nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO  OOO  OOOOOOOO\nOOOOOOOO OOOOOOOO OO    OO OO          OO    OOOOOOOO OOOOOOOO OO   OOO OOOOOOOO\n                           OO                                                   \n                           O\n";
+        this.ascii = "\nOOOOO OOOOO O     O OOOOO O    O OOOOO OOOOO OOOOOO OOOOO\nOOOOO OOOOO OO   OO OOOOO OO  OO OOOOO OOOOO OOOOOO OOOOO\nOO    OO OO OOO OOO    OO OOOOOO OO    OO OO     OO     \nOO    OO OO OOOOOOO OOOOO  OOOO  OO    OO OO OOOOOO OOOOO\nOO    OO OO OOOOOOO OOOOO   OO   OO    OO OO OOOOOO \nOOOOO OOOOO OO O OO OO      OO   OOOOO OOOOO OO OO  OOOOO\nOOOOO OOOOO OO   OO OO      OO   OOOOO OOOOO OO  OO OOOOO\n                    O\n";
     }
     Logo.prototype.draw = function () {
         log(this.ascii.replace(/O/g, characters.black));
@@ -98,8 +98,8 @@ function init() {
     map = new Map();
     player = new Player(map);
     logo = new Logo();
-    logo.draw();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
+    logo.draw();
 }
 var Point = (function () {
     function Point(xValue, yValue) {
@@ -550,7 +550,7 @@ function probability(percent) {
     return false;
 }
 function log(message) {
-    document.getElementById("game_output").value = message + "\n\n\n" + document.getElementById("game_output").value;
+    document.getElementById("game_output").value = message + "\n\n" + document.getElementById("game_output").value;
 }
 function combineBools(a, b) {
     if (a || b) {
