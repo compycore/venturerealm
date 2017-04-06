@@ -2,11 +2,13 @@
 
 <head>
 	<title>VentureRealm</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link rel="stylesheet" href="styles/main.css">
 </head>
 
 <body onload="init()">
-	<div class="window">
+	<div class="window" style="width: 500px; min-width: 470px; height: 400px; min-height: 200px;">
 		<div class="window_inner">
 			<div class="window_heading">VentureRealm</div>
 			<div class="window_actions">
@@ -22,7 +24,20 @@
 	</div>
 </body>
 
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 <script src="scripts/pathfinding-browser.min.js"></script>
 <script src="scripts/tsc.js"></script>
+
+<script>
+	$(function() {
+		$(".window").draggable({
+			cursor: "move",
+			handle: ".window_heading"
+		});
+
+		$(".window").resizable();
+	});
+</script>
 
 </html>

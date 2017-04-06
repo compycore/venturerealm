@@ -9,6 +9,7 @@ html,
 body {
     color: #fff;
     background: #008080;
+	overflow: hidden;
 }
 
 textarea,
@@ -27,7 +28,6 @@ input[type="text"] {
 }
 
 .window {
-    width: 500px;
     font-family: 'Arial', sans-serif;
     font-weight: bold;
     background: #c0c0c0;
@@ -109,5 +109,5 @@ input[type="text"] {
     left: 0;
     top: 0;
     width: 100%;
-	min-height: 400px;
+	height: calc(100% - 83px);
 }
