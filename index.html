@@ -8,7 +8,7 @@
 </head>
 
 <body onload="init()">
-	<div class="window" style="width: 500px; min-width: 470px; height: 400px; min-height: 200px;">
+	<div class="window" style="width: 500px; min-width: 470px; height: 400px; min-height: 200px;" onclick="$('#player_input').focus()">
 		<div class="window_inner">
 			<div class="window_heading">VentureRealm</div>
 			<div class="window_actions">
@@ -37,6 +37,12 @@
 		});
 
 		$(".window").resizable();
+
+		$(".window").position({
+			my: "center",
+			at: "center",
+			of: "body"
+		});
 	});
 </script>
 
