@@ -22,7 +22,7 @@ input[type="text"] {
 	overflow-x: hidden;
 	resize: none;
     font-family: 'freemonoregular', monospace;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
     line-height: 12px;
     outline: none;
@@ -94,7 +94,6 @@ input[type="text"] {
     border-left-color: #808080;
     border-bottom-color: #fff;
     border-right-color: #fff;
-    font-size: 13px;
 }
 
 .window_content_inner {

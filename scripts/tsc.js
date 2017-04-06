@@ -351,12 +351,12 @@ var characters = {
     esw: String.fromCharCode(9523),
     swn: String.fromCharCode(9515),
     wne: String.fromCharCode(9531),
-    city: String.fromCharCode(9689),
+    city: String.fromCharCode(9650),
     treasure: String.fromCharCode(11045),
-    portal: String.fromCharCode(11044),
+    portal: String.fromCharCode(9673),
     black: String.fromCharCode(9619),
-    gray: String.fromCharCode(9617),
-    player: String.fromCharCode(9673)
+    gray: String.fromCharCode(9618),
+    player: String.fromCharCode(9675)
 };
 var Tile = (function () {
     function Tile(x, y, character) {
