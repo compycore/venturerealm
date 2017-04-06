@@ -578,6 +578,9 @@ function asciiBar(current, max) {
     }
     return bar;
 }
+function changeBackground(image) {
+    document.body.style.backgroundImage = "url('/images/" + image + ".png')";
+}
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword. "),
     new Item("Wooden Shield", "A battered wooden shield with something scrawled on the back in a language you do not know. "),

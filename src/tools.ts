@@ -42,3 +42,7 @@ function asciiBar(current: number, max = 10) {
 
     return bar
 }
+
+function changeBackground(image: string) {
+    document.body.style.backgroundImage = "url('/images/" + image + ".png')";
+}
