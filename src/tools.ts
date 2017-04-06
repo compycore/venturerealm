@@ -44,5 +44,5 @@ function asciiBar(current: number, max = 10) {
 }
 
 function changeBackground(image: string) {
-    document.body.style.backgroundImage = "url('/images/" + image + ".png')";
+    document.body.style.backgroundImage = "url('../images/" + image + ".png')";
 }
