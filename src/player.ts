@@ -13,7 +13,7 @@ class Player implements IPlayer {
 
     constructor(map: Map) {
         this.spawned = false;
-		this.inventory = [];
+        this.inventory = [];
 
         this.spawn(map);
     }
@@ -68,11 +68,11 @@ class Player implements IPlayer {
         if (this.inventory.length == 0) {
             log("Your inventory is empty.");
         } else {
-			let message = "";
+            let message = "";
 
-			for (var i = 0; i < this.inventory.length; i++) {
-				message += this.inventory[i].describe() + "\n";
-			}
+            for (var i = 0; i < this.inventory.length; i++) {
+                message += this.inventory[i].describe() + "\n";
+            }
 
             log(message);
         }

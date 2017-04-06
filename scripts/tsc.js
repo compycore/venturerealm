@@ -37,7 +37,7 @@ document.getElementById("player_input").onkeypress = function (e) {
 function input(value) {
     value = value.toLowerCase();
     if (value == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'\n");
     }
     else if (value == "map") {
         map.draw();
@@ -51,19 +51,32 @@ function input(value) {
     else if (value == "look") {
         map.grid[player.y][player.x].describe();
     }
+    else if (value == "open") {
+        map.grid[player.y][player.x].obtain();
+    }
     else {
         log("Unknown command.");
     }
 }
 var Item = (function () {
-    function Item(description, attack, defense, healing) {
+    function Item(name, description, attack, defense, healing) {
         if (attack === void 0) { attack = 1; }
         if (defense === void 0) { defense = 1; }
         if (healing === void 0) { healing = 0; }
+        this.name = name;
         this.description = description;
     }
+    Item.prototype.obtain = function () {
+        if (isVowel(this.name[0])) {
+            log("You obtained an " + this.name.toLowerCase() + ".");
+        }
+        else {
+            log("You obtained a " + this.name.toLowerCase() + ".");
+        }
+        player.inventory.push(this);
+    };
     Item.prototype.describe = function () {
-        log(this.description + "Attack: " + this.attack + " Defense: " + this.defense + " Healing: " + this.healing);
+        log(this.name + "\n" + this.description + "\nAttack: " + asciiBar(this.attack) + " \tDefense: " + asciiBar(this.defense) + " \tHealing: " + asciiBar(this.healing));
     };
     return Item;
 }());
@@ -127,6 +140,7 @@ var Map = (function () {
                                 this.grid[y][x].description.interest = descriptions.portals[random(descriptions.portals)];
                             }
                             else if (character == characters.treasure) {
+                                this.grid[y][x].item = allItems[random(allItems)];
                                 this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
                             }
                         }
@@ -512,6 +526,15 @@ var Tile = (function () {
         grid[this.y][this.x] = this;
         return grid;
     };
+    Tile.prototype.obtain = function () {
+        if (this.item) {
+            this.item.obtain();
+            this.item = null;
+        }
+        else {
+            log("There is nothing here.");
+        }
+    };
     Tile.prototype.describe = function () {
         log(this.description.interest + this.description.direction);
     };
@@ -527,7 +550,7 @@ function probability(percent) {
     return false;
 }
 function log(message) {
-    document.getElementById("game_output").value = message + "\n\n" + document.getElementById("game_output").value;
+    document.getElementById("game_output").value = message + "\n\n\n" + document.getElementById("game_output").value;
 }
 function combineBools(a, b) {
     if (a || b) {
@@ -537,7 +560,27 @@ function combineBools(a, b) {
         return false;
     }
 }
-var items = [
-    new Item("A roughly-hewn wooden sword. ")
+function isVowel(character) {
+    return ['a', 'e', 'i', 'o', 'u'].indexOf(character.toLowerCase()) !== -1;
+}
+function asciiBar(current, max) {
+    if (max === void 0) { max = 10; }
+    var bar = "";
+    var barLength = 9;
+    var fill = Math.ceil(current / max * barLength);
+    for (var i = 0; i < barLength; i++) {
+        if (i < fill) {
+            bar += characters.black;
+        }
+        else {
+            bar += characters.gray;
+        }
+    }
+    return bar;
+}
+var allItems = [
+    new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword. "),
+    new Item("Wooden Shield", "A battered wooden shield with something scrawled on the back in a language you do not know. "),
+    new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys. ")
 ];
 //# sourceMappingURL=tsc.js.map

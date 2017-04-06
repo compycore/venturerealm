@@ -14,7 +14,7 @@ function input(value: string) {
     value = value.toLowerCase();
 
     if (value == "help") {
-		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'");
+		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'\n");
     } else if (value == "map") {
         map.draw();
     } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) { // Allow for player movement
@@ -23,6 +23,8 @@ function input(value: string) {
 		player.describe();
 	} else if (value == "look") {
 		map.grid[player.y][player.x].describe();
+	} else if (value == "open") {
+		map.grid[player.y][player.x].obtain();
     } else {
         log("Unknown command.");
     }

@@ -7,8 +7,8 @@
 
 html,
 body {
-    background-color: #1d2b53;
     color: #000000;
+    background: #008080;
     font-family: 'freemonoregular', monospace;
 }
 
@@ -16,7 +16,7 @@ textarea,
 input[type="text"] {
     font-family: 'freemonoregular', monospace;
     font-size: 12px;
-	line-height: 12px;
+    line-height: 12px;
 }
 
 textarea,
@@ -78,4 +78,57 @@ input {
     top: 75px;
     width: 590px;
     height: 470px;
+}
+
+.window {
+    width: 500px;
+    font-family: 'Arial', sans-serif;
+    background: #c0c0c0;
+    border: 1px solid;
+    border-top-color: #dfdfdf;
+    border-left-color: #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+}
+
+.window_inner {
+    border: 1px solid;
+    border-top-color: #fff;
+    border-left-color: #fff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+}
+
+.window_heading {
+    margin: 2px;
+    padding: 2px 5px;
+    color: #fff;
+    background: linear-gradient(to right, #000080, #1084d0);
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.window_content {
+    margin: 0 2px 2px 2px;
+    border: 1px solid;
+    border-top-color: #808080;
+    border-left-color: #808080;
+    border-bottom-color: #fff;
+    border-right-color: #fff;
+    font-size: 13px;
+}
+
+.window_content_inner {
+    background: #fff;
+    border: 1px solid;
+    border-top-color: #000;
+    border-left-color: #000;
+    border-bottom-color: #dfdfdf;
+    border-right-color: #dfdfdf;
+    padding: 10px;
+}
+
+p {
+    margin: 0;
 }

@@ -53,6 +53,7 @@ class Map {
                             } else if (character == characters.portal) {
                                 this.grid[y][x].description.interest = descriptions.portals[random(descriptions.portals)];
                             } else if (character == characters.treasure) {
+								this.grid[y][x].item = allItems[random(allItems)];
                                 this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
                             }
                         }

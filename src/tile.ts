@@ -34,6 +34,7 @@ interface ITile {
     y: number;
     character: string;
     road: boolean;
+    item: Item;
     direction: {
         n: boolean,
         e: boolean,
@@ -52,6 +53,7 @@ class Tile implements ITile {
     y: number;
     character: string;
     road: boolean;
+    item: Item;
     direction: {
         n: boolean,
         e: boolean,
@@ -74,10 +76,10 @@ class Tile implements ITile {
             s: false,
             w: false
         };
-		this.description = {
-			direction: "",
-			interest: ""
-		};
+        this.description = {
+            direction: "",
+            interest: ""
+        };
 
         // Set the direction array for path addition
         if (this.character == characters.n) {
@@ -213,6 +215,15 @@ class Tile implements ITile {
         grid[this.y][this.x] = this; // Apply the tile to the map
 
         return grid;
+    }
+
+    obtain() {
+        if (this.item) {
+            this.item.obtain();
+            this.item = null;
+        } else {
+            log("There is nothing here.");
+        }
     }
 
     describe() {
