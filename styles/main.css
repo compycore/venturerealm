@@ -9,18 +9,19 @@ html,
 body {
     color: #fff;
     background: #008080;
-	background-image: url("../images/grass.png");
-	background-repeat: repeat;
-	overflow: hidden;
-	margin: 0;
-	padding: 0;
+    background-image: url("../images/grass.png");
+    background-repeat: repeat;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-text-size-adjust: 100%;
 }
 
 textarea,
 input,
 input[type="text"] {
-	overflow-x: hidden;
-	resize: none;
+    overflow-x: hidden;
+    resize: none;
     font-family: 'freemonoregular', monospace;
     font-size: 13px;
     font-weight: bold;
@@ -72,10 +73,10 @@ input[type="text"] {
 }
 
 .input_bracket {
-	float: left;
+    float: left;
     width: 30px;
     height: 100%;
-	line-height: 25px;
+    line-height: 25px;
     font-size: 12px;
     font-weight: bold;
     text-align: center;
@@ -84,7 +85,7 @@ input[type="text"] {
 .input_area {
     width: calc(100% - 30px);
     height: 100%;
-	background-color: #bada55;
+    background-color: #bada55;
 }
 
 .window_content {
@@ -112,5 +113,5 @@ input[type="text"] {
     left: 0;
     top: 0;
     width: 100%;
-	height: calc(100% - 83px);
+    height: calc(100% - 83px);
 }

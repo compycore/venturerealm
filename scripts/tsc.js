@@ -82,7 +82,7 @@ var Item = (function () {
 }());
 var Logo = (function () {
     function Logo() {
-        this.ascii = "\nOOOOO OOOOO O     O OOOOO O    O OOOOO OOOOO OOOOOO OOOOO\nOOOOO OOOOO OO   OO OOOOO OO  OO OOOOO OOOOO OOOOOO OOOOO\nOO    OO OO OOO OOO    OO OOOOOO OO    OO OO     OO     \nOO    OO OO OOOOOOO OOOOO  OOOO  OO    OO OO OOOOOO OOOOO\nOO    OO OO OOOOOOO OOOOO   OO   OO    OO OO OOOOOO \nOOOOO OOOOO OO O OO OO      OO   OOOOO OOOOO OO OO  OOOOO\nOOOOO OOOOO OO   OO OO      OO   OOOOO OOOOO OO  OO OOOOO\n                    O\n";
+        this.ascii = "\nOOO OOO O   O OOO O   O OOO OOO OOOO OOO\nO   O O OO OO   O  O O  O   O O    O OO\nO   O O O O O OOO   O   O   O O OOO     \nOOO OOO O   O O     O   OOO OOO O  O OOO\n              O\n";
     }
     Logo.prototype.draw = function () {
         log(this.ascii.replace(/O/g, characters.black));
@@ -579,7 +579,7 @@ function asciiBar(current, max) {
     return bar;
 }
 function changeBackground(image) {
-    document.body.style.backgroundImage = "url('/images/" + image + ".png')";
+    document.body.style.backgroundImage = "url('../images/" + image + ".png')";
 }
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword. "),
