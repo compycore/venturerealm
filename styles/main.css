@@ -9,7 +9,11 @@ html,
 body {
     color: #fff;
     background: #008080;
+	background-image: url("/images/grass.png");
+	background-repeat: repeat;
 	overflow: hidden;
+	margin: 0;
+	padding: 0;
 }
 
 textarea,
