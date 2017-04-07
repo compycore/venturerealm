@@ -1,8 +1,8 @@
-function random(array: any[]) {
+function random(array: any[]): number {
     return Math.floor(Math.random() * array.length)
 }
 
-function probability(percent: number) {
+function probability(percent: number): boolean {
     if (Math.random() * 100 < percent) {
         return true
     }
@@ -15,7 +15,7 @@ function log(message: string) {
     (<HTMLInputElement>document.getElementById("game_output")).value = message + "\n\n" + (<HTMLInputElement>document.getElementById("game_output")).value;
 }
 
-function combineBools(a: boolean, b: boolean) {
+function combineBools(a: boolean, b: boolean): boolean {
     if (a || b) {
         return true;
     } else {
@@ -23,16 +23,16 @@ function combineBools(a: boolean, b: boolean) {
     }
 }
 
-function isVowel(character: string) {
+function isVowel(character: string): boolean {
     return ['a', 'e', 'i', 'o', 'u'].indexOf(character.toLowerCase()) !== -1
 }
 
-function asciiBar(current: number, max = 10) {
+function asciiBar(current: number, max = 100): string {
     let bar = "";
-    let barLength = 9;
+    let barLength = 15;
     let fill = Math.ceil(current / max * barLength);
 
-    for (var i = 0; i < barLength; i++) {
+    for (let i = 0; i < barLength; i++) {
         if (i < fill) {
             bar += characters.black;
         } else {

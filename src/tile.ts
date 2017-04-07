@@ -35,7 +35,7 @@ interface ITile {
     character: string;
     road: boolean;
     item: Item;
-	background: string;
+    background: string;
     direction: {
         n: boolean,
         e: boolean,
@@ -55,7 +55,7 @@ class Tile implements ITile {
     character: string;
     road: boolean;
     item: Item;
-	background: string;
+    background: string;
     direction: {
         n: boolean,
         e: boolean,

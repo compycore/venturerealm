@@ -2,6 +2,9 @@ interface IPlayer {
     x: number;
     y: number;
     spawned: boolean;
+    attack: number;
+    defense: number;
+    health: number;
     inventory: Item[];
 }
 
@@ -9,10 +12,16 @@ class Player implements IPlayer {
     x: number;
     y: number;
     spawned: boolean;
+    attack: number;
+    defense: number;
+    health: number;
     inventory: Item[];
 
-    constructor(map: Map) {
+    constructor(map: Map, attack = 1, defense = 1, health = 100) {
         this.spawned = false;
+        this.attack = attack;
+        this.defense = defense;
+        this.health = health;
         this.inventory = [];
 
         this.spawn(map);
@@ -68,13 +77,13 @@ class Player implements IPlayer {
         if (this.inventory.length == 0) {
             log("Your inventory is empty.");
         } else {
-            let message = "";
-
-            for (var i = 0; i < this.inventory.length; i++) {
-                message += this.inventory[i].describe() + "\n";
+            for (let i = 0; i < this.inventory.length; i++) {
+                this.inventory[i].describe();
             }
-
-            log(message);
         }
+
+        log("Defense: " + asciiBar(this.defense));
+        log("Attack:  " + asciiBar(this.attack));
+        log("Health:  " + asciiBar(this.health));
     }
 }

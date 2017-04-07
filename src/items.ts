@@ -13,9 +13,12 @@ class Item implements IItem {
     defense: number;
     healing: number;
 
-    constructor(name: string, description: string, attack = 1, defense = 1, healing = 0) {
+    constructor(name: string, description: string, attack = 0, defense = 0, healing = 0) {
         this.name = name;
         this.description = description;
+        this.attack = attack;
+        this.defense = defense;
+        this.healing = healing;
     }
 
     obtain() {
@@ -29,6 +32,6 @@ class Item implements IItem {
     }
 
     describe() {
-        log(this.name + "\n" + this.description + "\nAttack: " + asciiBar(this.attack) + " \tDefense: " + asciiBar(this.defense) + " \tHealing: " + asciiBar(this.healing));
+        log(this.name + "\n" + this.description + "\n  Attack:  " + asciiBar(this.attack) + " \n  Defense: " + asciiBar(this.defense) + " \n  Healing: " + asciiBar(this.healing));
     }
 }

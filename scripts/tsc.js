@@ -60,11 +60,14 @@ function input(value) {
 }
 var Item = (function () {
     function Item(name, description, attack, defense, healing) {
-        if (attack === void 0) { attack = 1; }
-        if (defense === void 0) { defense = 1; }
+        if (attack === void 0) { attack = 0; }
+        if (defense === void 0) { defense = 0; }
         if (healing === void 0) { healing = 0; }
         this.name = name;
         this.description = description;
+        this.attack = attack;
+        this.defense = defense;
+        this.healing = healing;
     }
     Item.prototype.obtain = function () {
         if (isVowel(this.name[0])) {
@@ -76,7 +79,7 @@ var Item = (function () {
         player.inventory.push(this);
     };
     Item.prototype.describe = function () {
-        log(this.name + "\n" + this.description + "\nAttack: " + asciiBar(this.attack) + " \tDefense: " + asciiBar(this.defense) + " \tHealing: " + asciiBar(this.healing));
+        log(this.name + "\n" + this.description + "\n  Attack:  " + asciiBar(this.attack) + " \n  Defense: " + asciiBar(this.defense) + " \n  Healing: " + asciiBar(this.healing));
     };
     return Item;
 }());
@@ -257,7 +260,7 @@ var Map = (function () {
         }
     };
     Map.prototype.draw = function () {
-        var message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+        var message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
         for (var y = 0; y < config.map.size; y++) {
             for (var x = 0; x < config.map.size; x++) {
                 if (x == player.x && y == player.y) {
@@ -276,8 +279,14 @@ var Map = (function () {
     return Map;
 }());
 var Player = (function () {
-    function Player(map) {
+    function Player(map, attack, defense, health) {
+        if (attack === void 0) { attack = 1; }
+        if (defense === void 0) { defense = 1; }
+        if (health === void 0) { health = 100; }
         this.spawned = false;
+        this.attack = attack;
+        this.defense = defense;
+        this.health = health;
         this.inventory = [];
         this.spawn(map);
     }
@@ -326,12 +335,13 @@ var Player = (function () {
             log("Your inventory is empty.");
         }
         else {
-            var message = "";
             for (var i = 0; i < this.inventory.length; i++) {
-                message += this.inventory[i].describe() + "\n";
+                this.inventory[i].describe();
             }
-            log(message);
         }
+        log("Health:  " + asciiBar(this.health));
+        log("Attack:  " + asciiBar(this.attack));
+        log("Defense: " + asciiBar(this.defense));
     };
     return Player;
 }());
@@ -564,9 +574,9 @@ function isVowel(character) {
     return ['a', 'e', 'i', 'o', 'u'].indexOf(character.toLowerCase()) !== -1;
 }
 function asciiBar(current, max) {
-    if (max === void 0) { max = 10; }
+    if (max === void 0) { max = 100; }
     var bar = "";
-    var barLength = 9;
+    var barLength = 15;
     var fill = Math.ceil(current / max * barLength);
     for (var i = 0; i < barLength; i++) {
         if (i < fill) {
@@ -582,8 +592,8 @@ function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
 var allItems = [
-    new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword. "),
-    new Item("Wooden Shield", "A battered wooden shield with something scrawled on the back in a language you do not know. "),
-    new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys. ")
+    new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", 5, 3),
+    new Item("Wooden Shield", "A battered wooden shield with something scrawled on the back in a language you do not know.", 1, 5),
+    new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys.", 2, 2, 1)
 ];
 //# sourceMappingURL=tsc.js.map

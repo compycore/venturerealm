@@ -189,7 +189,7 @@ class Map {
     }
 
     draw() {
-        let message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n";
+        let message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
 
         for (let y = 0; y < config.map.size; y++) {
             for (let x = 0; x < config.map.size; x++) {
