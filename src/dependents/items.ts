@@ -15,6 +15,6 @@ let allItems: Item[] = [
     new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys.", "staff", 2, 2, 1),
     new Item("Leather Helm", "A slightly misshapen, leather helmet.", "helmet", 0, 3),
     new Item("Leather Vest", "A worn, leather vest with tattered tie strings.", "shirt", 0, 3),
-    new Item("Leather Pants", "Worn, leather pants ripped near the bottom of the left leg.", "pants", 0, 3),
-    new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2),
+    new Item("Leather Pants", "Worn, leather pants ripped near the bottom of the left leg.", "pants", 0, 3, 0, true),
+    new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2, 0, true),
 ];

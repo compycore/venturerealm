@@ -45,7 +45,7 @@ class Map {
                     if (this.grid[y][x].road) { // Only place generated artifacts on road tiles
                         if (probability(2)) { // Arbitrary probability value
                             currentCount++;
-                            this.grid[y][x].character = character; // Change the tile's character
+                            this.grid[y][x].characterOverlay = character; // Change the tile's character
 
                             // Apply a randomized, non-directional description based on tile type
                             if (character == characters.city) {
@@ -199,6 +199,8 @@ class Map {
             for (let x = 0; x < config.map.width; x++) {
                 if (x == player.x && y == player.y) {
                     message += characters.player;
+                } else if (this.grid[y][x].characterOverlay) {
+                    message += this.grid[y][x].characterOverlay;
                 } else {
                     message += this.grid[y][x].character;
                 }

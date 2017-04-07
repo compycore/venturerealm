@@ -1,12 +1,12 @@
 var config = {
     map: {
-        width: 50,
-        height: 25,
-        minPathLength: 20,
+        width: 40,
+        height: 20,
+        minPathLength: 18,
         count: {
-            branches: 8,
-            cities: 5,
-            treasure: 5
+            branches: 7,
+            cities: 7,
+            treasure: 12
         }
     }
 };
@@ -60,28 +60,58 @@ function input(value) {
     }
 }
 var Item = (function () {
-    function Item(name, description, itemType, attack, defense, healing) {
+    function Item(name, description, itemType, attack, defense, healing, plural, count) {
         if (attack === void 0) { attack = 0; }
         if (defense === void 0) { defense = 0; }
         if (healing === void 0) { healing = 0; }
+        if (plural === void 0) { plural = false; }
+        if (count === void 0) { count = 1; }
         this.name = name;
+        this.plural = plural;
         this.description = description;
+        this.count = count;
         this.itemType = itemType;
         this.attack = attack;
         this.defense = defense;
         this.healing = healing;
     }
+    Item.prototype.addToInventory = function () {
+        for (var i = 0; i < player.inventory.length; i++) {
+            if (player.inventory[i].name == this.name) {
+                player.inventory[i].count += this.count;
+                return;
+            }
+        }
+        player.inventory.push(new Item(this.name, this.description, this.itemType, this.attack, this.defense, this.healing, this.plural, this.count));
+    };
     Item.prototype.obtain = function () {
-        if (isVowel(this.name[0])) {
+        if (this.count > 1) {
+            if (this.plural) {
+                log("You obtained " + this.count + " " + this.name.toLowerCase() + ".");
+            }
+            else {
+                log("You obtained " + this.count + " " + this.name.toLowerCase() + "s.");
+            }
+        }
+        else if (this.plural) {
+            log("You obtained " + this.name.toLowerCase() + ".");
+        }
+        else if (isVowel(this.name[0])) {
             log("You obtained an " + this.name.toLowerCase() + ".");
         }
         else {
             log("You obtained a " + this.name.toLowerCase() + ".");
         }
-        player.inventory.push(this);
+        this.addToInventory();
+        map.grid[player.y][player.x].item = null;
+        map.grid[player.y][player.x].characterOverlay = null;
     };
     Item.prototype.describe = function () {
-        log(this.name + " (" + this.itemType + ")\n" + this.description + "\nAttack:  " + asciiBar(this.attack) + " \nDefense: " + asciiBar(this.defense) + " \nHealing: " + asciiBar(this.healing));
+        var count = "";
+        if (this.count > 1) {
+            count = " " + this.count + "X";
+        }
+        log(this.name + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
     };
     return Item;
 }());
@@ -137,8 +167,7 @@ var Map = (function () {
                     if (this.grid[y][x].road) {
                         if (probability(2)) {
                             currentCount++;
-                            console.log(character, count, currentCount);
-                            this.grid[y][x].character = character;
+                            this.grid[y][x].characterOverlay = character;
                             if (character == characters.city) {
                                 this.grid[y][x].description.interest = descriptions.cities[random(descriptions.cities)];
                             }
@@ -271,6 +300,9 @@ var Map = (function () {
             for (var x = 0; x < config.map.width; x++) {
                 if (x == player.x && y == player.y) {
                     message += characters.player;
+                }
+                else if (this.grid[y][x].characterOverlay) {
+                    message += this.grid[y][x].characterOverlay;
                 }
                 else {
                     message += this.grid[y][x].character;
@@ -603,7 +635,7 @@ var allItems = [
     new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys.", "staff", 2, 2, 1),
     new Item("Leather Helm", "A slightly misshapen, leather helmet.", "helmet", 0, 3),
     new Item("Leather Vest", "A worn, leather vest with tattered tie strings.", "shirt", 0, 3),
-    new Item("Leather Pants", "Worn, leather pants ripped near the bottom of the left leg.", "pants", 0, 3),
-    new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2),
+    new Item("Leather Pants", "Worn, leather pants ripped near the bottom of the left leg.", "pants", 0, 3, 0, true),
+    new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2, 0, true),
 ];
 //# sourceMappingURL=tsc.js.map

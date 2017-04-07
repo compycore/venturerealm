@@ -33,6 +33,7 @@ interface ITile {
     x: number;
     y: number;
     character: string;
+	characterOverlay: string;
     road: boolean;
     item: Item;
     background: string;
@@ -49,10 +50,10 @@ interface ITile {
 }
 
 class Tile implements ITile {
-    // Copypasta of ITile
     x: number;
     y: number;
     character: string;
+	characterOverlay: string;
     road: boolean;
     item: Item;
     background: string;
