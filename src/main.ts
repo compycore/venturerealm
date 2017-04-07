@@ -12,6 +12,8 @@ function init() {
     player = new Player(map);
 	logo = new Logo();
 
+	player.updateBackground();
+
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
 	logo.draw();
 }

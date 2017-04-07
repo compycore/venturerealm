@@ -49,10 +49,13 @@ class Map {
 
                             // Apply a randomized, non-directional description based on tile type
                             if (character == characters.city) {
+								this.grid[y][x].backgroundOverlay = "city";
                                 this.grid[y][x].description.interest = random(descriptions.cities);
                             } else if (character == characters.portal) {
+								this.grid[y][x].backgroundOverlay = "portal";
                                 this.grid[y][x].description.interest = random(descriptions.portals);
                             } else if (character == characters.treasure) {
+								this.grid[y][x].backgroundOverlay = "treasure";
                                 this.grid[y][x].item = random(allItems);
                                 this.grid[y][x].description.interest = random(descriptions.treasure);
                             }

@@ -65,6 +65,9 @@ class Item implements IItem {
         // Remove the item icon from the map
         map.grid[player.y][player.x].item = null;
         map.grid[player.y][player.x].characterOverlay = null;
+        map.grid[player.y][player.x].backgroundOverlay = null;
+
+        player.updateBackground();
     }
 
     describe() {
@@ -76,9 +79,9 @@ class Item implements IItem {
         }
 
         if (this.equipped) {
-            equipped = "\nEquipped\n";
+            equipped = "Equipped\n";
         }
 
-        log(this.name + equipped + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
+        log(this.name + " (" + this.itemType + ")" + count + "\n" + equipped + " " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
     }
 }

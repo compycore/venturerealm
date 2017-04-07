@@ -45,7 +45,7 @@ function input(value) {
         parameter = buildParameter.join(" ");
     }
     if (command == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'");
     }
     else if (command == "map") {
         map.draw();
@@ -75,7 +75,7 @@ function input(value) {
     else if (command == "look") {
         map.grid[player.y][player.x].describe();
     }
-    else if (command == "open") {
+    else if (command == "open" || command == "get") {
         map.grid[player.y][player.x].obtain();
     }
     else {
@@ -130,6 +130,8 @@ var Item = (function () {
         this.addToInventory();
         map.grid[player.y][player.x].item = null;
         map.grid[player.y][player.x].characterOverlay = null;
+        map.grid[player.y][player.x].backgroundOverlay = null;
+        player.updateBackground();
     };
     Item.prototype.describe = function () {
         var equipped = "";
@@ -138,9 +140,9 @@ var Item = (function () {
             count = " " + this.count + "X";
         }
         if (this.equipped) {
-            equipped = "\nEquipped\n";
+            equipped = "Equipped\n";
         }
-        log(this.name + equipped + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
+        log(this.name + " (" + this.itemType + ")" + count + "\n" + equipped + " " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
     };
     return Item;
 }());
@@ -162,6 +164,7 @@ function init() {
     map = new Map();
     player = new Player(map);
     logo = new Logo();
+    player.updateBackground();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
 }
@@ -198,14 +201,17 @@ var Map = (function () {
                             currentCount++;
                             this.grid[y][x].characterOverlay = character;
                             if (character == characters.city) {
-                                this.grid[y][x].description.interest = descriptions.cities[random(descriptions.cities)];
+                                this.grid[y][x].backgroundOverlay = "city";
+                                this.grid[y][x].description.interest = random(descriptions.cities);
                             }
                             else if (character == characters.portal) {
-                                this.grid[y][x].description.interest = descriptions.portals[random(descriptions.portals)];
+                                this.grid[y][x].backgroundOverlay = "portal";
+                                this.grid[y][x].description.interest = random(descriptions.portals);
                             }
                             else if (character == characters.treasure) {
-                                this.grid[y][x].item = allItems[random(allItems)];
-                                this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
+                                this.grid[y][x].backgroundOverlay = "treasure";
+                                this.grid[y][x].item = random(allItems);
+                                this.grid[y][x].description.interest = random(descriptions.treasure);
                             }
                             if (currentCount == count) {
                                 return;
@@ -395,6 +401,7 @@ var Player = (function () {
                 map.draw();
             }
         }
+        this.updateBackground();
         map.grid[this.y][this.x].describe();
     };
     Player.prototype.equip = function (itemName) {
@@ -427,6 +434,14 @@ var Player = (function () {
             }
         }
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    };
+    Player.prototype.updateBackground = function () {
+        if (map.grid[this.y][this.x].backgroundOverlay) {
+            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
+        }
+        else {
+            changeBackground(map.grid[this.y][this.x].background);
+        }
     };
     Player.prototype.calculateAttack = function () {
         var total = this.attack;
@@ -483,12 +498,16 @@ var characters = {
     player: String.fromCharCode(9675)
 };
 var Tile = (function () {
-    function Tile(x, y, character) {
+    function Tile(x, y, character, background, backgroundOverlay) {
         if (character === void 0) { character = characters.gray; }
+        if (background === void 0) { background = "grass"; }
+        if (backgroundOverlay === void 0) { backgroundOverlay = null; }
         this.x = x;
         this.y = y;
         this.character = character;
         this.road = false;
+        this.background = random(["grass", "path"]);
+        this.backgroundOverlay = backgroundOverlay;
         this.direction = {
             n: false,
             e: false,
@@ -577,7 +596,7 @@ var Tile = (function () {
             this.direction.w = true;
         }
         if (this.road) {
-            this.description.interest = descriptions.roads[random(descriptions.roads)];
+            this.description.interest = random(descriptions.roads);
         }
     }
     Tile.prototype.apply = function (grid) {
@@ -665,7 +684,7 @@ var Tile = (function () {
     return Tile;
 }());
 function random(array) {
-    return Math.floor(Math.random() * array.length);
+    return array[Math.floor(Math.random() * array.length)];
 }
 function probability(percent) {
     if (Math.random() * 100 < percent) {

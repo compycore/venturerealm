@@ -33,10 +33,11 @@ interface ITile {
     x: number;
     y: number;
     character: string;
-	characterOverlay: string;
+    characterOverlay: string;
     road: boolean;
     item: Item;
     background: string;
+    backgroundOverlay: string;
     direction: {
         n: boolean,
         e: boolean,
@@ -53,10 +54,11 @@ class Tile implements ITile {
     x: number;
     y: number;
     character: string;
-	characterOverlay: string;
+    characterOverlay: string;
     road: boolean;
     item: Item;
     background: string;
+    backgroundOverlay: string;
     direction: {
         n: boolean,
         e: boolean,
@@ -68,12 +70,13 @@ class Tile implements ITile {
         interest: string
     };
 
-    constructor(x: number, y: number, character = characters.gray, background = "grass") {
+    constructor(x: number, y: number, character = characters.gray, background = "grass", backgroundOverlay: string = null) {
         this.x = x;
         this.y = y;
         this.character = character;
         this.road = false;
-		this.background = background;
+        this.background = random(["grass", "path"]);
+        this.backgroundOverlay = backgroundOverlay;
         this.direction = {
             n: false,
             e: false,

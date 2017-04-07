@@ -70,6 +70,7 @@ class Player implements IPlayer {
             }
         }
 
+        this.updateBackground();
         map.grid[this.y][this.x].describe();
     }
 
@@ -107,6 +108,14 @@ class Player implements IPlayer {
         }
 
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    }
+
+    updateBackground() {
+        if (map.grid[this.y][this.x].backgroundOverlay) {
+            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
+        } else {
+            changeBackground(map.grid[this.y][this.x].background);
+        }
     }
 
     calculateAttack(): number {
