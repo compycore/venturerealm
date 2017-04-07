@@ -37,22 +37,45 @@ document.getElementById("player_input").onkeypress = function (e) {
 };
 function input(value) {
     value = value.toLowerCase();
-    if (value == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'");
+    var command = value.split(" ")[0];
+    var parameter = "";
+    if (value.split(" ").length > 1) {
+        var buildParameter = value.split(" ");
+        buildParameter.shift();
+        parameter = buildParameter.join(" ");
     }
-    else if (value == "map") {
+    if (command == "help") {
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'");
+    }
+    else if (command == "map") {
         map.draw();
     }
-    else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) {
-        player.move(value);
+    else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) {
+        player.move(command);
     }
-    else if (value == "inventory") {
+    else if (command == "inventory") {
         player.describe();
     }
-    else if (value == "look") {
+    else if (command == "equip") {
+        if (parameter) {
+            player.equip(parameter);
+        }
+        else {
+            log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+        }
+    }
+    else if (command == "discard") {
+        if (parameter) {
+            player.discard(parameter);
+        }
+        else {
+            log("Please provide an item name to discard; E.g. 'discard wooden sword'");
+        }
+    }
+    else if (command == "look") {
         map.grid[player.y][player.x].describe();
     }
-    else if (value == "open") {
+    else if (command == "open") {
         map.grid[player.y][player.x].obtain();
     }
     else {
@@ -60,12 +83,13 @@ function input(value) {
     }
 }
 var Item = (function () {
-    function Item(name, description, itemType, attack, defense, healing, plural, count) {
+    function Item(name, description, itemType, attack, defense, healing, plural, count, equipped) {
         if (attack === void 0) { attack = 0; }
         if (defense === void 0) { defense = 0; }
         if (healing === void 0) { healing = 0; }
         if (plural === void 0) { plural = false; }
         if (count === void 0) { count = 1; }
+        if (equipped === void 0) { equipped = false; }
         this.name = name;
         this.plural = plural;
         this.description = description;
@@ -74,6 +98,7 @@ var Item = (function () {
         this.attack = attack;
         this.defense = defense;
         this.healing = healing;
+        this.equipped = false;
     }
     Item.prototype.addToInventory = function () {
         for (var i = 0; i < player.inventory.length; i++) {
@@ -82,7 +107,7 @@ var Item = (function () {
                 return;
             }
         }
-        player.inventory.push(new Item(this.name, this.description, this.itemType, this.attack, this.defense, this.healing, this.plural, this.count));
+        player.inventory.push(new Item(this.name, this.description, this.itemType, this.attack, this.defense, this.healing, this.plural, this.count, this.equipped));
     };
     Item.prototype.obtain = function () {
         if (this.count > 1) {
@@ -107,11 +132,15 @@ var Item = (function () {
         map.grid[player.y][player.x].characterOverlay = null;
     };
     Item.prototype.describe = function () {
+        var equipped = "";
         var count = "";
         if (this.count > 1) {
             count = " " + this.count + "X";
         }
-        log(this.name + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
+        if (this.equipped) {
+            equipped = "\nEquipped\n";
+        }
+        log(this.name + equipped + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
     };
     return Item;
 }());
@@ -368,6 +397,55 @@ var Player = (function () {
         }
         map.grid[this.y][this.x].describe();
     };
+    Player.prototype.equip = function (itemName) {
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                for (var j = 0; j < this.inventory.length; j++) {
+                    if (this.inventory[j].itemType == this.inventory[i].itemType) {
+                        this.inventory[j].equipped = false;
+                    }
+                }
+                this.inventory[i].equipped = true;
+                log("Equipped " + this.inventory[i].name + ".");
+                return;
+            }
+        }
+        log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    };
+    Player.prototype.discard = function (itemName) {
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                if (this.inventory[i].count > 1) {
+                    log("Discarded 1 " + this.inventory[i].name + ".");
+                    this.inventory[i].count--;
+                }
+                else {
+                    log("Discarded " + this.inventory[i].name + ".");
+                    this.inventory.splice(i, 1);
+                }
+                return;
+            }
+        }
+        log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    };
+    Player.prototype.calculateAttack = function () {
+        var total = this.attack;
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].attack;
+            }
+        }
+        return total;
+    };
+    Player.prototype.calculateDefense = function () {
+        var total = this.attack;
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].defense;
+            }
+        }
+        return total;
+    };
     Player.prototype.describe = function () {
         if (this.inventory.length == 0) {
             log("Your inventory is empty.");
@@ -377,7 +455,7 @@ var Player = (function () {
                 this.inventory[i].describe();
             }
         }
-        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.attack) + "\nDefense: " + asciiBar(this.defense));
+        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
     };
     return Player;
 }());

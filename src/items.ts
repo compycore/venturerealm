@@ -3,6 +3,7 @@ interface IItem {
     plural: boolean;
     description: string;
     count: number;
+    equipped: boolean;
     itemType: string;
     attack: number;
     defense: number;
@@ -14,12 +15,13 @@ class Item implements IItem {
     plural: boolean;
     description: string;
     count: number;
+    equipped: boolean;
     itemType: string;
     attack: number;
     defense: number;
     healing: number;
 
-    constructor(name: string, description: string, itemType: string, attack = 0, defense = 0, healing = 0, plural = false, count = 1) {
+    constructor(name: string, description: string, itemType: string, attack = 0, defense = 0, healing = 0, plural = false, count = 1, equipped = false) {
         this.name = name;
         this.plural = plural;
         this.description = description;
@@ -28,6 +30,7 @@ class Item implements IItem {
         this.attack = attack;
         this.defense = defense;
         this.healing = healing;
+        this.equipped = false;
     }
 
     addToInventory() {
@@ -38,7 +41,7 @@ class Item implements IItem {
             }
         }
 
-        player.inventory.push(new Item(this.name, this.description, this.itemType, this.attack, this.defense, this.healing, this.plural, this.count));
+        player.inventory.push(new Item(this.name, this.description, this.itemType, this.attack, this.defense, this.healing, this.plural, this.count, this.equipped));
     }
 
     obtain() {
@@ -65,12 +68,17 @@ class Item implements IItem {
     }
 
     describe() {
-        let count = ""
+        let equipped = "";
+        let count = "";
 
         if (this.count > 1) {
             count = " " + this.count + "X";
         }
 
-        log(this.name + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
+        if (this.equipped) {
+            equipped = "\nEquipped\n";
+        }
+
+        log(this.name + equipped + " (" + this.itemType + ")" + count + "\n " + this.description + "\n Attack:  " + asciiBar(this.attack) + " \n Defense: " + asciiBar(this.defense) + " \n Healing: " + asciiBar(this.healing));
     }
 }

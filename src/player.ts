@@ -73,6 +73,66 @@ class Player implements IPlayer {
         map.grid[this.y][this.x].describe();
     }
 
+    equip(itemName: string) {
+        for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                for (let j = 0; j < this.inventory.length; j++) {
+                    if (this.inventory[j].itemType == this.inventory[i].itemType) {
+                        this.inventory[j].equipped = false;
+                    }
+                }
+
+                this.inventory[i].equipped = true;
+                log("Equipped " + this.inventory[i].name + ".");
+                return;
+            }
+        }
+
+        log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    }
+
+    discard(itemName: string) {
+        for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                if (this.inventory[i].count > 1) {
+                    log("Discarded 1 " + this.inventory[i].name + ".");
+                    this.inventory[i].count--;
+                } else {
+                    log("Discarded " + this.inventory[i].name + ".");
+                    this.inventory.splice(i, 1);
+                }
+
+                return;
+            }
+        }
+
+        log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    }
+
+    calculateAttack(): number {
+        let total = this.attack;
+
+        for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].attack;
+            }
+        }
+
+        return total;
+    }
+
+    calculateDefense(): number {
+        let total = this.attack;
+
+        for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].defense;
+            }
+        }
+
+        return total;
+    }
+
     describe() {
         if (this.inventory.length == 0) {
             log("Your inventory is empty.");
@@ -82,6 +142,6 @@ class Player implements IPlayer {
             }
         }
 
-        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.attack) + "\nDefense: " + asciiBar(this.defense));
+        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
     }
 }
