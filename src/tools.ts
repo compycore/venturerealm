@@ -1,5 +1,5 @@
-function random(array: any[]): number {
-    return Math.floor(Math.random() * array.length)
+function random(array: any[]) {
+    return array[Math.floor(Math.random() * array.length)];
 }
 
 function probability(percent: number): boolean {

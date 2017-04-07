@@ -68,11 +68,12 @@ class Tile implements ITile {
         interest: string
     };
 
-    constructor(x: number, y: number, character = characters.gray) {
+    constructor(x: number, y: number, character = characters.gray, background = "grass") {
         this.x = x;
         this.y = y;
         this.character = character;
         this.road = false;
+		this.background = background;
         this.direction = {
             n: false,
             e: false,
@@ -151,7 +152,7 @@ class Tile implements ITile {
 
         // Apply a road description if applicable
         if (this.road) {
-            this.description.interest = descriptions.roads[random(descriptions.roads)];
+            this.description.interest = random(descriptions.roads);
         }
     }
 
