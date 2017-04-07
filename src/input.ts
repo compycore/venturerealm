@@ -14,7 +14,7 @@ function input(value: string) {
     value = value.toLowerCase();
 
     if (value == "help") {
-		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'\n");
+		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'");
     } else if (value == "map") {
         map.draw();
     } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(value) > -1) { // Allow for player movement

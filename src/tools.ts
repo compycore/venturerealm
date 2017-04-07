@@ -36,7 +36,7 @@ function asciiBar(current: number, max = 100): string {
         if (i < fill) {
             bar += characters.black;
         } else {
-            bar += characters.gray;
+            bar += "-";
         }
     }
 

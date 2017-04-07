@@ -40,8 +40,8 @@ class Map {
         let currentCount = 0;
 
         while (currentCount < count) {
-            for (let y = 0; y < config.map.size; y++) {
-                for (let x = 0; x < config.map.size; x++) {
+            for (let y = 0; y < config.map.height; y++) {
+                for (let x = 0; x < config.map.width; x++) {
                     if (this.grid[y][x].road) { // Only place generated artifacts on road tiles
                         if (probability(2)) { // Arbitrary probability value
                             currentCount++;
@@ -53,8 +53,12 @@ class Map {
                             } else if (character == characters.portal) {
                                 this.grid[y][x].description.interest = descriptions.portals[random(descriptions.portals)];
                             } else if (character == characters.treasure) {
-								this.grid[y][x].item = allItems[random(allItems)];
+                                this.grid[y][x].item = allItems[random(allItems)];
                                 this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
+                            }
+
+                            if (currentCount == count) {
+                                return;
                             }
                         }
                     }
@@ -98,26 +102,26 @@ class Map {
         return this.findPath(pointA, pointB).length
     }
 
-    // Make an empty 2D array of size config.map.size
+    // Make an empty 2D array of size defined in the map configuration
     makeEmptyMap() {
-        for (let y = 0; y < config.map.size; y++) {
+        for (let y = 0; y < config.map.height; y++) {
             this.grid[y] = [];
 
-            for (let x = 0; x < config.map.size; x++) {
+            for (let x = 0; x < config.map.width; x++) {
                 this.grid[y][x] = new Tile(x, y);
             }
         }
     }
 
     randomPoint() {
-        let x = Math.floor(Math.random() * config.map.size);
-        let y = Math.floor(Math.random() * config.map.size);
+        let x = Math.floor(Math.random() * config.map.width);
+        let y = Math.floor(Math.random() * config.map.height);
 
         return [x, y];
     }
 
     findPath(pointA: number[], pointB: number[]) {
-        let grid = new PF.Grid(config.map.size, config.map.size);
+        let grid = new PF.Grid(config.map.width, config.map.height);
         let finder = new PF.AStarFinder();
         return finder.findPath(pointA[0], pointA[1], pointB[0], pointB[1], grid);
     }
@@ -191,15 +195,15 @@ class Map {
     draw() {
         let message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
 
-        for (let y = 0; y < config.map.size; y++) {
-            for (let x = 0; x < config.map.size; x++) {
+        for (let y = 0; y < config.map.height; y++) {
+            for (let x = 0; x < config.map.width; x++) {
                 if (x == player.x && y == player.y) {
                     message += characters.player;
                 } else {
                     message += this.grid[y][x].character;
                 }
 
-                if (x == config.map.size - 1 && y < config.map.size - 1) {
+                if (x == config.map.width - 1 && y < config.map.height - 1) {
                     message += "\n";
                 }
             }

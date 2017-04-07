@@ -1,6 +1,7 @@
 interface IItem {
     name: string;
     description: string;
+    itemType: string;
     attack: number;
     defense: number;
     healing: number;
@@ -9,13 +10,15 @@ interface IItem {
 class Item implements IItem {
     name: string;
     description: string;
+    itemType: string;
     attack: number;
     defense: number;
     healing: number;
 
-    constructor(name: string, description: string, attack = 0, defense = 0, healing = 0) {
+    constructor(name: string, description: string, itemType: string, attack = 0, defense = 0, healing = 0) {
         this.name = name;
         this.description = description;
+        this.itemType = itemType;
         this.attack = attack;
         this.defense = defense;
         this.healing = healing;
@@ -32,6 +35,6 @@ class Item implements IItem {
     }
 
     describe() {
-        log(this.name + "\n" + this.description + "\n  Attack:  " + asciiBar(this.attack) + " \n  Defense: " + asciiBar(this.defense) + " \n  Healing: " + asciiBar(this.healing));
+        log(this.name + " (" + this.itemType + ")\n" + this.description + "\nAttack:  " + asciiBar(this.attack) + " \nDefense: " + asciiBar(this.defense) + " \nHealing: " + asciiBar(this.healing));
     }
 }

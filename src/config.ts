@@ -1,11 +1,12 @@
 let config = {
     map: {
-        size: 25,
-        minPathLength: 12,
+        width: 50,
+		height: 25,
+        minPathLength: 20,
         count: {
-            branches: 5,
-            cities: 3,
-            treasure: 3
+            branches: 8,
+            cities: 5,
+            treasure: 5
         }
     }
 }

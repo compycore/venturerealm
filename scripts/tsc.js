@@ -1,11 +1,12 @@
 var config = {
     map: {
-        size: 25,
-        minPathLength: 12,
+        width: 50,
+        height: 25,
+        minPathLength: 20,
         count: {
-            branches: 5,
-            cities: 3,
-            treasure: 3
+            branches: 8,
+            cities: 5,
+            treasure: 5
         }
     }
 };
@@ -37,7 +38,7 @@ document.getElementById("player_input").onkeypress = function (e) {
 function input(value) {
     value = value.toLowerCase();
     if (value == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'\n");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'look'\n'open'");
     }
     else if (value == "map") {
         map.draw();
@@ -59,12 +60,13 @@ function input(value) {
     }
 }
 var Item = (function () {
-    function Item(name, description, attack, defense, healing) {
+    function Item(name, description, itemType, attack, defense, healing) {
         if (attack === void 0) { attack = 0; }
         if (defense === void 0) { defense = 0; }
         if (healing === void 0) { healing = 0; }
         this.name = name;
         this.description = description;
+        this.itemType = itemType;
         this.attack = attack;
         this.defense = defense;
         this.healing = healing;
@@ -79,7 +81,7 @@ var Item = (function () {
         player.inventory.push(this);
     };
     Item.prototype.describe = function () {
-        log(this.name + "\n" + this.description + "\n  Attack:  " + asciiBar(this.attack) + " \n  Defense: " + asciiBar(this.defense) + " \n  Healing: " + asciiBar(this.healing));
+        log(this.name + " (" + this.itemType + ")\n" + this.description + "\nAttack:  " + asciiBar(this.attack) + " \nDefense: " + asciiBar(this.defense) + " \nHealing: " + asciiBar(this.healing));
     };
     return Item;
 }());
@@ -130,11 +132,12 @@ var Map = (function () {
     Map.prototype.generate = function (character, count) {
         var currentCount = 0;
         while (currentCount < count) {
-            for (var y = 0; y < config.map.size; y++) {
-                for (var x = 0; x < config.map.size; x++) {
+            for (var y = 0; y < config.map.height; y++) {
+                for (var x = 0; x < config.map.width; x++) {
                     if (this.grid[y][x].road) {
                         if (probability(2)) {
                             currentCount++;
+                            console.log(character, count, currentCount);
                             this.grid[y][x].character = character;
                             if (character == characters.city) {
                                 this.grid[y][x].description.interest = descriptions.cities[random(descriptions.cities)];
@@ -145,6 +148,9 @@ var Map = (function () {
                             else if (character == characters.treasure) {
                                 this.grid[y][x].item = allItems[random(allItems)];
                                 this.grid[y][x].description.interest = descriptions.treasure[random(descriptions.treasure)];
+                            }
+                            if (currentCount == count) {
+                                return;
                             }
                         }
                     }
@@ -178,20 +184,20 @@ var Map = (function () {
         return this.findPath(pointA, pointB).length;
     };
     Map.prototype.makeEmptyMap = function () {
-        for (var y = 0; y < config.map.size; y++) {
+        for (var y = 0; y < config.map.height; y++) {
             this.grid[y] = [];
-            for (var x = 0; x < config.map.size; x++) {
+            for (var x = 0; x < config.map.width; x++) {
                 this.grid[y][x] = new Tile(x, y);
             }
         }
     };
     Map.prototype.randomPoint = function () {
-        var x = Math.floor(Math.random() * config.map.size);
-        var y = Math.floor(Math.random() * config.map.size);
+        var x = Math.floor(Math.random() * config.map.width);
+        var y = Math.floor(Math.random() * config.map.height);
         return [x, y];
     };
     Map.prototype.findPath = function (pointA, pointB) {
-        var grid = new PF.Grid(config.map.size, config.map.size);
+        var grid = new PF.Grid(config.map.width, config.map.height);
         var finder = new PF.AStarFinder();
         return finder.findPath(pointA[0], pointA[1], pointB[0], pointB[1], grid);
     };
@@ -261,15 +267,15 @@ var Map = (function () {
     };
     Map.prototype.draw = function () {
         var message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
-        for (var y = 0; y < config.map.size; y++) {
-            for (var x = 0; x < config.map.size; x++) {
+        for (var y = 0; y < config.map.height; y++) {
+            for (var x = 0; x < config.map.width; x++) {
                 if (x == player.x && y == player.y) {
                     message += characters.player;
                 }
                 else {
                     message += this.grid[y][x].character;
                 }
-                if (x == config.map.size - 1 && y < config.map.size - 1) {
+                if (x == config.map.width - 1 && y < config.map.height - 1) {
                     message += "\n";
                 }
             }
@@ -292,8 +298,8 @@ var Player = (function () {
     }
     Player.prototype.spawn = function (map) {
         while (!this.spawned) {
-            for (var y = 0; y < config.map.size; y++) {
-                for (var x = 0; x < config.map.size; x++) {
+            for (var y = 0; y < config.map.height; y++) {
+                for (var x = 0; x < config.map.width; x++) {
                     if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
@@ -339,9 +345,7 @@ var Player = (function () {
                 this.inventory[i].describe();
             }
         }
-        log("Defense: " + asciiBar(this.defense));
-        log("Attack:  " + asciiBar(this.attack));
-        log("Health:  " + asciiBar(this.health));
+        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.attack) + "\nDefense: " + asciiBar(this.defense));
     };
     return Player;
 }());
@@ -583,7 +587,7 @@ function asciiBar(current, max) {
             bar += characters.black;
         }
         else {
-            bar += characters.gray;
+            bar += "-";
         }
     }
     return bar;
@@ -592,8 +596,14 @@ function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
 var allItems = [
-    new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", 5, 3),
-    new Item("Wooden Shield", "A battered wooden shield with something scrawled on the back in a language you do not know.", 1, 5),
-    new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys.", 2, 2, 1)
+    new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", "weapon", 5, 3),
+    new Item("Steel Sword", "A dull but reliable metal sword.", "weapon", 10, 4),
+    new Item("Wooden Shield", "A battered wooden shield with something scrawled on the back in a language you do not know.", "shield", 1, 5),
+    new Item("Steel Shield", "A tarnished metal shield with dents around the edges.", "shield", 3, 10),
+    new Item("Walking Staff", "A cracked walking staff that seems to have seen many journeys.", "staff", 2, 2, 1),
+    new Item("Leather Helm", "A slightly misshapen, leather helmet.", "helmet", 0, 3),
+    new Item("Leather Vest", "A worn, leather vest with tattered tie strings.", "shirt", 0, 3),
+    new Item("Leather Pants", "Worn, leather pants ripped near the bottom of the left leg.", "pants", 0, 3),
+    new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2),
 ];
 //# sourceMappingURL=tsc.js.map
