@@ -5,15 +5,26 @@
     font-style: normal;
 }
 
+@keyframes animatedBackground {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 0 100%;
+    }
+}
+
 html,
 body {
     color: #fff;
     background: #008080;
-    background-image: url("../images/grass.png");
-    background-repeat: repeat;
     overflow: hidden;
     margin: 0;
     padding: 0;
+    background-image: url("../images/grass.png");
+    background-repeat: repeat;
+    background-position: 0px 0px;
+    animation: animatedBackground 200s linear infinite;
 }
 
 textarea,
