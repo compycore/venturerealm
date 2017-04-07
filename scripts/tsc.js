@@ -579,7 +579,7 @@ function asciiBar(current, max) {
     return bar;
 }
 function changeBackground(image) {
-    document.body.style.backgroundImage = "url('../images/" + image + ".png')";
+    document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword. "),
