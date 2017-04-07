@@ -339,9 +339,9 @@ var Player = (function () {
                 this.inventory[i].describe();
             }
         }
-        log("Health:  " + asciiBar(this.health));
-        log("Attack:  " + asciiBar(this.attack));
         log("Defense: " + asciiBar(this.defense));
+        log("Attack:  " + asciiBar(this.attack));
+        log("Health:  " + asciiBar(this.health));
     };
     return Player;
 }());
