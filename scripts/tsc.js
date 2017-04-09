@@ -1,3 +1,103 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var Character = (function () {
+    function Character(map, description, attack, defense, health, background) {
+        if (attack === void 0) { attack = 1; }
+        if (defense === void 0) { defense = 1; }
+        if (health === void 0) { health = 100; }
+        if (background === void 0) { background = ""; }
+        this.spawned = false;
+        this.attack = attack;
+        this.defense = defense;
+        this.health = health;
+        this.background = background;
+        this.dialogue = random(this.allDialogue);
+        this.description = description;
+        for (var i = 0; i < 5; i++) {
+            this.inventory.push(random(allItems));
+        }
+        this.item = random(this.inventory);
+        this.spawn(map);
+    }
+    Character.prototype.spawn = function (map) {
+        while (!this.spawned) {
+            for (var y = 0; y < config.map.height; y++) {
+                for (var x = 0; x < config.map.width; x++) {
+                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                        this.x = x;
+                        this.y = y;
+                        this.spawned = true;
+                    }
+                }
+            }
+        }
+    };
+    Character.prototype.give = function (itemName) {
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                if (this.inventory[i].count > 1) {
+                    log("Discarded 1 " + this.inventory[i].name + ".");
+                    this.inventory[i].count--;
+                }
+                else {
+                    log("Discarded " + this.inventory[i].name + ".");
+                    this.inventory.splice(i, 1);
+                }
+                return;
+            }
+        }
+        log("You received.");
+    };
+    Character.prototype.updateBackground = function () {
+        if (map.grid[this.y][this.x].backgroundOverlay) {
+            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
+        }
+        else {
+            changeBackground(map.grid[this.y][this.x].background);
+        }
+    };
+    Character.prototype.calculateAttack = function () {
+        var total = this.attack;
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].attack;
+            }
+        }
+        return total;
+    };
+    Character.prototype.calculateDefense = function () {
+        var total = this.attack;
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].defense;
+            }
+        }
+        return total;
+    };
+    Character.prototype.speak = function () {
+        log(this.dialogue);
+    };
+    Character.prototype.describe = function () {
+        if (this.inventory.length == 0) {
+            log("Your inventory is empty.");
+        }
+        else {
+            for (var i = 0; i < this.inventory.length; i++) {
+                this.inventory[i].describe();
+            }
+        }
+        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
+    };
+    return Character;
+}());
 var config = {
     map: {
         width: 40,
@@ -724,6 +824,17 @@ function asciiBar(current, max) {
 function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
+var Gregory = (function (_super) {
+    __extends(Gregory, _super);
+    function Gregory() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.allDialogue = [
+            "BUUUUUUUURITOOOOOOOOO! BURRRRRRITOOOOOOOO! BUUUUUUURIIIIITTTOOOOOO!"
+        ];
+        return _this;
+    }
+    return Gregory;
+}(Character));
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", "weapon", 5, 3),
     new Item("Steel Sword", "A dull but reliable metal sword.", "weapon", 10, 4),
