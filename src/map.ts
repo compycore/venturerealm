@@ -202,6 +202,8 @@ class Map {
             for (let x = 0; x < config.map.width; x++) {
                 if (x == player.x && y == player.y) {
                     message += characters.player;
+				} else if (x == gregory.x && y == gregory.y) {
+					message += characters.character;
                 } else if (this.grid[y][x].characterOverlay) {
                     message += this.grid[y][x].characterOverlay;
                 } else {

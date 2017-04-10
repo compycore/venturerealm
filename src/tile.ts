@@ -26,7 +26,8 @@ let characters = {
     black: String.fromCharCode(9619),
     gray: String.fromCharCode(9618),
 
-    player: String.fromCharCode(9675)
+    player: String.fromCharCode(9675),
+    character: String.fromCharCode(9635)
 }
 
 interface ITile {

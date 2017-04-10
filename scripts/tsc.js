@@ -1,15 +1,5 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var Character = (function () {
-    function Character(map, description, attack, defense, health, background) {
+    function Character(map, description, attack, defense, health, background, allDialogue, inventory) {
         if (attack === void 0) { attack = 1; }
         if (defense === void 0) { defense = 1; }
         if (health === void 0) { health = 100; }
@@ -19,6 +9,8 @@ var Character = (function () {
         this.defense = defense;
         this.health = health;
         this.background = background;
+        this.inventory = inventory;
+        this.allDialogue = allDialogue;
         this.dialogue = random(this.allDialogue);
         this.description = description;
         for (var i = 0; i < 5; i++) {
@@ -258,12 +250,18 @@ var Logo = (function () {
 var map;
 var player;
 var logo;
+var gregory;
 function init() {
     console.log("Loaded");
     document.getElementById("player_input").focus();
     map = new Map();
     player = new Player(map);
     logo = new Logo();
+    gregory = new Character(map, "A short yet stalwart wizard. Carries a crackling staff and wears a fabulous tophat. ", 40, 35, 100, "burrito", [
+        "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!"
+    ], [
+        new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing")
+    ]);
     player.updateBackground();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
@@ -436,6 +434,9 @@ var Map = (function () {
                 if (x == player.x && y == player.y) {
                     message += characters.player;
                 }
+                else if (x == gregory.x && y == gregory.y) {
+                    message += characters.character;
+                }
                 else if (this.grid[y][x].characterOverlay) {
                     message += this.grid[y][x].characterOverlay;
                 }
@@ -595,7 +596,8 @@ var characters = {
     portal: String.fromCharCode(9673),
     black: String.fromCharCode(9619),
     gray: String.fromCharCode(9618),
-    player: String.fromCharCode(9675)
+    player: String.fromCharCode(9675),
+    character: String.fromCharCode(9635)
 };
 var Tile = (function () {
     function Tile(x, y, character, background, backgroundOverlay) {
@@ -824,17 +826,6 @@ function asciiBar(current, max) {
 function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
-var Gregory = (function (_super) {
-    __extends(Gregory, _super);
-    function Gregory() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.allDialogue = [
-            "BUUUUUUUURITOOOOOOOOO! BURRRRRRITOOOOOOOO! BUUUUUUURIIIIITTTOOOOOO!"
-        ];
-        return _this;
-    }
-    return Gregory;
-}(Character));
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", "weapon", 5, 3),
     new Item("Steel Sword", "A dull but reliable metal sword.", "weapon", 10, 4),

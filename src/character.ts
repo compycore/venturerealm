@@ -29,12 +29,14 @@ class Character implements ICharacter {
     allDialogue: string[];
 	description: string;
 
-    constructor(map: Map, description: string, attack = 1, defense = 1, health = 100, background = "") {
+    constructor(map: Map, description: string, attack = 1, defense = 1, health = 100, background = "", allDialogue: string[], inventory: Item[]) {
         this.spawned = false;
         this.attack = attack;
         this.defense = defense;
         this.health = health;
 		this.background = background;
+		this.inventory = inventory;
+		this.allDialogue = allDialogue;
         this.dialogue = random(this.allDialogue);
 		this.description = description;
 
