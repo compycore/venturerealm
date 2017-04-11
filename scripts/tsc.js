@@ -78,6 +78,14 @@ function input(value) {
     else if (command == "talk") {
         map.grid[player.y][player.x].talk();
     }
+    else if (command == "trade") {
+        if (parameter) {
+            map.grid[player.y][player.x].trade(parameter);
+        }
+        else {
+            log("Please provide an item name to trade; E.g. 'trade wooden sword'");
+        }
+    }
     else if (command == "open" || command == "get") {
         map.grid[player.y][player.x].obtain();
     }
@@ -383,9 +391,7 @@ var NPC = (function () {
         this.allDialogue = allDialogue;
         this.dialogue = random(this.allDialogue);
         this.description = description;
-        for (var i = 0; i < 5; i++) {
-            this.inventory.push(random(allItems));
-        }
+        this.inventory = inventory;
         this.item = random(this.inventory);
         this.spawn(map);
     }
@@ -528,15 +534,20 @@ var Player = (function () {
         }
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
     };
-    Player.prototype.discard = function (itemName) {
+    Player.prototype.discard = function (itemName, logMessage) {
+        if (logMessage === void 0) { logMessage = true; }
         for (var i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
                 if (this.inventory[i].count > 1) {
-                    log("Discarded 1 " + this.inventory[i].name + ".");
+                    if (logMessage) {
+                        log("Discarded 1 " + this.inventory[i].name + ".");
+                    }
                     this.inventory[i].count--;
                 }
                 else {
-                    log("Discarded " + this.inventory[i].name + ".");
+                    if (logMessage) {
+                        log("Discarded " + this.inventory[i].name + ".");
+                    }
                     this.inventory.splice(i, 1);
                 }
                 return;
@@ -793,6 +804,39 @@ var Tile = (function () {
         for (var i = 0; i < allNPCs.length; i++) {
             if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
                 log(allNPCs[i].name + " says, \"" + allNPCs[i].dialogue + "\"");
+                return;
+            }
+        }
+        log("There is nobody here.");
+    };
+    Tile.prototype.trade = function (itemName) {
+        var itemExists = false;
+        var npcWillTrade = false;
+        for (var i = 0; i < allNPCs.length; i++) {
+            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+                if (allNPCs[i].item != null) {
+                    for (var i_1 = 0; i_1 < player.inventory.length; i_1++) {
+                        if (player.inventory[i_1].name.toLowerCase() == itemName.toLowerCase()) {
+                            if (allNPCs[i_1].item.plural) {
+                                log("You traded for " + allNPCs[i_1].item.name.toLowerCase() + ".");
+                            }
+                            else if (isVowel(allNPCs[i_1].item.name[0])) {
+                                log("You traded for an " + allNPCs[i_1].item.name.toLowerCase() + ".");
+                            }
+                            else {
+                                log("You traded for a " + allNPCs[i_1].item.name.toLowerCase() + ".");
+                            }
+                            allNPCs[i_1].item.addToInventory();
+                            allNPCs[i_1].item = null;
+                            player.discard(itemName, false);
+                            return;
+                        }
+                    }
+                    log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+                }
+                else {
+                    log(allNPCs[i].name + " has nothing to trade.");
+                }
                 return;
             }
         }

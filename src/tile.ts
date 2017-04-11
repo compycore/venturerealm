@@ -248,6 +248,42 @@ class Tile implements ITile {
         log("There is nobody here.");
     }
 
+    trade(itemName: string) {
+        let itemExists = false;
+        let npcWillTrade = false;
+
+        for (let i = 0; i < allNPCs.length; i++) {
+            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+                if (allNPCs[i].item != null) {
+                    for (let i = 0; i < player.inventory.length; i++) {
+                        if (player.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                            if (allNPCs[i].item.plural) {
+                                log("You traded for " + allNPCs[i].item.name.toLowerCase() + ".");
+                            } else if (isVowel(allNPCs[i].item.name[0])) {
+                                log("You traded for an " + allNPCs[i].item.name.toLowerCase() + ".");
+                            } else {
+                                log("You traded for a " + allNPCs[i].item.name.toLowerCase() + ".");
+                            }
+
+                            allNPCs[i].item.addToInventory();
+                            allNPCs[i].item = null;
+                            player.discard(itemName, false);
+                            return;
+                        }
+                    }
+
+                    log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+                } else {
+                    log(allNPCs[i].name + " has nothing to trade.");
+                }
+
+                return;
+            }
+        }
+
+        log("There is nobody here.");
+    }
+
     describe() {
         for (let i = 0; i < allNPCs.length; i++) {
             if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {

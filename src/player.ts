@@ -92,14 +92,20 @@ class Player implements IPlayer {
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
     }
 
-    discard(itemName: string) {
+    discard(itemName: string, logMessage = true) {
         for (let i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
                 if (this.inventory[i].count > 1) {
-                    log("Discarded 1 " + this.inventory[i].name + ".");
+					if (logMessage) {
+						log("Discarded 1 " + this.inventory[i].name + ".");
+					}
+
                     this.inventory[i].count--;
                 } else {
-                    log("Discarded " + this.inventory[i].name + ".");
+					if (logMessage) {
+						log("Discarded " + this.inventory[i].name + ".");
+					}
+
                     this.inventory.splice(i, 1);
                 }
 

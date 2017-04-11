@@ -47,6 +47,12 @@ function input(value: string) {
         map.grid[player.y][player.x].describe();
     } else if (command == "talk") {
         map.grid[player.y][player.x].talk();
+    } else if (command == "trade") {
+        if (parameter) {
+            map.grid[player.y][player.x].trade(parameter);
+        } else {
+            log("Please provide an item name to trade; E.g. 'trade wooden sword'");
+		}
     } else if (command == "open" || command == "get") {
         map.grid[player.y][player.x].obtain();
     } else {

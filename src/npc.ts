@@ -1,5 +1,5 @@
 interface INPC {
-	name: string;
+    name: string;
     x: number;
     y: number;
     spawned: boolean;
@@ -11,11 +11,11 @@ interface INPC {
     inventory: Item[];
     dialogue: string;
     allDialogue: string[];
-	description: string;
+    description: string;
 }
 
 class NPC implements INPC {
-	name: string;
+    name: string;
     x: number;
     y: number;
     spawned: boolean;
@@ -27,24 +27,20 @@ class NPC implements INPC {
     inventory: Item[];
     dialogue: string;
     allDialogue: string[];
-	description: string;
+    description: string;
 
     constructor(map: Map, name: string, description: string, attack = 1, defense = 1, health = 100, background = "", allDialogue: string[], inventory: Item[]) {
         this.spawned = false;
-		this.name = name;
+        this.name = name;
         this.attack = attack;
         this.defense = defense;
         this.health = health;
-		this.background = background;
-		this.inventory = inventory;
-		this.allDialogue = allDialogue;
+        this.background = background;
+        this.inventory = inventory;
+        this.allDialogue = allDialogue;
         this.dialogue = random(this.allDialogue);
-		this.description = description;
-
-		// Give each character five random items
-        for (let i = 0; i < 5; i++) {
-            this.inventory.push(random(allItems));
-        }
+        this.description = description;
+        this.inventory = inventory;
 
         this.item = random(this.inventory);
 
