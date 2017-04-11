@@ -96,15 +96,15 @@ class Player implements IPlayer {
         for (let i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
                 if (this.inventory[i].count > 1) {
-					if (logMessage) {
-						log("Discarded 1 " + this.inventory[i].name + ".");
-					}
+                    if (logMessage) {
+                        log("Discarded 1 " + this.inventory[i].name + ".");
+                    }
 
                     this.inventory[i].count--;
                 } else {
-					if (logMessage) {
-						log("Discarded " + this.inventory[i].name + ".");
-					}
+                    if (logMessage) {
+                        log("Discarded " + this.inventory[i].name + ".");
+                    }
 
                     this.inventory.splice(i, 1);
                 }
@@ -117,6 +117,20 @@ class Player implements IPlayer {
     }
 
     updateBackground() {
+        for (let i = 0; i < allEnemies.length; i++) {
+            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+                changeBackground(allEnemies[i].background);
+                return;
+            }
+        }
+
+        for (let i = 0; i < allNPCs.length; i++) {
+            if (this.x == allNPCs[i].x && this.y == allNPCs[i].y) {
+                changeBackground(allNPCs[i].background);
+                return;
+            }
+        }
+
         if (map.grid[this.y][this.x].backgroundOverlay) {
             changeBackground(map.grid[this.y][this.x].backgroundOverlay);
         } else {

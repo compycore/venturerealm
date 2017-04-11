@@ -95,8 +95,8 @@ function input(value) {
 }
 var Item = (function () {
     function Item(name, description, itemType, attack, defense, healing, plural, count, equipped) {
-        if (attack === void 0) { attack = 0; }
-        if (defense === void 0) { defense = 0; }
+        if (attack === void 0) { attack = 1; }
+        if (defense === void 0) { defense = 1; }
         if (healing === void 0) { healing = 0; }
         if (plural === void 0) { plural = false; }
         if (count === void 0) { count = 1; }
@@ -175,6 +175,7 @@ function init() {
     player = new Player(map);
     logo = new Logo();
     makeNPCs(map);
+    makeEnemies(map);
     player.updateBackground();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
@@ -376,10 +377,11 @@ var Map = (function () {
     return Map;
 }());
 var NPC = (function () {
-    function NPC(map, name, description, attack, defense, health, background, allDialogue, inventory) {
+    function NPC(map, name, description, allDialogue, inventory, attack, defense, health, maxHealth, background) {
         if (attack === void 0) { attack = 1; }
         if (defense === void 0) { defense = 1; }
         if (health === void 0) { health = 100; }
+        if (maxHealth === void 0) { maxHealth = 100; }
         if (background === void 0) { background = ""; }
         this.spawned = false;
         this.name = name;
@@ -556,6 +558,18 @@ var Player = (function () {
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
     };
     Player.prototype.updateBackground = function () {
+        for (var i = 0; i < allEnemies.length; i++) {
+            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+                changeBackground(allEnemies[i].background);
+                return;
+            }
+        }
+        for (var i = 0; i < allNPCs.length; i++) {
+            if (this.x == allNPCs[i].x && this.y == allNPCs[i].y) {
+                changeBackground(allNPCs[i].background);
+                return;
+            }
+        }
         if (map.grid[this.y][this.x].backgroundOverlay) {
             changeBackground(map.grid[this.y][this.x].backgroundOverlay);
         }
@@ -894,6 +908,14 @@ function asciiBar(current, max) {
 function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
+var allEnemies;
+function makeEnemies(map) {
+    allEnemies = [
+        new NPC(map, "Stone Golem", "A stone stares at you from the side of the road, malice in its beady eyes. ", [
+            "..."
+        ], [], 10, 15, 25, 25, "sword"),
+    ];
+}
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", "weapon", 5, 3),
     new Item("Steel Sword", "A dull but reliable metal sword.", "weapon", 10, 4),
@@ -908,11 +930,11 @@ var allItems = [
 var allNPCs;
 function makeNPCs(map) {
     allNPCs = [
-        new NPC(map, "Gregory the Gray", "You come upon a short yet stalwart wizard. He wears a fabulous tophat and carries a staff that crackles with electricity. ", 40, 35, 100, "burrito", [
+        new NPC(map, "Gregory the Gray", "You come upon a short yet stalwart wizard. He wears a fabulous tophat and carries a staff that crackles with electricity. ", [
             "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!"
         ], [
-            new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing")
-        ]),
+            new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing", 1, 1, 50)
+        ], 40, 35, 100, 100, "burrito"),
     ];
 }
 //# sourceMappingURL=tsc.js.map

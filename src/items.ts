@@ -21,7 +21,7 @@ class Item implements IItem {
     defense: number;
     healing: number;
 
-    constructor(name: string, description: string, itemType: string, attack = 0, defense = 0, healing = 0, plural = false, count = 1, equipped = false) {
+    constructor(name: string, description: string, itemType: string, attack = 1, defense = 1, healing = 0, plural = false, count = 1, equipped = false) {
         this.name = name;
         this.plural = plural;
         this.description = description;

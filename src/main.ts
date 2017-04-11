@@ -12,6 +12,7 @@ function init() {
     logo = new Logo();
 
 	makeNPCs(map);
+	makeEnemies(map);
 
     player.updateBackground();
 
