@@ -49,13 +49,13 @@ class Map {
 
                             // Apply a randomized, non-directional description based on tile type
                             if (character == characters.city) {
-								this.grid[y][x].backgroundOverlay = "city";
+                                this.grid[y][x].backgroundOverlay = "city";
                                 this.grid[y][x].description.interest = random(descriptions.cities);
                             } else if (character == characters.portal) {
-								this.grid[y][x].backgroundOverlay = "portal";
+                                this.grid[y][x].backgroundOverlay = "portal";
                                 this.grid[y][x].description.interest = random(descriptions.portals);
                             } else if (character == characters.treasure) {
-								this.grid[y][x].backgroundOverlay = "treasure";
+                                this.grid[y][x].backgroundOverlay = "treasure";
                                 this.grid[y][x].item = random(allItems);
                                 this.grid[y][x].description.interest = random(descriptions.treasure);
                             }
@@ -196,18 +196,30 @@ class Map {
     }
 
     draw() {
-        let message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
+        let message = characters.player + "=player " + characters.npc + "=NPC " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
 
         for (let y = 0; y < config.map.height; y++) {
             for (let x = 0; x < config.map.width; x++) {
+                let characterHere = false;
+
                 if (x == player.x && y == player.y) {
                     message += characters.player;
-				} else if (x == gregory.x && y == gregory.y) {
-					message += characters.character;
-                } else if (this.grid[y][x].characterOverlay) {
-                    message += this.grid[y][x].characterOverlay;
                 } else {
-                    message += this.grid[y][x].character;
+                    for (let i = 0; i < allNPCs.length; i++) {
+                        if (allNPCs[i].x == x && allNPCs[i].y == y) {
+                            message += characters.npc;
+                            characterHere = true;
+                            break;
+                        }
+                    }
+
+                    if (!characterHere) {
+                        if (this.grid[y][x].characterOverlay) {
+                            message += this.grid[y][x].characterOverlay;
+                        } else {
+                            message += this.grid[y][x].character;
+                        }
+                    }
                 }
 
                 if (x == config.map.width - 1 && y < config.map.height - 1) {

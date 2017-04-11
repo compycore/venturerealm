@@ -1,4 +1,4 @@
-interface ICharacter {
+interface INPC {
 	name: string;
     x: number;
     y: number;
@@ -14,7 +14,7 @@ interface ICharacter {
 	description: string;
 }
 
-class Character implements ICharacter {
+class NPC implements INPC {
 	name: string;
     x: number;
     y: number;
@@ -29,8 +29,9 @@ class Character implements ICharacter {
     allDialogue: string[];
 	description: string;
 
-    constructor(map: Map, description: string, attack = 1, defense = 1, health = 100, background = "", allDialogue: string[], inventory: Item[]) {
+    constructor(map: Map, name: string, description: string, attack = 1, defense = 1, health = 100, background = "", allDialogue: string[], inventory: Item[]) {
         this.spawned = false;
+		this.name = name;
         this.attack = attack;
         this.defense = defense;
         this.health = health;

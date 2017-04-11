@@ -1,95 +1,3 @@
-var Character = (function () {
-    function Character(map, description, attack, defense, health, background, allDialogue, inventory) {
-        if (attack === void 0) { attack = 1; }
-        if (defense === void 0) { defense = 1; }
-        if (health === void 0) { health = 100; }
-        if (background === void 0) { background = ""; }
-        this.spawned = false;
-        this.attack = attack;
-        this.defense = defense;
-        this.health = health;
-        this.background = background;
-        this.inventory = inventory;
-        this.allDialogue = allDialogue;
-        this.dialogue = random(this.allDialogue);
-        this.description = description;
-        for (var i = 0; i < 5; i++) {
-            this.inventory.push(random(allItems));
-        }
-        this.item = random(this.inventory);
-        this.spawn(map);
-    }
-    Character.prototype.spawn = function (map) {
-        while (!this.spawned) {
-            for (var y = 0; y < config.map.height; y++) {
-                for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
-                        this.x = x;
-                        this.y = y;
-                        this.spawned = true;
-                    }
-                }
-            }
-        }
-    };
-    Character.prototype.give = function (itemName) {
-        for (var i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
-                if (this.inventory[i].count > 1) {
-                    log("Discarded 1 " + this.inventory[i].name + ".");
-                    this.inventory[i].count--;
-                }
-                else {
-                    log("Discarded " + this.inventory[i].name + ".");
-                    this.inventory.splice(i, 1);
-                }
-                return;
-            }
-        }
-        log("You received.");
-    };
-    Character.prototype.updateBackground = function () {
-        if (map.grid[this.y][this.x].backgroundOverlay) {
-            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
-        }
-        else {
-            changeBackground(map.grid[this.y][this.x].background);
-        }
-    };
-    Character.prototype.calculateAttack = function () {
-        var total = this.attack;
-        for (var i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i].equipped) {
-                total += this.inventory[i].attack;
-            }
-        }
-        return total;
-    };
-    Character.prototype.calculateDefense = function () {
-        var total = this.attack;
-        for (var i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i].equipped) {
-                total += this.inventory[i].defense;
-            }
-        }
-        return total;
-    };
-    Character.prototype.speak = function () {
-        log(this.dialogue);
-    };
-    Character.prototype.describe = function () {
-        if (this.inventory.length == 0) {
-            log("Your inventory is empty.");
-        }
-        else {
-            for (var i = 0; i < this.inventory.length; i++) {
-                this.inventory[i].describe();
-            }
-        }
-        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
-    };
-    return Character;
-}());
 var config = {
     map: {
         width: 40,
@@ -137,7 +45,7 @@ function input(value) {
         parameter = buildParameter.join(" ");
     }
     if (command == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'");
     }
     else if (command == "map") {
         map.draw();
@@ -166,6 +74,9 @@ function input(value) {
     }
     else if (command == "look") {
         map.grid[player.y][player.x].describe();
+    }
+    else if (command == "talk") {
+        map.grid[player.y][player.x].talk();
     }
     else if (command == "open" || command == "get") {
         map.grid[player.y][player.x].obtain();
@@ -250,21 +161,16 @@ var Logo = (function () {
 var map;
 var player;
 var logo;
-var gregory;
 function init() {
-    console.log("Loaded");
     document.getElementById("player_input").focus();
     map = new Map();
     player = new Player(map);
     logo = new Logo();
-    gregory = new Character(map, "A short yet stalwart wizard. Carries a crackling staff and wears a fabulous tophat. ", 40, 35, 100, "burrito", [
-        "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!"
-    ], [
-        new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing")
-    ]);
+    makeNPCs(map);
     player.updateBackground();
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
+    console.log("Loaded");
 }
 var Point = (function () {
     function Point(xValue, yValue) {
@@ -428,20 +334,29 @@ var Map = (function () {
         }
     };
     Map.prototype.draw = function () {
-        var message = characters.player + "=player " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
+        var message = characters.player + "=player " + characters.npc + "=NPC " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
         for (var y = 0; y < config.map.height; y++) {
             for (var x = 0; x < config.map.width; x++) {
+                var characterHere = false;
                 if (x == player.x && y == player.y) {
                     message += characters.player;
                 }
-                else if (x == gregory.x && y == gregory.y) {
-                    message += characters.character;
-                }
-                else if (this.grid[y][x].characterOverlay) {
-                    message += this.grid[y][x].characterOverlay;
-                }
                 else {
-                    message += this.grid[y][x].character;
+                    for (var i = 0; i < allNPCs.length; i++) {
+                        if (allNPCs[i].x == x && allNPCs[i].y == y) {
+                            message += characters.npc;
+                            characterHere = true;
+                            break;
+                        }
+                    }
+                    if (!characterHere) {
+                        if (this.grid[y][x].characterOverlay) {
+                            message += this.grid[y][x].characterOverlay;
+                        }
+                        else {
+                            message += this.grid[y][x].character;
+                        }
+                    }
                 }
                 if (x == config.map.width - 1 && y < config.map.height - 1) {
                     message += "\n";
@@ -451,6 +366,99 @@ var Map = (function () {
         log(message);
     };
     return Map;
+}());
+var NPC = (function () {
+    function NPC(map, name, description, attack, defense, health, background, allDialogue, inventory) {
+        if (attack === void 0) { attack = 1; }
+        if (defense === void 0) { defense = 1; }
+        if (health === void 0) { health = 100; }
+        if (background === void 0) { background = ""; }
+        this.spawned = false;
+        this.name = name;
+        this.attack = attack;
+        this.defense = defense;
+        this.health = health;
+        this.background = background;
+        this.inventory = inventory;
+        this.allDialogue = allDialogue;
+        this.dialogue = random(this.allDialogue);
+        this.description = description;
+        for (var i = 0; i < 5; i++) {
+            this.inventory.push(random(allItems));
+        }
+        this.item = random(this.inventory);
+        this.spawn(map);
+    }
+    NPC.prototype.spawn = function (map) {
+        while (!this.spawned) {
+            for (var y = 0; y < config.map.height; y++) {
+                for (var x = 0; x < config.map.width; x++) {
+                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                        this.x = x;
+                        this.y = y;
+                        this.spawned = true;
+                    }
+                }
+            }
+        }
+    };
+    NPC.prototype.give = function (itemName) {
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                if (this.inventory[i].count > 1) {
+                    log("Discarded 1 " + this.inventory[i].name + ".");
+                    this.inventory[i].count--;
+                }
+                else {
+                    log("Discarded " + this.inventory[i].name + ".");
+                    this.inventory.splice(i, 1);
+                }
+                return;
+            }
+        }
+        log("You received.");
+    };
+    NPC.prototype.updateBackground = function () {
+        if (map.grid[this.y][this.x].backgroundOverlay) {
+            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
+        }
+        else {
+            changeBackground(map.grid[this.y][this.x].background);
+        }
+    };
+    NPC.prototype.calculateAttack = function () {
+        var total = this.attack;
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].attack;
+            }
+        }
+        return total;
+    };
+    NPC.prototype.calculateDefense = function () {
+        var total = this.attack;
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].equipped) {
+                total += this.inventory[i].defense;
+            }
+        }
+        return total;
+    };
+    NPC.prototype.speak = function () {
+        log(this.dialogue);
+    };
+    NPC.prototype.describe = function () {
+        if (this.inventory.length == 0) {
+            log("Your inventory is empty.");
+        }
+        else {
+            for (var i = 0; i < this.inventory.length; i++) {
+                this.inventory[i].describe();
+            }
+        }
+        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
+    };
+    return NPC;
 }());
 var Player = (function () {
     function Player(map, attack, defense, health) {
@@ -597,7 +605,7 @@ var characters = {
     black: String.fromCharCode(9619),
     gray: String.fromCharCode(9618),
     player: String.fromCharCode(9675),
-    character: String.fromCharCode(9635)
+    npc: String.fromCharCode(9635)
 };
 var Tile = (function () {
     function Tile(x, y, character, background, backgroundOverlay) {
@@ -617,6 +625,7 @@ var Tile = (function () {
             w: false
         };
         this.description = {
+            character: "",
             direction: "",
             interest: ""
         };
@@ -780,7 +789,22 @@ var Tile = (function () {
             log("There is nothing here.");
         }
     };
+    Tile.prototype.talk = function () {
+        for (var i = 0; i < allNPCs.length; i++) {
+            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+                log(allNPCs[i].name + " says, \"" + allNPCs[i].dialogue + "\"");
+                return;
+            }
+        }
+        log("There is nobody here.");
+    };
     Tile.prototype.describe = function () {
+        for (var i = 0; i < allNPCs.length; i++) {
+            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+                log(allNPCs[i].description + this.description.interest + this.description.direction);
+                return;
+            }
+        }
         log(this.description.interest + this.description.direction);
     };
     return Tile;
@@ -837,4 +861,14 @@ var allItems = [
     new Item("Leather Pants", "Worn, leather pants ripped near the bottom of the left leg.", "pants", 0, 3, 0, true),
     new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2, 0, true),
 ];
+var allNPCs;
+function makeNPCs(map) {
+    allNPCs = [
+        new NPC(map, "Gregory the Gray", "You come upon a short yet stalwart wizard. He wears a fabulous tophat and carries a staff that crackles with electricity. ", 40, 35, 100, "burrito", [
+            "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!"
+        ], [
+            new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing")
+        ]),
+    ];
+}
 //# sourceMappingURL=tsc.js.map

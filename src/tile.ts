@@ -27,7 +27,7 @@ let characters = {
     gray: String.fromCharCode(9618),
 
     player: String.fromCharCode(9675),
-    character: String.fromCharCode(9635)
+    npc: String.fromCharCode(9635)
 }
 
 interface ITile {
@@ -46,6 +46,7 @@ interface ITile {
         w: boolean
     };
     description: {
+        character: string,
         direction: string,
         interest: string
     };
@@ -67,6 +68,7 @@ class Tile implements ITile {
         w: boolean
     };
     description: {
+        character: string,
         direction: string,
         interest: string
     };
@@ -85,6 +87,7 @@ class Tile implements ITile {
             w: false
         };
         this.description = {
+            character: "",
             direction: "",
             interest: ""
         };
@@ -234,7 +237,25 @@ class Tile implements ITile {
         }
     }
 
+    talk() {
+        for (let i = 0; i < allNPCs.length; i++) {
+            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+                log(allNPCs[i].name + " says, \"" + allNPCs[i].dialogue + "\"");
+                return;
+            }
+        }
+
+        log("There is nobody here.");
+    }
+
     describe() {
+        for (let i = 0; i < allNPCs.length; i++) {
+            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+                log(allNPCs[i].description + this.description.interest + this.description.direction);
+                return;
+            }
+        }
+
         log(this.description.interest + this.description.direction);
     }
 }
