@@ -2,6 +2,7 @@ interface IPlayer {
     x: number;
     y: number;
     spawned: boolean;
+    inCombat: boolean;
     attack: number;
     defense: number;
     health: number;
@@ -12,6 +13,7 @@ class Player implements IPlayer {
     x: number;
     y: number;
     spawned: boolean;
+    inCombat: boolean;
     attack: number;
     defense: number;
     health: number;
@@ -19,12 +21,16 @@ class Player implements IPlayer {
 
     constructor(map: Map, attack = 1, defense = 1, health = 100) {
         this.spawned = false;
+        this.inCombat = false;
         this.attack = attack;
         this.defense = defense;
         this.health = health;
         this.inventory = [];
 
         this.spawn(map);
+
+        this.updateBackground();
+        this.checkCombat();
     }
 
     spawn(map: Map) {
@@ -41,37 +47,64 @@ class Player implements IPlayer {
         }
     }
 
+    flee() {
+        if (!this.inCombat) {
+            log("You are not in combat.");
+        } else {
+            if (probability(40)) {
+                log("You got away!");
+                this.inCombat = false;
+            } else {
+                log("You failed to escape!");
+            }
+        }
+    }
+
     move(direction: string) {
-        if (direction == "n" || direction == "north") {
-            if (map.grid[this.y][this.x].direction.n) {
-                this.y--;
-                map.draw();
+        if (this.inCombat) {
+            log("You must 'flee' from combat first!");
+        } else {
+            if (direction == "n" || direction == "north") {
+                if (map.grid[this.y][this.x].direction.n) {
+                    this.y--;
+                    map.draw();
+                }
+            }
+
+            if (direction == "s" || direction == "south") {
+                if (map.grid[this.y][this.x].direction.s) {
+                    this.y++;
+                    map.draw();
+                }
+            }
+
+            if (direction == "e" || direction == "east") {
+                if (map.grid[this.y][this.x].direction.e) {
+                    this.x++;
+                    map.draw();
+                }
+            }
+
+            if (direction == "w" || direction == "west") {
+                if (map.grid[this.y][this.x].direction.w) {
+                    this.x--;
+                    map.draw();
+                }
+            }
+
+            this.updateBackground();
+            this.checkCombat();
+            map.grid[this.y][this.x].describe();
+        }
+    }
+
+    checkCombat() {
+        for (let i = 0; i < allEnemies.length; i++) {
+            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+                this.inCombat = true;
+                return;
             }
         }
-
-        if (direction == "s" || direction == "south") {
-            if (map.grid[this.y][this.x].direction.s) {
-                this.y++;
-                map.draw();
-            }
-        }
-
-        if (direction == "e" || direction == "east") {
-            if (map.grid[this.y][this.x].direction.e) {
-                this.x++;
-                map.draw();
-            }
-        }
-
-        if (direction == "w" || direction == "west") {
-            if (map.grid[this.y][this.x].direction.w) {
-                this.x--;
-                map.draw();
-            }
-        }
-
-        this.updateBackground();
-        map.grid[this.y][this.x].describe();
     }
 
     equip(itemName: string) {

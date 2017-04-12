@@ -24,7 +24,7 @@ function input(value: string) {
     }
 
     if (command == "help") {
-		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'");
+		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'");
     } else if (command == "map") {
         map.draw();
     } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) { // Allow for player movement
@@ -55,6 +55,8 @@ function input(value: string) {
 		}
     } else if (command == "open" || command == "get") {
         map.grid[player.y][player.x].obtain();
+    } else if (command == "flee") {
+		player.flee();
     } else {
         log("Unknown command.");
     }

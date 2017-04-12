@@ -45,7 +45,7 @@ function input(value) {
         parameter = buildParameter.join(" ");
     }
     if (command == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'");
     }
     else if (command == "map") {
         map.draw();
@@ -88,6 +88,9 @@ function input(value) {
     }
     else if (command == "open" || command == "get") {
         map.grid[player.y][player.x].obtain();
+    }
+    else if (command == "flee") {
+        player.flee();
     }
     else {
         log("Unknown command.");
@@ -172,11 +175,10 @@ var logo;
 function init() {
     document.getElementById("player_input").focus();
     map = new Map();
-    player = new Player(map);
     logo = new Logo();
     makeNPCs(map);
-    makeEnemies(map);
-    player.updateBackground();
+    makeEnemies(map, 15);
+    player = new Player(map);
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
     console.log("Loaded");
@@ -474,11 +476,14 @@ var Player = (function () {
         if (defense === void 0) { defense = 1; }
         if (health === void 0) { health = 100; }
         this.spawned = false;
+        this.inCombat = false;
         this.attack = attack;
         this.defense = defense;
         this.health = health;
         this.inventory = [];
         this.spawn(map);
+        this.updateBackground();
+        this.checkCombat();
     }
     Player.prototype.spawn = function (map) {
         while (!this.spawned) {
@@ -493,33 +498,61 @@ var Player = (function () {
             }
         }
     };
+    Player.prototype.flee = function () {
+        if (!this.inCombat) {
+            log("You are not in combat.");
+        }
+        else {
+            if (probability(40)) {
+                log("You got away!");
+                this.inCombat = false;
+            }
+            else {
+                log("You failed to escape!");
+            }
+        }
+    };
     Player.prototype.move = function (direction) {
-        if (direction == "n" || direction == "north") {
-            if (map.grid[this.y][this.x].direction.n) {
-                this.y--;
-                map.draw();
+        if (this.inCombat) {
+            log("You must 'flee' from combat first!");
+        }
+        else {
+            if (direction == "n" || direction == "north") {
+                if (map.grid[this.y][this.x].direction.n) {
+                    this.y--;
+                    map.draw();
+                }
+            }
+            if (direction == "s" || direction == "south") {
+                if (map.grid[this.y][this.x].direction.s) {
+                    this.y++;
+                    map.draw();
+                }
+            }
+            if (direction == "e" || direction == "east") {
+                if (map.grid[this.y][this.x].direction.e) {
+                    this.x++;
+                    map.draw();
+                }
+            }
+            if (direction == "w" || direction == "west") {
+                if (map.grid[this.y][this.x].direction.w) {
+                    this.x--;
+                    map.draw();
+                }
+            }
+            this.updateBackground();
+            this.checkCombat();
+            map.grid[this.y][this.x].describe();
+        }
+    };
+    Player.prototype.checkCombat = function () {
+        for (var i = 0; i < allEnemies.length; i++) {
+            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+                this.inCombat = true;
+                return;
             }
         }
-        if (direction == "s" || direction == "south") {
-            if (map.grid[this.y][this.x].direction.s) {
-                this.y++;
-                map.draw();
-            }
-        }
-        if (direction == "e" || direction == "east") {
-            if (map.grid[this.y][this.x].direction.e) {
-                this.x++;
-                map.draw();
-            }
-        }
-        if (direction == "w" || direction == "west") {
-            if (map.grid[this.y][this.x].direction.w) {
-                this.x--;
-                map.draw();
-            }
-        }
-        this.updateBackground();
-        map.grid[this.y][this.x].describe();
     };
     Player.prototype.equip = function (itemName) {
         for (var i = 0; i < this.inventory.length; i++) {
@@ -908,13 +941,19 @@ function asciiBar(current, max) {
 function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
+var enemiesCollection;
 var allEnemies;
-function makeEnemies(map) {
-    allEnemies = [
+function makeEnemies(map, enemyCount) {
+    allEnemies = [];
+    enemiesCollection = [
         new NPC(map, "Stone Golem", "A stone stares at you from the side of the road, malice in its beady eyes. ", [
             "..."
         ], [], 10, 15, 25, 25, "sword"),
     ];
+    for (var i = 0; i < enemyCount; i++) {
+        var currentEnemy = random(enemiesCollection);
+        allEnemies.push(new NPC(map, currentEnemy.name, currentEnemy.description, currentEnemy.allDialogue, currentEnemy.inventory, currentEnemy.attack, currentEnemy.defense, currentEnemy.health, currentEnemy.maxHealth, currentEnemy.background));
+    }
 }
 var allItems = [
     new Item("Wooden Sword", "A roughly-hewn, mud-stained wooden sword.", "weapon", 5, 3),

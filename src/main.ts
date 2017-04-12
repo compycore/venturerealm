@@ -8,13 +8,12 @@ function init() {
 
     // Set variables
     map = new Map();
-    player = new Player(map);
     logo = new Logo();
 
 	makeNPCs(map);
-	makeEnemies(map);
+	makeEnemies(map, 15);
 
-    player.updateBackground();
+    player = new Player(map);
 
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
