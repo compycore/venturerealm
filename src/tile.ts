@@ -46,6 +46,7 @@ interface ITile {
         w: boolean
     };
     description: {
+        enemy: string,
         character: string,
         direction: string,
         interest: string
@@ -68,6 +69,7 @@ class Tile implements ITile {
         w: boolean
     };
     description: {
+        enemy: string,
         character: string,
         direction: string,
         interest: string
@@ -87,6 +89,7 @@ class Tile implements ITile {
             w: false
         };
         this.description = {
+            enemy: "",
             character: "",
             direction: "",
             interest: ""
@@ -285,6 +288,13 @@ class Tile implements ITile {
     }
 
     describe() {
+        for (let i = 0; i < allEnemies.length; i++) {
+            if (allEnemies[i].x == this.x && allEnemies[i].y == this.y) {
+                log(allEnemies[i].description);
+				return;
+			}
+		}
+
         for (let i = 0; i < allNPCs.length; i++) {
             if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
                 log(allNPCs[i].description + this.description.interest + this.description.direction);
