@@ -44,7 +44,7 @@ function input(value) {
         parameter = buildParameter.join(" ");
     }
     if (command == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'");
+        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'");
     }
     else if (command == "map") {
         map.draw();
@@ -90,6 +90,9 @@ function input(value) {
     }
     else if (command == "flee") {
         player.flee();
+    }
+    else if (command == "fight") {
+        player.fight();
     }
     else {
         log("Unknown command.");
@@ -176,7 +179,7 @@ function init() {
     map = new Map();
     logo = new Logo();
     makeNPCs(map);
-    makeEnemies(map, 15);
+    makeEnemies(map, 50);
     player = new Player(map);
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
@@ -476,8 +479,8 @@ var Player = (function () {
         this.health = health;
         this.inventory = [];
         this.spawn(map);
-        this.updateBackground();
         this.checkCombat();
+        this.updateBackground();
     }
     Player.prototype.spawn = function (map) {
         while (!this.spawned) {
@@ -497,13 +500,28 @@ var Player = (function () {
             log("You are not in combat.");
         }
         else {
-            if (probability(65)) {
+            if (probability(50)) {
                 log("You got away!");
                 this.inCombat = false;
+                this.updateBackground();
             }
             else {
                 log("You failed to escape!");
                 windowShake();
+            }
+        }
+    };
+    Player.prototype.fight = function () {
+        if (!this.inCombat) {
+            log("You are not in combat.");
+        }
+        else {
+            if (probability(50)) {
+                log("You dealt " + this.calculateAttack + " damage!");
+                windowShake();
+            }
+            else {
+                log("Your attack missed!");
             }
         }
     };
@@ -536,8 +554,8 @@ var Player = (function () {
                     map.draw();
                 }
             }
-            this.updateBackground();
             this.checkCombat();
+            this.updateBackground();
             map.grid[this.y][this.x].describe();
         }
     };

@@ -11,7 +11,7 @@ function init() {
     logo = new Logo();
 
 	makeNPCs(map);
-	makeEnemies(map, 15);
+	makeEnemies(map, 50);
 
     player = new Player(map);
 
