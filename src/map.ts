@@ -31,7 +31,6 @@ class Map {
 
         this.applyPaths();
 
-        this.generate(characters.city, config.map.count.cities);
         this.generate(characters.treasure, config.map.count.treasure);
         this.generate(characters.portal, 1);
     }
@@ -48,10 +47,7 @@ class Map {
                             this.grid[y][x].characterOverlay = character; // Change the tile's character
 
                             // Apply a randomized, non-directional description based on tile type
-                            if (character == characters.city) {
-                                this.grid[y][x].backgroundOverlay = "city";
-                                this.grid[y][x].description.interest = random(descriptions.cities);
-                            } else if (character == characters.portal) {
+                            if (character == characters.portal) {
                                 this.grid[y][x].backgroundOverlay = "portal";
                                 this.grid[y][x].description.interest = random(descriptions.portals);
                             } else if (character == characters.treasure) {
@@ -196,7 +192,7 @@ class Map {
     }
 
     draw() {
-        let message = characters.player + "=player " + characters.npc + "=NPC " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
+        let message = characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
 
         for (let y = 0; y < config.map.height; y++) {
             for (let x = 0; x < config.map.width; x++) {

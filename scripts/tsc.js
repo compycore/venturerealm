@@ -5,7 +5,7 @@ var config = {
         minPathLength: 18,
         count: {
             branches: 7,
-            cities: 7,
+            enemies: 15,
             treasure: 12
         }
     }
@@ -13,10 +13,6 @@ var config = {
 var descriptions = {
     roads: [
         "The road is barren with a solitary blade of grass growing in the center of the path. ",
-    ],
-    cities: [
-        "The city stretches majestically in all directions, colors and sounds filling your senses. Street vendors shout at passersby advertising their wares. Police forces are seen walking leisurly through the crowd. ",
-        "You find yourself in a small village. On one side of the main road lies a blacksmith, on the other you find an inn. ",
     ],
     portals: [
         "Before you floats a shimmering orb. You inch closer and notice faces warping in and out of focus as the orb shimmers and deforms, always maintaining a loosely-spherical shape. ",
@@ -26,6 +22,9 @@ var descriptions = {
         "A battered chest lies just off the road, most likely the result of a wagon accident. ",
     ]
 };
+function windowShake() {
+    $(".window").effect("shake");
+}
 document.getElementById("player_input").onkeypress = function (e) {
     var keyCode = e.keyCode || e.which;
     if (keyCode == 13) {
@@ -202,7 +201,6 @@ var Map = (function () {
             this.makeMapBranch();
         }
         this.applyPaths();
-        this.generate(characters.city, config.map.count.cities);
         this.generate(characters.treasure, config.map.count.treasure);
         this.generate(characters.portal, 1);
     }
@@ -215,11 +213,7 @@ var Map = (function () {
                         if (probability(2)) {
                             currentCount++;
                             this.grid[y][x].characterOverlay = character;
-                            if (character == characters.city) {
-                                this.grid[y][x].backgroundOverlay = "city";
-                                this.grid[y][x].description.interest = random(descriptions.cities);
-                            }
-                            else if (character == characters.portal) {
+                            if (character == characters.portal) {
                                 this.grid[y][x].backgroundOverlay = "portal";
                                 this.grid[y][x].description.interest = random(descriptions.portals);
                             }
@@ -345,7 +339,7 @@ var Map = (function () {
         }
     };
     Map.prototype.draw = function () {
-        var message = characters.player + "=player " + characters.npc + "=NPC " + characters.city + "=city " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
+        var message = characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
         for (var y = 0; y < config.map.height; y++) {
             for (var x = 0; x < config.map.width; x++) {
                 var characterHere = false;
@@ -403,7 +397,7 @@ var NPC = (function () {
         while (!this.spawned) {
             for (var y = 0; y < config.map.height; y++) {
                 for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -489,7 +483,7 @@ var Player = (function () {
         while (!this.spawned) {
             for (var y = 0; y < config.map.height; y++) {
                 for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -503,12 +497,13 @@ var Player = (function () {
             log("You are not in combat.");
         }
         else {
-            if (probability(40)) {
+            if (probability(65)) {
                 log("You got away!");
                 this.inCombat = false;
             }
             else {
                 log("You failed to escape!");
+                windowShake();
             }
         }
     };
@@ -592,7 +587,7 @@ var Player = (function () {
     };
     Player.prototype.updateBackground = function () {
         for (var i = 0; i < allEnemies.length; i++) {
-            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+            if (this.inCombat && this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
                 changeBackground(allEnemies[i].background);
                 return;
             }
@@ -657,13 +652,12 @@ var characters = {
     esw: String.fromCharCode(9523),
     swn: String.fromCharCode(9515),
     wne: String.fromCharCode(9531),
-    city: String.fromCharCode(9650),
     treasure: String.fromCharCode(11045),
     portal: String.fromCharCode(9673),
     black: String.fromCharCode(9619),
     gray: String.fromCharCode(9618),
     player: String.fromCharCode(9675),
-    npc: String.fromCharCode(9635)
+    npc: String.fromCharCode(9650)
 };
 var Tile = (function () {
     function Tile(x, y, character, background, backgroundOverlay) {

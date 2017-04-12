@@ -37,7 +37,7 @@ class Player implements IPlayer {
         while (!this.spawned) {
             for (let y = 0; y < config.map.height; y++) {
                 for (let x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.city && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -51,11 +51,12 @@ class Player implements IPlayer {
         if (!this.inCombat) {
             log("You are not in combat.");
         } else {
-            if (probability(40)) {
+            if (probability(65)) {
                 log("You got away!");
                 this.inCombat = false;
             } else {
                 log("You failed to escape!");
+				windowShake();
             }
         }
     }
@@ -151,7 +152,7 @@ class Player implements IPlayer {
 
     updateBackground() {
         for (let i = 0; i < allEnemies.length; i++) {
-            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+            if (this.inCombat && this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
                 changeBackground(allEnemies[i].background);
                 return;
             }

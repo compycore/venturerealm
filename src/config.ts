@@ -5,7 +5,7 @@ let config = {
         minPathLength: 18,
         count: {
             branches: 7,
-            cities: 7,
+            enemies: 15,
             treasure: 12
         }
     }

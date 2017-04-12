@@ -19,7 +19,6 @@ let characters = {
     swn: String.fromCharCode(9515),
     wne: String.fromCharCode(9531),
 
-    city: String.fromCharCode(9650),
     treasure: String.fromCharCode(11045),
     portal: String.fromCharCode(9673),
 
@@ -27,7 +26,7 @@ let characters = {
     gray: String.fromCharCode(9618),
 
     player: String.fromCharCode(9675),
-    npc: String.fromCharCode(9635)
+    npc: String.fromCharCode(9650),
 }
 
 interface ITile {
