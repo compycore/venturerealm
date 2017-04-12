@@ -13,6 +13,8 @@ var config = {
 var descriptions = {
     roads: [
         "The road is barren with a solitary blade of grass growing in the center of the path. ",
+        "The road has a small stream of water flowing through crack. ",
+        "The road is overgrown with weeds. ",
     ],
     portals: [
         "Before you floats a shimmering orb. You inch closer and notice faces warping in and out of focus as the orb shimmers and deforms, always maintaining a loosely-spherical shape. ",
@@ -20,6 +22,7 @@ var descriptions = {
     ],
     treasure: [
         "A battered chest lies just off the road, most likely the result of a wagon accident. ",
+        "An item lying mostly concealed in the grass catches your eye. ",
     ]
 };
 function windowShake() {
@@ -189,7 +192,7 @@ function init() {
     map = new Map();
     logo = new Logo();
     makeNPCs(map);
-    makeEnemies(map, 50);
+    makeEnemies(map, 5);
     player = new Player(map);
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
@@ -1019,10 +1022,16 @@ var allNPCs;
 function makeNPCs(map) {
     allNPCs = [
         new NPC(map, "Gregory the Gray", "You come upon a short yet stalwart wizard. He wears a fabulous tophat and carries a staff that crackles with electricity. ", [
-            "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!"
+            "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!",
         ], [
-            new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing", 1, 1, 50)
+            new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing", 1, 1, 50),
+            new Item("Deck of Cards", "A lightweight box containing fifty-two cards used as throwing weapons. ", "weapon", 30, 1),
         ], 40, 35, 100, 100, "burrito"),
+        new NPC(map, "Michael the Strong", "Before you is the most muscular beast you've ever seen. His meaty fists look strong enough to crush boulders and his well-kempt goatee fills you with feelings of power. ", [
+            "If you go to the Academy for basic training, you could be this buff too.",
+        ], [
+            new Item("Thumping Gloves", "Loose-fitting gloves made of a magical material that amplifies your blows. ", "weapon", 40, 1),
+        ], 70, 45, 100, 100, "beast"),
     ];
 }
 //# sourceMappingURL=tsc.js.map
