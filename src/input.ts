@@ -23,43 +23,49 @@ function input(value: string) {
         parameter = buildParameter.join(" ");
     }
 
-    if (command == "help") {
-		log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'");
-    } else if (command == "map") {
-        map.draw();
-    } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) { // Allow for player movement
-        player.move(command);
-    } else if (command == "inventory") {
-        player.describe();
-    } else if (command == "equip") {
-        if (parameter) {
-            player.equip(parameter);
+    if (!gameOver) {
+        if (command == "help") {
+            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'");
+        } else if (command == "map") {
+            map.draw();
+        } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) { // Allow for player movement
+            player.move(command);
+        } else if (command == "inventory") {
+            player.describe();
+        } else if (command == "equip") {
+            if (parameter) {
+                player.equip(parameter);
+            } else {
+                log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+            }
+        } else if (command == "discard") {
+            if (parameter) {
+                player.discard(parameter);
+            } else {
+                log("Please provide an item name to discard; E.g. 'discard wooden sword'");
+            }
+        } else if (command == "look") {
+            map.grid[player.y][player.x].describe();
+        } else if (command == "talk") {
+            map.grid[player.y][player.x].talk();
+        } else if (command == "trade") {
+            if (parameter) {
+                map.grid[player.y][player.x].trade(parameter);
+            } else {
+                log("Please provide an item name to trade; E.g. 'trade wooden sword'");
+            }
+        } else if (command == "open" || command == "get") {
+            map.grid[player.y][player.x].obtain();
+        } else if (command == "flee") {
+            player.flee();
+        } else if (command == "fight" || command == "attack") {
+            player.fight();
         } else {
-            log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+            log("Unknown command.");
         }
-    } else if (command == "discard") {
-        if (parameter) {
-            player.discard(parameter);
-        } else {
-            log("Please provide an item name to discard; E.g. 'discard wooden sword'");
-        }
-    } else if (command == "look") {
-        map.grid[player.y][player.x].describe();
-    } else if (command == "talk") {
-        map.grid[player.y][player.x].talk();
-    } else if (command == "trade") {
-        if (parameter) {
-            map.grid[player.y][player.x].trade(parameter);
-        } else {
-            log("Please provide an item name to trade; E.g. 'trade wooden sword'");
-		}
-    } else if (command == "open" || command == "get") {
-        map.grid[player.y][player.x].obtain();
-    } else if (command == "flee") {
-		player.flee();
-    } else if (command == "fight") {
-		player.fight();
+    } else if (command == "restart") {
+        init();
     } else {
-        log("Unknown command.");
+        log("Game over. Type 'restart' to start fresh and play again.");
     }
 }

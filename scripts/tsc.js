@@ -43,59 +43,67 @@ function input(value) {
         buildParameter.shift();
         parameter = buildParameter.join(" ");
     }
-    if (command == "help") {
-        log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'");
-    }
-    else if (command == "map") {
-        map.draw();
-    }
-    else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) {
-        player.move(command);
-    }
-    else if (command == "inventory") {
-        player.describe();
-    }
-    else if (command == "equip") {
-        if (parameter) {
-            player.equip(parameter);
+    if (!gameOver) {
+        if (command == "help") {
+            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'");
+        }
+        else if (command == "map") {
+            map.draw();
+        }
+        else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) {
+            player.move(command);
+        }
+        else if (command == "inventory") {
+            player.describe();
+        }
+        else if (command == "equip") {
+            if (parameter) {
+                player.equip(parameter);
+            }
+            else {
+                log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+            }
+        }
+        else if (command == "discard") {
+            if (parameter) {
+                player.discard(parameter);
+            }
+            else {
+                log("Please provide an item name to discard; E.g. 'discard wooden sword'");
+            }
+        }
+        else if (command == "look") {
+            map.grid[player.y][player.x].describe();
+        }
+        else if (command == "talk") {
+            map.grid[player.y][player.x].talk();
+        }
+        else if (command == "trade") {
+            if (parameter) {
+                map.grid[player.y][player.x].trade(parameter);
+            }
+            else {
+                log("Please provide an item name to trade; E.g. 'trade wooden sword'");
+            }
+        }
+        else if (command == "open" || command == "get") {
+            map.grid[player.y][player.x].obtain();
+        }
+        else if (command == "flee") {
+            player.flee();
+        }
+        else if (command == "fight" || command == "attack") {
+            player.fight();
         }
         else {
-            log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+            log("Unknown command.");
         }
     }
-    else if (command == "discard") {
-        if (parameter) {
-            player.discard(parameter);
-        }
-        else {
-            log("Please provide an item name to discard; E.g. 'discard wooden sword'");
-        }
-    }
-    else if (command == "look") {
-        map.grid[player.y][player.x].describe();
-    }
-    else if (command == "talk") {
-        map.grid[player.y][player.x].talk();
-    }
-    else if (command == "trade") {
-        if (parameter) {
-            map.grid[player.y][player.x].trade(parameter);
-        }
-        else {
-            log("Please provide an item name to trade; E.g. 'trade wooden sword'");
-        }
-    }
-    else if (command == "open" || command == "get") {
-        map.grid[player.y][player.x].obtain();
-    }
-    else if (command == "flee") {
-        player.flee();
-    }
-    else if (command == "fight") {
-        player.fight();
+    else if (command == "restart") {
+        init();
     }
     else {
-        log("Unknown command.");
+        log("Game over. Type 'restart' to start fresh and play again.");
     }
 }
 var Item = (function () {
@@ -171,10 +179,12 @@ var Logo = (function () {
     };
     return Logo;
 }());
+var gameOver;
 var map;
 var player;
 var logo;
 function init() {
+    gameOver = false;
     document.getElementById("player_input").focus();
     map = new Map();
     logo = new Logo();
@@ -433,6 +443,16 @@ var NPC = (function () {
             changeBackground(map.grid[this.y][this.x].background);
         }
     };
+    NPC.prototype.fight = function () {
+        if (probability(50)) {
+            log("You were attacked by " + this.name + " and received " + this.calculateAttack() + " damage!");
+            player.health -= this.calculateAttack();
+            windowShake();
+        }
+        else {
+            log(this.name + " attacked and missed.");
+        }
+    };
     NPC.prototype.calculateAttack = function () {
         var total = this.attack;
         for (var i = 0; i < this.inventory.length; i++) {
@@ -473,7 +493,7 @@ var Player = (function () {
         if (defense === void 0) { defense = 1; }
         if (health === void 0) { health = 100; }
         this.spawned = false;
-        this.inCombat = false;
+        this.inCombat = null;
         this.attack = attack;
         this.defense = defense;
         this.health = health;
@@ -501,13 +521,14 @@ var Player = (function () {
         }
         else {
             if (probability(50)) {
-                log("You got away!");
-                this.inCombat = false;
+                log("You got away from " + this.inCombat.name + "!");
+                this.inCombat = null;
                 this.updateBackground();
             }
             else {
                 log("You failed to escape!");
-                windowShake();
+                this.inCombat.fight();
+                this.checkCombat();
             }
         }
     };
@@ -517,17 +538,19 @@ var Player = (function () {
         }
         else {
             if (probability(50)) {
-                log("You dealt " + this.calculateAttack + " damage!");
-                windowShake();
+                log("You dealt " + this.calculateAttack() + " damage to " + this.inCombat.name + "!");
+                this.inCombat.health -= this.calculateAttack();
             }
             else {
-                log("Your attack missed!");
+                log("Your attack missed...");
             }
+            this.inCombat.fight();
+            this.checkCombat();
         }
     };
     Player.prototype.move = function (direction) {
         if (this.inCombat) {
-            log("You must 'flee' from combat first!");
+            log("You must 'fight' or 'flee' from combat!");
         }
         else {
             if (direction == "n" || direction == "north") {
@@ -560,10 +583,17 @@ var Player = (function () {
         }
     };
     Player.prototype.checkCombat = function () {
+        if (this.health <= 0) {
+            log("You have died. Game over.");
+            gameOver = true;
+            return;
+        }
         for (var i = 0; i < allEnemies.length; i++) {
             if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
-                this.inCombat = true;
-                return;
+                if (allEnemies[i].health > 0) {
+                    this.inCombat = allEnemies[i];
+                    return;
+                }
             }
         }
     };

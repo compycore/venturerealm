@@ -87,6 +87,16 @@ class NPC implements INPC {
         }
     }
 
+    fight() {
+        if (probability(50)) {
+            log("You were attacked by " + this.name + " and received " + this.calculateAttack() + " damage!");
+            player.health -= this.calculateAttack();
+            windowShake();
+        } else {
+            log(this.name + " attacked and missed.");
+        }
+    }
+
     calculateAttack(): number {
         let total = this.attack;
 

@@ -1,9 +1,12 @@
 // Create variables
+let gameOver: boolean;
 let map: Map;
 let player: Player;
 let logo: Logo;
 
 function init() {
+	gameOver = false;
+
     document.getElementById("player_input").focus();
 
     // Set variables

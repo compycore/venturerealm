@@ -2,7 +2,7 @@ interface IPlayer {
     x: number;
     y: number;
     spawned: boolean;
-    inCombat: boolean;
+    inCombat: NPC;
     attack: number;
     defense: number;
     health: number;
@@ -13,7 +13,7 @@ class Player implements IPlayer {
     x: number;
     y: number;
     spawned: boolean;
-    inCombat: boolean;
+    inCombat: NPC;
     attack: number;
     defense: number;
     health: number;
@@ -21,7 +21,7 @@ class Player implements IPlayer {
 
     constructor(map: Map, attack = 1, defense = 1, health = 100) {
         this.spawned = false;
-        this.inCombat = false;
+        this.inCombat = null;
         this.attack = attack;
         this.defense = defense;
         this.health = health;
@@ -29,8 +29,8 @@ class Player implements IPlayer {
 
         this.spawn(map);
 
-		this.checkCombat();
-		this.updateBackground();
+        this.checkCombat();
+        this.updateBackground();
     }
 
     spawn(map: Map) {
@@ -52,12 +52,13 @@ class Player implements IPlayer {
             log("You are not in combat.");
         } else {
             if (probability(50)) {
-                log("You got away!");
-                this.inCombat = false;
-				this.updateBackground();
+                log("You got away from " + this.inCombat.name + "!");
+                this.inCombat = null;
+                this.updateBackground();
             } else {
                 log("You failed to escape!");
-                windowShake();
+                this.inCombat.fight();
+                this.checkCombat();
             }
         }
     }
@@ -67,17 +68,20 @@ class Player implements IPlayer {
             log("You are not in combat.");
         } else {
             if (probability(50)) {
-                log("You dealt " + this.calculateAttack + " damage!");
-                windowShake();
+                log("You dealt " + this.calculateAttack() + " damage to " + this.inCombat.name + "!");
+                this.inCombat.health -= this.calculateAttack();
             } else {
                 log("Your attack missed...");
             }
+
+            this.inCombat.fight();
+            this.checkCombat();
         }
     }
 
     move(direction: string) {
         if (this.inCombat) {
-            log("You must 'flee' from combat first!");
+            log("You must 'fight' or 'flee' from combat!");
         } else {
             if (direction == "n" || direction == "north") {
                 if (map.grid[this.y][this.x].direction.n) {
@@ -114,10 +118,18 @@ class Player implements IPlayer {
     }
 
     checkCombat() {
+        if (this.health <= 0) {
+            log("You have died. Game over.");
+            gameOver = true;
+            return;
+        }
+
         for (let i = 0; i < allEnemies.length; i++) {
             if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
-                this.inCombat = true;
-                return;
+                if (allEnemies[i].health > 0) {
+                    this.inCombat = allEnemies[i];
+                    return;
+                }
             }
         }
     }
