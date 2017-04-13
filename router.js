@@ -31,7 +31,7 @@ exports.missing = function(req) {
 				"Content-Type": mime
 			});
 			res.write(data);
-			res.close();
+			res.end();
 		});
 	} catch (e) {
 		return handlerFactory.createHandler(function(req, res) {
@@ -39,7 +39,7 @@ exports.missing = function(req) {
 				"Content-Type": "text/plain"
 			});
 			res.write("No route registered for " + url.pathname);
-			res.close();
+			res.end();
 		});
 	}
 }
