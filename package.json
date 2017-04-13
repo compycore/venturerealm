@@ -1,0 +1,28 @@
+{
+  "name": "venturerealm",
+  "version": "1.0.0",
+  "description": "A hyper-realistic digital simulation developed by CompyCore.",
+  "main": "server.js",
+  "dependencies": {
+    "cors": "^2.8.3",
+    "express": "^4.15.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jessemillar/venturerealm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jessemillar/venturerealm/issues"
+  },
+  "homepage": "https://github.com/jessemillar/venturerealm#readme"
+}

@@ -27,9 +27,9 @@ body {
     animation: animatedBackground 200s linear infinite;
 }
 
-textarea,
-input,
-input[type="text"] {
+.window textarea,
+.window input,
+.window input[type="text"] {
     overflow-x: hidden;
     resize: none;
     font-family: 'freemonoregular', monospace;

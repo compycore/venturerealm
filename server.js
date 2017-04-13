@@ -1,21 +1,16 @@
-var http = require("http");
-var router = require("./router");
+var express = require('express');
+var cors = require('cors');
+var app = express();
 
-// Handle your routes here, put static pages in ./public and they will server
-router.register("/", function(req, res) {
-	res.writeHead(200, {
-		"Content-Type": "text/plain"
-	});
-	res.write("Hello World");
-	res.end();
-});
+app.use(cors());
 
-// We need a server which relies on our router
-var server = http.createServer(function(req, res) {
-	handler = router.route(req);
-	handler.process(req, res);
-});
+app.listen(8000, function() {
+	console.log('Listening on 8000');
+})
 
-// Start it up
-server.listen(8000);
-console.log("Server running");
+// Serve static files
+app.use(express.static('public'));
+
+app.post('/users', function(req, res) {
+	console.log('Hellooooooooooooooooo!');
+})

@@ -1,6 +1,11 @@
 # VentureRealm
 A hyper-realistic digital simulation developed by CompyCore.
 
+## Setup
+```
+docker run --name venturerealm -d mongo
+```
+
 ## Notes
 - Entirely text based
 - Money system
