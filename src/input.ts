@@ -45,17 +45,17 @@ function input(value: string) {
                 log("Please provide an item name to discard; E.g. 'discard wooden sword'");
             }
         } else if (command == "look") {
-            map.grid[player.y][player.x].describe();
+            map.grid[player.layer][player.y][player.x].describe();
         } else if (command == "talk") {
-            map.grid[player.y][player.x].talk();
+            map.grid[player.layer][player.y][player.x].talk();
         } else if (command == "trade") {
             if (parameter) {
-                map.grid[player.y][player.x].trade(parameter);
+                map.grid[player.layer][player.y][player.x].trade(parameter);
             } else {
                 log("Please provide an item name to trade; E.g. 'trade wooden sword'");
             }
         } else if (command == "open" || command == "get") {
-            map.grid[player.y][player.x].obtain();
+            map.grid[player.layer][player.y][player.x].obtain();
         } else if (command == "flee") {
             player.flee();
         } else if (command == "fight" || command == "attack") {

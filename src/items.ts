@@ -63,9 +63,9 @@ class Item implements IItem {
         this.addToInventory();
 
         // Remove the item icon from the map
-        map.grid[player.y][player.x].item = null;
-        map.grid[player.y][player.x].characterOverlay = null;
-        map.grid[player.y][player.x].backgroundOverlay = null;
+        map.grid[player.layer][player.y][player.x].item = null;
+        map.grid[player.layer][player.y][player.x].characterOverlay = null;
+        map.grid[player.layer][player.y][player.x].backgroundOverlay = null;
 
         player.updateBackground();
     }

@@ -16,7 +16,7 @@ class Point implements IPoint {
 }
 
 class Map {
-    grid: Tile[][]; // The 2D grid array
+    grid: Tile[][][]; // The 2D grid array of world layers
     paths: number[][][];
 
     constructor() {
@@ -24,10 +24,7 @@ class Map {
         this.paths = [];
         this.makeEmptyMap();
         this.makeMapTrunk();
-
-        for (let i = 0; i < config.map.count.branches; i++) {
-            this.makeMapBranch();
-        }
+        this.makeMapBranch();
 
         this.applyPaths();
 
@@ -36,28 +33,30 @@ class Map {
     }
 
     generate(character: string, count: number) {
-        let currentCount = 0;
+        for (let i = 0; i < config.map.layers; i++) {
+            let currentCount = 0;
 
-        while (currentCount < count) {
-            for (let y = 0; y < config.map.height; y++) {
-                for (let x = 0; x < config.map.width; x++) {
-                    if (this.grid[y][x].road) { // Only place generated artifacts on road tiles
-                        if (probability(2)) { // Arbitrary probability value
-                            currentCount++;
-                            this.grid[y][x].characterOverlay = character; // Change the tile's character
+            while (currentCount < count) {
+                for (let y = 0; y < config.map.height; y++) {
+                    for (let x = 0; x < config.map.width; x++) {
+                        if (this.grid[i][y][x].road) { // Only place generated artifacts on road tiles
+                            if (probability(2)) { // Arbitrary probability value
+                                currentCount++;
+                                this.grid[i][y][x].characterOverlay = character; // Change the tile's character
 
-                            // Apply a randomized, non-directional description based on tile type
-                            if (character == characters.portal) {
-                                this.grid[y][x].backgroundOverlay = "portal";
-                                this.grid[y][x].description.interest = random(descriptions.portals);
-                            } else if (character == characters.treasure) {
-                                this.grid[y][x].backgroundOverlay = "treasure";
-                                this.grid[y][x].item = random(allItems);
-                                this.grid[y][x].description.interest = random(descriptions.treasure);
-                            }
+                                // Apply a randomized, non-directional description based on tile type
+                                if (character == characters.portal) {
+                                    this.grid[i][y][x].backgroundOverlay = "portal";
+                                    this.grid[i][y][x].description.interest = random(descriptions.portals);
+                                } else if (character == characters.treasure) {
+                                    this.grid[i][y][x].backgroundOverlay = "treasure";
+                                    this.grid[i][y][x].item = random(allItems);
+                                    this.grid[i][y][x].description.interest = random(descriptions.treasure);
+                                }
 
-                            if (currentCount == count) {
-                                return;
+                                if (currentCount == count) {
+                                    return;
+                                }
                             }
                         }
                     }
@@ -69,32 +68,47 @@ class Map {
     // Apply all paths in the paths array to the map
     applyPaths() {
         for (let i = 0; i < this.paths.length; i++) {
-            this.applyPath(this.paths[i]);
+            for (let j = 0; j < this.paths[i].length; j++) {
+                this.applyPath(this.paths[i][j]);
+            }
         }
     }
 
     // Make the main path to start the path branching
     makeMapTrunk() {
-        let pointA = this.randomPoint();
-        let pointB = this.randomPoint();
+        for (let i = 0; i < config.map.layers; i++) {
+            this.paths[i] = [];
 
-        while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
-            pointA = this.randomPoint();
-            pointB = this.randomPoint();
+            let pointA = this.randomPoint();
+            let pointB = this.randomPoint();
+
+            while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
+                pointA = this.randomPoint();
+                pointB = this.randomPoint();
+            }
+
+            this.paths[i].push(this.findPath(pointA, pointB)); // Add the path to the paths array
         }
 
-        this.paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
+		console.log(this.paths[0][0][0]);
     }
 
     makeMapBranch() {
-        let pointA = this.paths[this.paths.length - 1][Math.floor(Math.random() * (this.paths[this.paths.length - 1].length - 1))];
-        let pointB = this.randomPoint();
+        for (let i = 0; i < config.map.layers; i++) {
+            for (let j = 0; j < config.map.count.branches; j++) {
+				// let pointA = this.paths[i][this.paths[i].length - 1][Math.floor(Math.random() * (this.paths[i][this.paths[i].length - 1].length - 1))];
+                let pointA = this.randomPoint();
+                let pointB = this.randomPoint();
 
-        while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
-            pointB = this.randomPoint();
+                while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
+                    pointB = this.randomPoint();
+                }
+
+                this.paths[i].push(this.findPath(pointA, pointB)); // Add the path to the paths array
+            }
         }
 
-        this.paths.push(this.findPath(pointA, pointB)); // Add the path to the paths array
+		console.log(this.paths);
     }
 
     getPathLength(pointA: number[], pointB: number[]) {
@@ -103,11 +117,15 @@ class Map {
 
     // Make an empty 2D array of size defined in the map configuration
     makeEmptyMap() {
-        for (let y = 0; y < config.map.height; y++) {
-            this.grid[y] = [];
+        for (let i = 0; i < config.map.layers; i++) {
+            this.grid[i] = [];
 
-            for (let x = 0; x < config.map.width; x++) {
-                this.grid[y][x] = new Tile(x, y);
+            for (let y = 0; y < config.map.height; y++) {
+                this.grid[i][y] = [];
+
+                for (let x = 0; x < config.map.width; x++) {
+                    this.grid[i][y][x] = new Tile(x, y);
+                }
             }
         }
     }
@@ -151,7 +169,7 @@ class Map {
                 character = this.getPathCharacterEnd(b, a);
             }
 
-            this.grid = new Tile(b.x, b.y, character).apply(this.grid); // Make and apply the tile
+            this.grid[i] = new Tile(b.x, b.y, character).apply(this.grid[i]); // Make and apply the tile
         }
     }
 
@@ -192,28 +210,28 @@ class Map {
     }
 
     draw() {
-        let message = characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
+        let message = "World Layer " + player.layer + "\n" + characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
 
         for (let y = 0; y < config.map.height; y++) {
             for (let x = 0; x < config.map.width; x++) {
-                let characterHere = false;
+                let npcHere = false;
 
                 if (x == player.x && y == player.y) {
                     message += characters.player;
                 } else {
                     for (let i = 0; i < allNPCs.length; i++) {
-                        if (allNPCs[i].x == x && allNPCs[i].y == y) {
+                        if (allNPCs[i].position[player.layer].x == x && allNPCs[i].position[player.layer].y == y) {
                             message += characters.npc;
-                            characterHere = true;
+                            npcHere = true;
                             break;
                         }
                     }
 
-                    if (!characterHere) {
-                        if (this.grid[y][x].characterOverlay) {
-                            message += this.grid[y][x].characterOverlay;
+                    if (!npcHere) {
+                        if (this.grid[player.layer][y][x].characterOverlay) {
+                            message += this.grid[player.layer][y][x].characterOverlay;
                         } else {
-                            message += this.grid[y][x].character;
+                            message += this.grid[player.layer][y][x].character;
                         }
                     }
                 }

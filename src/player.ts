@@ -2,6 +2,7 @@ interface IPlayer {
     x: number;
     y: number;
     spawned: boolean;
+    layer: number;
     inCombat: NPC;
     attack: number;
     defense: number;
@@ -13,6 +14,7 @@ class Player implements IPlayer {
     x: number;
     y: number;
     spawned: boolean;
+    layer: number;
     inCombat: NPC;
     attack: number;
     defense: number;
@@ -21,6 +23,7 @@ class Player implements IPlayer {
 
     constructor(map: Map, attack = 1, defense = 1, health = 100) {
         this.spawned = false;
+        this.layer = 0;
         this.inCombat = null;
         this.attack = attack;
         this.defense = defense;
@@ -37,7 +40,7 @@ class Player implements IPlayer {
         while (!this.spawned) {
             for (let y = 0; y < config.map.height; y++) {
                 for (let x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(2) && map.grid[this.layer][y][x].direction.n && map.grid[this.layer][y][x].character != characters.treasure && map.grid[this.layer][y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -84,28 +87,28 @@ class Player implements IPlayer {
             log("You must 'fight' or 'flee' from combat!");
         } else {
             if (direction == "n" || direction == "north") {
-                if (map.grid[this.y][this.x].direction.n) {
+                if (map.grid[this.layer][this.y][this.x].direction.n) {
                     this.y--;
                     map.draw();
                 }
             }
 
             if (direction == "s" || direction == "south") {
-                if (map.grid[this.y][this.x].direction.s) {
+                if (map.grid[this.layer][this.y][this.x].direction.s) {
                     this.y++;
                     map.draw();
                 }
             }
 
             if (direction == "e" || direction == "east") {
-                if (map.grid[this.y][this.x].direction.e) {
+                if (map.grid[this.layer][this.y][this.x].direction.e) {
                     this.x++;
                     map.draw();
                 }
             }
 
             if (direction == "w" || direction == "west") {
-                if (map.grid[this.y][this.x].direction.w) {
+                if (map.grid[this.layer][this.y][this.x].direction.w) {
                     this.x--;
                     map.draw();
                 }
@@ -113,7 +116,7 @@ class Player implements IPlayer {
 
             this.checkCombat();
             this.updateBackground();
-            map.grid[this.y][this.x].describe();
+            map.grid[this.layer][this.y][this.x].describe();
         }
     }
 
@@ -125,7 +128,7 @@ class Player implements IPlayer {
         }
 
         for (let i = 0; i < allEnemies.length; i++) {
-            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+            if (this.x == allEnemies[i].position[this.layer].x && this.y == allEnemies[i].position[this.layer].y) {
                 if (allEnemies[i].health > 0) {
                     this.inCombat = allEnemies[i];
                     return;
@@ -178,23 +181,23 @@ class Player implements IPlayer {
 
     updateBackground() {
         for (let i = 0; i < allEnemies.length; i++) {
-            if (this.inCombat && this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+            if (this.inCombat && this.x == allEnemies[i].position[this.layer].x && this.y == allEnemies[i].position[this.layer].y) {
                 changeBackground(allEnemies[i].background);
                 return;
             }
         }
 
         for (let i = 0; i < allNPCs.length; i++) {
-            if (this.x == allNPCs[i].x && this.y == allNPCs[i].y) {
+            if (this.x == allNPCs[i].position[this.layer].x && this.y == allNPCs[i].position[this.layer].y) {
                 changeBackground(allNPCs[i].background);
                 return;
             }
         }
 
-        if (map.grid[this.y][this.x].backgroundOverlay) {
-            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
+        if (map.grid[this.layer][this.y][this.x].backgroundOverlay) {
+            changeBackground(map.grid[this.layer][this.y][this.x].backgroundOverlay);
         } else {
-            changeBackground(map.grid[this.y][this.x].background);
+            changeBackground(map.grid[this.layer][this.y][this.x].background);
         }
     }
 

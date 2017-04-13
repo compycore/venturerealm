@@ -1,5 +1,6 @@
 var config = {
     map: {
+        layers: 10,
         width: 40,
         height: 20,
         minPathLength: 18,
@@ -76,21 +77,21 @@ function input(value) {
             }
         }
         else if (command == "look") {
-            map.grid[player.y][player.x].describe();
+            map.grid[player.layer][player.y][player.x].describe();
         }
         else if (command == "talk") {
-            map.grid[player.y][player.x].talk();
+            map.grid[player.layer][player.y][player.x].talk();
         }
         else if (command == "trade") {
             if (parameter) {
-                map.grid[player.y][player.x].trade(parameter);
+                map.grid[player.layer][player.y][player.x].trade(parameter);
             }
             else {
                 log("Please provide an item name to trade; E.g. 'trade wooden sword'");
             }
         }
         else if (command == "open" || command == "get") {
-            map.grid[player.y][player.x].obtain();
+            map.grid[player.layer][player.y][player.x].obtain();
         }
         else if (command == "flee") {
             player.flee();
@@ -155,9 +156,9 @@ var Item = (function () {
             log("You obtained a " + this.name.toLowerCase() + ".");
         }
         this.addToInventory();
-        map.grid[player.y][player.x].item = null;
-        map.grid[player.y][player.x].characterOverlay = null;
-        map.grid[player.y][player.x].backgroundOverlay = null;
+        map.grid[player.layer][player.y][player.x].item = null;
+        map.grid[player.layer][player.y][player.x].characterOverlay = null;
+        map.grid[player.layer][player.y][player.x].backgroundOverlay = null;
         player.updateBackground();
     };
     Item.prototype.describe = function () {
@@ -213,33 +214,33 @@ var Map = (function () {
         this.paths = [];
         this.makeEmptyMap();
         this.makeMapTrunk();
-        for (var i = 0; i < config.map.count.branches; i++) {
-            this.makeMapBranch();
-        }
+        this.makeMapBranch();
         this.applyPaths();
         this.generate(characters.treasure, config.map.count.treasure);
         this.generate(characters.portal, 1);
     }
     Map.prototype.generate = function (character, count) {
-        var currentCount = 0;
-        while (currentCount < count) {
-            for (var y = 0; y < config.map.height; y++) {
-                for (var x = 0; x < config.map.width; x++) {
-                    if (this.grid[y][x].road) {
-                        if (probability(2)) {
-                            currentCount++;
-                            this.grid[y][x].characterOverlay = character;
-                            if (character == characters.portal) {
-                                this.grid[y][x].backgroundOverlay = "portal";
-                                this.grid[y][x].description.interest = random(descriptions.portals);
-                            }
-                            else if (character == characters.treasure) {
-                                this.grid[y][x].backgroundOverlay = "treasure";
-                                this.grid[y][x].item = random(allItems);
-                                this.grid[y][x].description.interest = random(descriptions.treasure);
-                            }
-                            if (currentCount == count) {
-                                return;
+        for (var i = 0; i < config.map.layers; i++) {
+            var currentCount = 0;
+            while (currentCount < count) {
+                for (var y = 0; y < config.map.height; y++) {
+                    for (var x = 0; x < config.map.width; x++) {
+                        if (this.grid[i][y][x].road) {
+                            if (probability(2)) {
+                                currentCount++;
+                                this.grid[i][y][x].characterOverlay = character;
+                                if (character == characters.portal) {
+                                    this.grid[i][y][x].backgroundOverlay = "portal";
+                                    this.grid[i][y][x].description.interest = random(descriptions.portals);
+                                }
+                                else if (character == characters.treasure) {
+                                    this.grid[i][y][x].backgroundOverlay = "treasure";
+                                    this.grid[i][y][x].item = random(allItems);
+                                    this.grid[i][y][x].description.interest = random(descriptions.treasure);
+                                }
+                                if (currentCount == count) {
+                                    return;
+                                }
                             }
                         }
                     }
@@ -249,34 +250,48 @@ var Map = (function () {
     };
     Map.prototype.applyPaths = function () {
         for (var i = 0; i < this.paths.length; i++) {
-            this.applyPath(this.paths[i]);
+            for (var j = 0; j < this.paths[i].length; j++) {
+                this.applyPath(this.paths[i][j]);
+            }
         }
     };
     Map.prototype.makeMapTrunk = function () {
-        var pointA = this.randomPoint();
-        var pointB = this.randomPoint();
-        while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
-            pointA = this.randomPoint();
-            pointB = this.randomPoint();
+        for (var i = 0; i < config.map.layers; i++) {
+            this.paths[i] = [];
+            var pointA = this.randomPoint();
+            var pointB = this.randomPoint();
+            while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
+                pointA = this.randomPoint();
+                pointB = this.randomPoint();
+            }
+            this.paths[i].push(this.findPath(pointA, pointB));
         }
-        this.paths.push(this.findPath(pointA, pointB));
+        console.log(this.paths[0][0][0]);
     };
     Map.prototype.makeMapBranch = function () {
-        var pointA = this.paths[this.paths.length - 1][Math.floor(Math.random() * (this.paths[this.paths.length - 1].length - 1))];
-        var pointB = this.randomPoint();
-        while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
-            pointB = this.randomPoint();
+        for (var i = 0; i < config.map.layers; i++) {
+            for (var j = 0; j < config.map.count.branches; j++) {
+                var pointA = this.randomPoint();
+                var pointB = this.randomPoint();
+                while (this.getPathLength(pointA, pointB) < config.map.minPathLength) {
+                    pointB = this.randomPoint();
+                }
+                this.paths[i].push(this.findPath(pointA, pointB));
+            }
         }
-        this.paths.push(this.findPath(pointA, pointB));
+        console.log(this.paths);
     };
     Map.prototype.getPathLength = function (pointA, pointB) {
         return this.findPath(pointA, pointB).length;
     };
     Map.prototype.makeEmptyMap = function () {
-        for (var y = 0; y < config.map.height; y++) {
-            this.grid[y] = [];
-            for (var x = 0; x < config.map.width; x++) {
-                this.grid[y][x] = new Tile(x, y);
+        for (var i = 0; i < config.map.layers; i++) {
+            this.grid[i] = [];
+            for (var y = 0; y < config.map.height; y++) {
+                this.grid[i][y] = [];
+                for (var x = 0; x < config.map.width; x++) {
+                    this.grid[i][y][x] = new Tile(x, y);
+                }
             }
         }
     };
@@ -313,7 +328,7 @@ var Map = (function () {
             else {
                 character = this.getPathCharacterEnd(b, a);
             }
-            this.grid = new Tile(b.x, b.y, character).apply(this.grid);
+            this.grid[i] = new Tile(b.x, b.y, character).apply(this.grid[i]);
         }
     };
     Map.prototype.getPathCharacterMiddle = function (a, b, c) {
@@ -355,27 +370,27 @@ var Map = (function () {
         }
     };
     Map.prototype.draw = function () {
-        var message = characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
+        var message = "World Layer " + player.layer + "\n" + characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
         for (var y = 0; y < config.map.height; y++) {
             for (var x = 0; x < config.map.width; x++) {
-                var characterHere = false;
+                var npcHere = false;
                 if (x == player.x && y == player.y) {
                     message += characters.player;
                 }
                 else {
                     for (var i = 0; i < allNPCs.length; i++) {
-                        if (allNPCs[i].x == x && allNPCs[i].y == y) {
+                        if (allNPCs[i].position[player.layer].x == x && allNPCs[i].position[player.layer].y == y) {
                             message += characters.npc;
-                            characterHere = true;
+                            npcHere = true;
                             break;
                         }
                     }
-                    if (!characterHere) {
-                        if (this.grid[y][x].characterOverlay) {
-                            message += this.grid[y][x].characterOverlay;
+                    if (!npcHere) {
+                        if (this.grid[player.layer][y][x].characterOverlay) {
+                            message += this.grid[player.layer][y][x].characterOverlay;
                         }
                         else {
-                            message += this.grid[y][x].character;
+                            message += this.grid[player.layer][y][x].character;
                         }
                     }
                 }
@@ -395,7 +410,6 @@ var NPC = (function () {
         if (health === void 0) { health = 100; }
         if (maxHealth === void 0) { maxHealth = 100; }
         if (background === void 0) { background = ""; }
-        this.spawned = false;
         this.name = name;
         this.attack = attack;
         this.defense = defense;
@@ -410,13 +424,14 @@ var NPC = (function () {
         this.spawn(map);
     }
     NPC.prototype.spawn = function (map) {
-        while (!this.spawned) {
-            for (var y = 0; y < config.map.height; y++) {
-                for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
-                        this.x = x;
-                        this.y = y;
-                        this.spawned = true;
+        for (var i = 0; i < config.map.layers; i++) {
+            while (!this.position[i]) {
+                for (var y = 0; y < config.map.height; y++) {
+                    for (var x = 0; x < config.map.width; x++) {
+                        if (probability(2) && !this.position[i] && map.grid[i][y][x].direction.n && map.grid[i][y][x].character != characters.treasure && map.grid[i][y][x].character != characters.portal) {
+                            this.position[i].x = x;
+                            this.position[i].y = y;
+                        }
                     }
                 }
             }
@@ -437,14 +452,6 @@ var NPC = (function () {
             }
         }
         log("You received.");
-    };
-    NPC.prototype.updateBackground = function () {
-        if (map.grid[this.y][this.x].backgroundOverlay) {
-            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
-        }
-        else {
-            changeBackground(map.grid[this.y][this.x].background);
-        }
     };
     NPC.prototype.fight = function () {
         if (probability(50)) {
@@ -496,6 +503,7 @@ var Player = (function () {
         if (defense === void 0) { defense = 1; }
         if (health === void 0) { health = 100; }
         this.spawned = false;
+        this.layer = 0;
         this.inCombat = null;
         this.attack = attack;
         this.defense = defense;
@@ -509,7 +517,7 @@ var Player = (function () {
         while (!this.spawned) {
             for (var y = 0; y < config.map.height; y++) {
                 for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(2) && map.grid[this.layer][y][x].direction.n && map.grid[this.layer][y][x].character != characters.treasure && map.grid[this.layer][y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -557,32 +565,32 @@ var Player = (function () {
         }
         else {
             if (direction == "n" || direction == "north") {
-                if (map.grid[this.y][this.x].direction.n) {
+                if (map.grid[this.layer][this.y][this.x].direction.n) {
                     this.y--;
                     map.draw();
                 }
             }
             if (direction == "s" || direction == "south") {
-                if (map.grid[this.y][this.x].direction.s) {
+                if (map.grid[this.layer][this.y][this.x].direction.s) {
                     this.y++;
                     map.draw();
                 }
             }
             if (direction == "e" || direction == "east") {
-                if (map.grid[this.y][this.x].direction.e) {
+                if (map.grid[this.layer][this.y][this.x].direction.e) {
                     this.x++;
                     map.draw();
                 }
             }
             if (direction == "w" || direction == "west") {
-                if (map.grid[this.y][this.x].direction.w) {
+                if (map.grid[this.layer][this.y][this.x].direction.w) {
                     this.x--;
                     map.draw();
                 }
             }
             this.checkCombat();
             this.updateBackground();
-            map.grid[this.y][this.x].describe();
+            map.grid[this.layer][this.y][this.x].describe();
         }
     };
     Player.prototype.checkCombat = function () {
@@ -592,7 +600,7 @@ var Player = (function () {
             return;
         }
         for (var i = 0; i < allEnemies.length; i++) {
-            if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+            if (this.x == allEnemies[i].position[this.layer].x && this.y == allEnemies[i].position[this.layer].y) {
                 if (allEnemies[i].health > 0) {
                     this.inCombat = allEnemies[i];
                     return;
@@ -638,22 +646,22 @@ var Player = (function () {
     };
     Player.prototype.updateBackground = function () {
         for (var i = 0; i < allEnemies.length; i++) {
-            if (this.inCombat && this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
+            if (this.inCombat && this.x == allEnemies[i].position[this.layer].x && this.y == allEnemies[i].position[this.layer].y) {
                 changeBackground(allEnemies[i].background);
                 return;
             }
         }
         for (var i = 0; i < allNPCs.length; i++) {
-            if (this.x == allNPCs[i].x && this.y == allNPCs[i].y) {
+            if (this.x == allNPCs[i].position[this.layer].x && this.y == allNPCs[i].position[this.layer].y) {
                 changeBackground(allNPCs[i].background);
                 return;
             }
         }
-        if (map.grid[this.y][this.x].backgroundOverlay) {
-            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
+        if (map.grid[this.layer][this.y][this.x].backgroundOverlay) {
+            changeBackground(map.grid[this.layer][this.y][this.x].backgroundOverlay);
         }
         else {
-            changeBackground(map.grid[this.y][this.x].background);
+            changeBackground(map.grid[this.layer][this.y][this.x].background);
         }
     };
     Player.prototype.calculateAttack = function () {
@@ -895,7 +903,7 @@ var Tile = (function () {
     };
     Tile.prototype.talk = function () {
         for (var i = 0; i < allNPCs.length; i++) {
-            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+            if (allNPCs[i].position[player.layer].x == this.x && allNPCs[i].position[player.layer].y == this.y) {
                 log(allNPCs[i].name + " says, \"" + allNPCs[i].dialogue + "\"");
                 return;
             }
@@ -906,7 +914,7 @@ var Tile = (function () {
         var itemExists = false;
         var npcWillTrade = false;
         for (var i = 0; i < allNPCs.length; i++) {
-            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+            if (allNPCs[i].position[player.layer].x == this.x && allNPCs[i].position[player.layer].y == this.y) {
                 if (allNPCs[i].item != null) {
                     for (var i_1 = 0; i_1 < player.inventory.length; i_1++) {
                         if (player.inventory[i_1].name.toLowerCase() == itemName.toLowerCase()) {
@@ -937,13 +945,13 @@ var Tile = (function () {
     };
     Tile.prototype.describe = function () {
         for (var i = 0; i < allEnemies.length; i++) {
-            if (allEnemies[i].x == this.x && allEnemies[i].y == this.y) {
+            if (allEnemies[i].position[player.layer].x == this.x && allEnemies[i].position[player.layer].y == this.y) {
                 log(allEnemies[i].description);
                 return;
             }
         }
         for (var i = 0; i < allNPCs.length; i++) {
-            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+            if (allNPCs[i].position[player.layer].x == this.x && allNPCs[i].position[player.layer].y == this.y) {
                 log(allNPCs[i].description + this.description.interest + this.description.direction);
                 return;
             }

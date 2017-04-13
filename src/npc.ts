@@ -1,8 +1,9 @@
 interface INPC {
     name: string;
-    x: number;
-    y: number;
-    spawned: boolean;
+    position: {
+        x: number;
+        y: number;
+    }[];
     attack: number;
     defense: number;
     health: number;
@@ -16,9 +17,10 @@ interface INPC {
 
 class NPC implements INPC {
     name: string;
-    x: number;
-    y: number;
-    spawned: boolean;
+    position: {
+        x: number;
+        y: number;
+    }[];
     attack: number;
     defense: number;
     health: number;
@@ -30,7 +32,6 @@ class NPC implements INPC {
     description: string;
 
     constructor(map: Map, name: string, description: string, allDialogue: string[], inventory: Item[], attack = 1, defense = 1, health = 100, maxHealth = 100, background = "", ) {
-        this.spawned = false;
         this.name = name;
         this.attack = attack;
         this.defense = defense;
@@ -48,13 +49,14 @@ class NPC implements INPC {
     }
 
     spawn(map: Map) {
-        while (!this.spawned) {
-            for (let y = 0; y < config.map.height; y++) {
-                for (let x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
-                        this.x = x;
-                        this.y = y;
-                        this.spawned = true;
+        for (let i = 0; i < config.map.layers; i++) {
+            while (!this.position[i]) {
+                for (let y = 0; y < config.map.height; y++) {
+                    for (let x = 0; x < config.map.width; x++) {
+                        if (probability(2) && !this.position[i] && map.grid[i][y][x].direction.n && map.grid[i][y][x].character != characters.treasure && map.grid[i][y][x].character != characters.portal) {
+                            this.position[i].x = x;
+                            this.position[i].y = y;
+                        }
                     }
                 }
             }
@@ -77,14 +79,6 @@ class NPC implements INPC {
         }
 
         log("You received.");
-    }
-
-    updateBackground() {
-        if (map.grid[this.y][this.x].backgroundOverlay) {
-            changeBackground(map.grid[this.y][this.x].backgroundOverlay);
-        } else {
-            changeBackground(map.grid[this.y][this.x].background);
-        }
     }
 
     fight() {

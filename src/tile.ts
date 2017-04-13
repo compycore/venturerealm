@@ -241,7 +241,7 @@ class Tile implements ITile {
 
     talk() {
         for (let i = 0; i < allNPCs.length; i++) {
-            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+            if (allNPCs[i].position[player.layer].x == this.x && allNPCs[i].position[player.layer].y == this.y) {
                 log(allNPCs[i].name + " says, \"" + allNPCs[i].dialogue + "\"");
                 return;
             }
@@ -255,7 +255,7 @@ class Tile implements ITile {
         let npcWillTrade = false;
 
         for (let i = 0; i < allNPCs.length; i++) {
-            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+            if (allNPCs[i].position[player.layer].x == this.x && allNPCs[i].position[player.layer].y == this.y) {
                 if (allNPCs[i].item != null) {
                     for (let i = 0; i < player.inventory.length; i++) {
                         if (player.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
@@ -288,14 +288,14 @@ class Tile implements ITile {
 
     describe() {
         for (let i = 0; i < allEnemies.length; i++) {
-            if (allEnemies[i].x == this.x && allEnemies[i].y == this.y) {
+            if (allEnemies[i].position[player.layer].x == this.x && allEnemies[i].position[player.layer].y == this.y) {
                 log(allEnemies[i].description);
 				return;
 			}
 		}
 
         for (let i = 0; i < allNPCs.length; i++) {
-            if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {
+            if (allNPCs[i].position[player.layer].x == this.x && allNPCs[i].position[player.layer].y == this.y) {
                 log(allNPCs[i].description + this.description.interest + this.description.direction);
                 return;
             }

@@ -1,5 +1,6 @@
 let config = {
     map: {
+		layers: 10,
         width: 40,
 		height: 20,
         minPathLength: 18,
