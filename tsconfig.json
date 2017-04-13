@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"removeComments": true,
 		"noImplicitAny": true,
-		"outFile": "scripts/tsc.js",
+		"outFile": "public/scripts/tsc.js",
 		"sourceMap": true
 	},
 	"include": [

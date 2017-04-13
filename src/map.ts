@@ -42,7 +42,7 @@ class Map {
             for (let y = 0; y < config.map.height; y++) {
                 for (let x = 0; x < config.map.width; x++) {
                     if (this.grid[y][x].road) { // Only place generated artifacts on road tiles
-                        if (probability(2)) { // Arbitrary probability value
+                        if (probability(1)) { // Arbitrary probability value
                             currentCount++;
                             this.grid[y][x].characterOverlay = character; // Change the tile's character
 

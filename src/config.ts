@@ -6,12 +6,12 @@ let config = {
 			width: 39,
 			height: 19,
 		},
-        minPathLength: 75,
+        minPathLength: 50,
         count: {
-            branches: 50,
-            enemies: 100,
-            treasure: 200,
-			npcs: 15,
+            branches: 100,
+            enemies: 150,
+            treasure: 500,
+			npcs: 20,
         }
     }
 }

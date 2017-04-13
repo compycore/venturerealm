@@ -2,14 +2,35 @@ let enemiesCollection: NPC[];
 let allEnemies: NPC[];
 
 function makeEnemies(map: Map, enemyCount: number) {
-	allEnemies = []; // Not sure why I need this but I do
+	allEnemies = [];
     enemiesCollection = [
         new NPC(map, "Stone Golem", "A stone stares at you from the side of the road, malice in its beady eyes. ",
             [
                 "..."
             ],
             [],
-            10, 15, 25, "sword",
+            8, 5, 25, "sword",
+        ),
+        new NPC(map, "Medium Spider", "A spider the size of a large cat blocks your path. ",
+            [
+                "..."
+            ],
+            [],
+            4, 2, 7, "sword",
+        ),
+        new NPC(map, "Ent", "A tree blocks your path. It stares threateningly at you down a long, wooden nose. ",
+            [
+                "..."
+            ],
+            [],
+            3, 10, 18, "sword",
+        ),
+        new NPC(map, "Flaming Lizard", "An alligator-sized lizard watches you hungrily as flames flick around its body. ",
+            [
+                "..."
+            ],
+            [],
+            10, 5, 10, "sword",
         ),
     ];
 

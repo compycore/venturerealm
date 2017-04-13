@@ -6,12 +6,12 @@ var config = {
             width: 39,
             height: 19
         },
-        minPathLength: 75,
+        minPathLength: 50,
         count: {
-            branches: 50,
-            enemies: 100,
-            treasure: 200,
-            npcs: 15
+            branches: 100,
+            enemies: 150,
+            treasure: 500,
+            npcs: 20
         }
     }
 };
@@ -239,7 +239,7 @@ var Map = (function () {
             for (var y = 0; y < config.map.height; y++) {
                 for (var x = 0; x < config.map.width; x++) {
                     if (this.grid[y][x].road) {
-                        if (probability(2)) {
+                        if (probability(1)) {
                             currentCount++;
                             this.grid[y][x].characterOverlay = character;
                             if (character == characters.portal) {
@@ -441,7 +441,7 @@ var NPC = (function () {
         while (!this.spawned) {
             for (var y = 0; y < config.map.height; y++) {
                 for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(1) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -517,13 +517,12 @@ var Player = (function () {
         this.inventory = [];
         this.spawn(map);
         this.checkCombat();
-        this.updateBackground();
     }
     Player.prototype.spawn = function (map) {
         while (!this.spawned) {
             for (var y = 0; y < config.map.height; y++) {
                 for (var x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(1) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -537,7 +536,7 @@ var Player = (function () {
             log("You are not in combat.");
         }
         else {
-            if (probability(50)) {
+            if (probability(80)) {
                 log("You got away from " + this.inCombat.name + "!");
                 this.inCombat = null;
                 this.updateBackground();
@@ -601,7 +600,6 @@ var Player = (function () {
                 }
             }
             this.checkCombat();
-            this.updateBackground();
             map.grid[this.y][this.x].describe();
         }
     };
@@ -609,12 +607,20 @@ var Player = (function () {
         if (this.health <= 0) {
             log("You have died. Game over.");
             gameOver = true;
+            this.updateBackground();
             return;
         }
         for (var i = 0; i < allEnemies.length; i++) {
             if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
                 if (allEnemies[i].health > 0) {
                     this.inCombat = allEnemies[i];
+                    this.updateBackground();
+                    return;
+                }
+                else {
+                    log("You defeated " + this.inCombat.name + "!");
+                    this.inCombat = null;
+                    this.updateBackground();
                     return;
                 }
             }
@@ -675,11 +681,9 @@ var Player = (function () {
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
     };
     Player.prototype.updateBackground = function () {
-        for (var i = 0; i < allEnemies.length; i++) {
-            if (this.inCombat && this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
-                changeBackground(allEnemies[i].background);
-                return;
-            }
+        if (this.inCombat) {
+            changeBackground(this.inCombat.background);
+            return;
         }
         for (var i = 0; i < allNPCs.length; i++) {
             if (this.x == allNPCs[i].x && this.y == allNPCs[i].y) {
@@ -1038,7 +1042,16 @@ function makeEnemies(map, enemyCount) {
     enemiesCollection = [
         new NPC(map, "Stone Golem", "A stone stares at you from the side of the road, malice in its beady eyes. ", [
             "..."
-        ], [], 10, 15, 25, "sword"),
+        ], [], 8, 5, 25, "sword"),
+        new NPC(map, "Medium Spider", "A spider the size of a large cat blocks your path. ", [
+            "..."
+        ], [], 4, 2, 7, "sword"),
+        new NPC(map, "Ent", "A tree blocks your path. It stares threateningly at you down a long, wooden nose. ", [
+            "..."
+        ], [], 3, 10, 18, "sword"),
+        new NPC(map, "Flaming Lizard", "An alligator-sized lizard watches you hungrily as flames flick around its body. ", [
+            "..."
+        ], [], 10, 5, 10, "sword"),
     ];
     for (var i = 0; i < enemyCount; i++) {
         var currentEnemy = random(enemiesCollection);

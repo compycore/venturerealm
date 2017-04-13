@@ -30,14 +30,13 @@ class Player implements IPlayer {
         this.spawn(map);
 
         this.checkCombat();
-        this.updateBackground();
     }
 
     spawn(map: Map) {
         while (!this.spawned) {
             for (let y = 0; y < config.map.height; y++) {
                 for (let x = 0; x < config.map.width; x++) {
-                    if (probability(2) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
+                    if (probability(1) && map.grid[y][x].direction.n && map.grid[y][x].character != characters.treasure && map.grid[y][x].character != characters.portal) {
                         this.x = x;
                         this.y = y;
                         this.spawned = true;
@@ -51,7 +50,7 @@ class Player implements IPlayer {
         if (!this.inCombat) {
             log("You are not in combat.");
         } else {
-            if (probability(50)) {
+            if (probability(80)) {
                 log("You got away from " + this.inCombat.name + "!");
                 this.inCombat = null;
                 this.updateBackground();
@@ -118,7 +117,6 @@ class Player implements IPlayer {
             }
 
             this.checkCombat();
-            this.updateBackground();
             map.grid[this.y][this.x].describe();
         }
     }
@@ -127,6 +125,7 @@ class Player implements IPlayer {
         if (this.health <= 0) {
             log("You have died. Game over.");
             gameOver = true;
+            this.updateBackground();
             return;
         }
 
@@ -134,6 +133,12 @@ class Player implements IPlayer {
             if (this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
                 if (allEnemies[i].health > 0) {
                     this.inCombat = allEnemies[i];
+                    this.updateBackground();
+                    return;
+                } else {
+                    log("You defeated " + this.inCombat.name + "!");
+                    this.inCombat = null;
+                    this.updateBackground();
                     return;
                 }
             }
@@ -206,11 +211,9 @@ class Player implements IPlayer {
     }
 
     updateBackground() {
-        for (let i = 0; i < allEnemies.length; i++) {
-            if (this.inCombat && this.x == allEnemies[i].x && this.y == allEnemies[i].y) {
-                changeBackground(allEnemies[i].background);
-                return;
-            }
+        if (this.inCombat) {
+            changeBackground(this.inCombat.background);
+            return;
         }
 
         for (let i = 0; i < allNPCs.length; i++) {
