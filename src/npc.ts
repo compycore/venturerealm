@@ -29,7 +29,7 @@ class NPC implements INPC {
     allDialogue: string[];
     description: string;
 
-    constructor(map: Map, name: string, description: string, allDialogue: string[], inventory: Item[], attack = 1, defense = 1, health = 100, maxHealth = 100, background = "", ) {
+    constructor(map: Map, name: string, description: string, allDialogue: string[], inventory: Item[], attack = 1, defense = 1, health = 20, background = "", ) {
         this.spawned = false;
         this.name = name;
         this.attack = attack;

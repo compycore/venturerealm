@@ -9,13 +9,13 @@ function makeEnemies(map: Map, enemyCount: number) {
                 "..."
             ],
             [],
-            10, 15, 25, 25, "sword",
+            10, 15, 25, "sword",
         ),
     ];
 
 	for (let i = 0; i < enemyCount; i++) {
 		let currentEnemy = random(enemiesCollection);
 
-		allEnemies.push(new NPC(map, currentEnemy.name, currentEnemy.description, currentEnemy.allDialogue, currentEnemy.inventory, currentEnemy.attack, currentEnemy.defense, currentEnemy.health, currentEnemy.maxHealth, currentEnemy.background));
+		allEnemies.push(new NPC(map, currentEnemy.name, currentEnemy.description, currentEnemy.allDialogue, currentEnemy.inventory, currentEnemy.attack, currentEnemy.defense, currentEnemy.health, currentEnemy.background));
 	}
 }

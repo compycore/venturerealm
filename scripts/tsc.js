@@ -10,7 +10,8 @@ var config = {
         count: {
             branches: 50,
             enemies: 100,
-            treasure: 200
+            treasure: 200,
+            npcs: 15
         }
     }
 };
@@ -203,8 +204,8 @@ function init() {
     document.getElementById("player_input").focus();
     map = new Map();
     logo = new Logo();
-    makeNPCs(map);
-    makeEnemies(map, 5);
+    makeNPCs(map, config.map.count.npcs);
+    makeEnemies(map, config.map.count.enemies);
     player = new Player(map);
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
@@ -417,11 +418,10 @@ var Map = (function () {
     return Map;
 }());
 var NPC = (function () {
-    function NPC(map, name, description, allDialogue, inventory, attack, defense, health, maxHealth, background) {
+    function NPC(map, name, description, allDialogue, inventory, attack, defense, health, background) {
         if (attack === void 0) { attack = 1; }
         if (defense === void 0) { defense = 1; }
-        if (health === void 0) { health = 100; }
-        if (maxHealth === void 0) { maxHealth = 100; }
+        if (health === void 0) { health = 20; }
         if (background === void 0) { background = ""; }
         this.spawned = false;
         this.name = name;
@@ -1038,11 +1038,11 @@ function makeEnemies(map, enemyCount) {
     enemiesCollection = [
         new NPC(map, "Stone Golem", "A stone stares at you from the side of the road, malice in its beady eyes. ", [
             "..."
-        ], [], 10, 15, 25, 25, "sword"),
+        ], [], 10, 15, 25, "sword"),
     ];
     for (var i = 0; i < enemyCount; i++) {
         var currentEnemy = random(enemiesCollection);
-        allEnemies.push(new NPC(map, currentEnemy.name, currentEnemy.description, currentEnemy.allDialogue, currentEnemy.inventory, currentEnemy.attack, currentEnemy.defense, currentEnemy.health, currentEnemy.maxHealth, currentEnemy.background));
+        allEnemies.push(new NPC(map, currentEnemy.name, currentEnemy.description, currentEnemy.allDialogue, currentEnemy.inventory, currentEnemy.attack, currentEnemy.defense, currentEnemy.health, currentEnemy.background));
     }
 }
 var allItems = [
@@ -1057,19 +1057,25 @@ var allItems = [
     new Item("Leather Shoes", "Leather shoes with small holes in the bottom.", "shoes", 0, 2, 0, true),
 ];
 var allNPCs;
-function makeNPCs(map) {
-    allNPCs = [
+function makeNPCs(map, replicas) {
+    allNPCs = [];
+    var npcCollection = [
         new NPC(map, "Gregory the Gray", "You come upon a short yet stalwart wizard. He wears a fabulous tophat and carries a staff that crackles with electricity. ", [
             "BUUUUUURITOOOOOOOO! BURRRRRRITOOOOOOO! BUUUUUUUUURITTTTTTOOOOOO!",
         ], [
             new Item("Magical Burrito", "A delicious-smelling burrito dripping with shimmering sauce. ", "healing", 1, 1, 50),
             new Item("Deck of Cards", "A lightweight box containing fifty-two cards used as throwing weapons. ", "weapon", 30, 1),
-        ], 40, 35, 100, 100, "burrito"),
+        ], 40, 35, 100, "burrito"),
         new NPC(map, "Michael the Strong", "Before you is the most muscular beast you've ever seen. His meaty fists look strong enough to crush boulders and his well-kempt goatee fills you with feelings of power. ", [
             "If you go to the Academy for basic training, you could be this buff too.",
         ], [
             new Item("Thumping Gloves", "Loose-fitting gloves made of a magical material that amplifies your blows. ", "weapon", 40, 1),
-        ], 70, 45, 100, 100, "beast"),
+        ], 70, 45, 100, "beast"),
     ];
+    for (var i = 0; i < npcCollection.length; i++) {
+        for (var j = 0; j < replicas; j++) {
+            allNPCs.push(new NPC(map, npcCollection[i].name, npcCollection[i].description, npcCollection[i].allDialogue, npcCollection[i].inventory, npcCollection[i].attack, npcCollection[i].defense, npcCollection[i].health, npcCollection[i].background));
+        }
+    }
 }
 //# sourceMappingURL=tsc.js.map

@@ -11,7 +11,7 @@ let config = {
             branches: 50,
             enemies: 100,
             treasure: 200,
-			npcs: 30,
+			npcs: 15,
         }
     }
 }
