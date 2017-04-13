@@ -68,8 +68,14 @@ class Player implements IPlayer {
             log("You are not in combat.");
         } else {
             if (probability(50)) {
-                log("You dealt " + this.calculateAttack() + " damage to " + this.inCombat.name + "!");
-                this.inCombat.health -= this.calculateAttack();
+                let damage = this.calculateAttack() - this.inCombat.defense;
+
+                if (damage > 0) {
+                    log("You dealt " + damage + " damage to " + this.inCombat.name + "!");
+                    this.inCombat.health -= damage;
+                } else {
+                    log("You attacked " + this.inCombat.name + " but did no damage!");
+                }
             } else {
                 log("Your attack missed...");
             }
@@ -152,6 +158,29 @@ class Player implements IPlayer {
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
     }
 
+    use(itemName: string) {
+        for (let i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                this.heal(this.inventory[i].healing);
+                this.discard(this.inventory[i].name);
+                log("Used " + this.inventory[i].name + ".");
+                return;
+            }
+        }
+
+        log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    }
+
+    heal(amount: number) {
+        this.health += amount;
+
+        if (this.health > 100) {
+            this.health = 100;
+        }
+
+        log("You were healed by " + amount + " health points!");
+    }
+
     discard(itemName: string, logMessage = true) {
         for (let i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
@@ -211,7 +240,7 @@ class Player implements IPlayer {
     }
 
     calculateDefense(): number {
-        let total = this.attack;
+        let total = this.defense;
 
         for (let i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i].equipped) {

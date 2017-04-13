@@ -1,12 +1,16 @@
 let config = {
     map: {
-        width: 40,
-		height: 20,
-        minPathLength: 18,
+        width: 400,
+		height: 200,
+		draw: {
+			width: 39,
+			height: 19,
+		},
+        minPathLength: 75,
         count: {
-            branches: 7,
-            enemies: 15,
-            treasure: 12
+            branches: 50,
+            enemies: 100,
+            treasure: 200,
         }
     }
 }

@@ -25,7 +25,7 @@ function input(value: string) {
 
     if (!gameOver) {
         if (command == "help") {
-            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'");
+            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
         } else if (command == "map") {
             map.draw();
         } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) { // Allow for player movement
@@ -37,6 +37,12 @@ function input(value: string) {
                 player.equip(parameter);
             } else {
                 log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+            }
+        } else if (command == "use") {
+            if (parameter) {
+                player.use(parameter);
+            } else {
+                log("Please provide an item name to use; E.g. 'use potion'");
             }
         } else if (command == "discard") {
             if (parameter) {

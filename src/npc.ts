@@ -89,9 +89,15 @@ class NPC implements INPC {
 
     fight() {
         if (probability(50)) {
-            log("You were attacked by " + this.name + " and received " + this.calculateAttack() + " damage!");
-            player.health -= this.calculateAttack();
-            windowShake();
+            let damage = this.calculateAttack() - player.calculateDefense();
+
+            if (damage > 0) {
+                log("You were attacked by " + this.name + " and received " + damage + " damage!");
+                player.health -= damage;
+                windowShake();
+            } else {
+                log("You were attacked by " + this.name + " but received no damage!");
+            }
         } else {
             log(this.name + " attacked and missed.");
         }
@@ -109,31 +115,7 @@ class NPC implements INPC {
         return total;
     }
 
-    calculateDefense(): number {
-        let total = this.attack;
-
-        for (let i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i].equipped) {
-                total += this.inventory[i].defense;
-            }
-        }
-
-        return total;
-    }
-
     speak() {
         log(this.dialogue);
-    }
-
-    describe() {
-        if (this.inventory.length == 0) {
-            log("Your inventory is empty.");
-        } else {
-            for (let i = 0; i < this.inventory.length; i++) {
-                this.inventory[i].describe();
-            }
-        }
-
-        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
     }
 }

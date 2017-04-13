@@ -194,8 +194,29 @@ class Map {
     draw() {
         let message = characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
 
-        for (let y = 0; y < config.map.height; y++) {
-            for (let x = 0; x < config.map.width; x++) {
+        let left = player.x - Math.floor(config.map.draw.width / 2);
+        let right = player.x + Math.floor(config.map.draw.width / 2);
+        let top = player.y - Math.floor(config.map.draw.height / 2);
+        let bottom = player.y + Math.floor(config.map.draw.height / 2);
+
+        if (left < 0) {
+            left = 0;
+        }
+
+        if (right > config.map.width) {
+            right = config.map.width;
+        }
+
+        if (top < 0) {
+            top = 0;
+        }
+
+        if (bottom > config.map.height) {
+            bottom = config.map.height;
+        }
+
+        for (let y = top; y < bottom; y++) {
+            for (let x = left; x < right; x++) {
                 let characterHere = false;
 
                 if (x == player.x && y == player.y) {
@@ -218,7 +239,7 @@ class Map {
                     }
                 }
 
-                if (x == config.map.width - 1 && y < config.map.height - 1) {
+                if (x == right - 1 && y < bottom - 1) {
                     message += "\n";
                 }
             }

@@ -1,12 +1,16 @@
 var config = {
     map: {
-        width: 40,
-        height: 20,
-        minPathLength: 18,
+        width: 400,
+        height: 200,
+        draw: {
+            width: 39,
+            height: 19
+        },
+        minPathLength: 75,
         count: {
-            branches: 7,
-            enemies: 15,
-            treasure: 12
+            branches: 50,
+            enemies: 100,
+            treasure: 200
         }
     }
 };
@@ -48,7 +52,7 @@ function input(value) {
     }
     if (!gameOver) {
         if (command == "help") {
-            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'");
+            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
         }
         else if (command == "map") {
             map.draw();
@@ -65,6 +69,14 @@ function input(value) {
             }
             else {
                 log("Please provide an item name to equip; E.g. 'equip wooden sword'");
+            }
+        }
+        else if (command == "use") {
+            if (parameter) {
+                player.use(parameter);
+            }
+            else {
+                log("Please provide an item name to use; E.g. 'use potion'");
             }
         }
         else if (command == "discard") {
@@ -356,8 +368,24 @@ var Map = (function () {
     };
     Map.prototype.draw = function () {
         var message = characters.player + "=player " + characters.npc + "=NPC " + characters.treasure + "=treasure " + characters.portal + "=portal\n\n";
-        for (var y = 0; y < config.map.height; y++) {
-            for (var x = 0; x < config.map.width; x++) {
+        var left = player.x - Math.floor(config.map.draw.width / 2);
+        var right = player.x + Math.floor(config.map.draw.width / 2);
+        var top = player.y - Math.floor(config.map.draw.height / 2);
+        var bottom = player.y + Math.floor(config.map.draw.height / 2);
+        if (left < 0) {
+            left = 0;
+        }
+        if (right > config.map.width) {
+            right = config.map.width;
+        }
+        if (top < 0) {
+            top = 0;
+        }
+        if (bottom > config.map.height) {
+            bottom = config.map.height;
+        }
+        for (var y = top; y < bottom; y++) {
+            for (var x = left; x < right; x++) {
                 var characterHere = false;
                 if (x == player.x && y == player.y) {
                     message += characters.player;
@@ -379,7 +407,7 @@ var Map = (function () {
                         }
                     }
                 }
-                if (x == config.map.width - 1 && y < config.map.height - 1) {
+                if (x == right - 1 && y < bottom - 1) {
                     message += "\n";
                 }
             }
@@ -448,9 +476,15 @@ var NPC = (function () {
     };
     NPC.prototype.fight = function () {
         if (probability(50)) {
-            log("You were attacked by " + this.name + " and received " + this.calculateAttack() + " damage!");
-            player.health -= this.calculateAttack();
-            windowShake();
+            var damage = this.calculateAttack() - player.calculateDefense();
+            if (damage > 0) {
+                log("You were attacked by " + this.name + " and received " + damage + " damage!");
+                player.health -= damage;
+                windowShake();
+            }
+            else {
+                log("You were attacked by " + this.name + " but received no damage!");
+            }
         }
         else {
             log(this.name + " attacked and missed.");
@@ -465,28 +499,8 @@ var NPC = (function () {
         }
         return total;
     };
-    NPC.prototype.calculateDefense = function () {
-        var total = this.attack;
-        for (var i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i].equipped) {
-                total += this.inventory[i].defense;
-            }
-        }
-        return total;
-    };
     NPC.prototype.speak = function () {
         log(this.dialogue);
-    };
-    NPC.prototype.describe = function () {
-        if (this.inventory.length == 0) {
-            log("Your inventory is empty.");
-        }
-        else {
-            for (var i = 0; i < this.inventory.length; i++) {
-                this.inventory[i].describe();
-            }
-        }
-        log("Health:  " + asciiBar(this.health) + "\nAttack:  " + asciiBar(this.calculateAttack()) + "\nDefense: " + asciiBar(this.calculateDefense()));
     };
     return NPC;
 }());
@@ -541,8 +555,14 @@ var Player = (function () {
         }
         else {
             if (probability(50)) {
-                log("You dealt " + this.calculateAttack() + " damage to " + this.inCombat.name + "!");
-                this.inCombat.health -= this.calculateAttack();
+                var damage = this.calculateAttack() - this.inCombat.defense;
+                if (damage > 0) {
+                    log("You dealt " + damage + " damage to " + this.inCombat.name + "!");
+                    this.inCombat.health -= damage;
+                }
+                else {
+                    log("You attacked " + this.inCombat.name + " but did no damage!");
+                }
             }
             else {
                 log("Your attack missed...");
@@ -615,6 +635,24 @@ var Player = (function () {
         }
         log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
     };
+    Player.prototype.use = function (itemName) {
+        for (var i = 0; i < this.inventory.length; i++) {
+            if (this.inventory[i].name.toLowerCase() == itemName.toLowerCase()) {
+                this.heal(this.inventory[i].healing);
+                this.discard(this.inventory[i].name);
+                log("Used " + this.inventory[i].name + ".");
+                return;
+            }
+        }
+        log("You don't have '" + itemName.toLowerCase() + "' in your inventory.");
+    };
+    Player.prototype.heal = function (amount) {
+        this.health += amount;
+        if (this.health > 100) {
+            this.health = 100;
+        }
+        log("You were healed by " + amount + " health points!");
+    };
     Player.prototype.discard = function (itemName, logMessage) {
         if (logMessage === void 0) { logMessage = true; }
         for (var i = 0; i < this.inventory.length; i++) {
@@ -666,7 +704,7 @@ var Player = (function () {
         return total;
     };
     Player.prototype.calculateDefense = function () {
-        var total = this.attack;
+        var total = this.defense;
         for (var i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i].equipped) {
                 total += this.inventory[i].defense;
