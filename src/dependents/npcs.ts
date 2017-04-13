@@ -1,6 +1,6 @@
 let allNPCs: NPC[];
 
-function makeNPCs(map: Map) {
+function makeNPCs(map: Map, replicas: number) {
     allNPCs = [
         new NPC(map, "Gregory the Gray", "You come upon a short yet stalwart wizard. He wears a fabulous tophat and carries a staff that crackles with electricity. ",
             [

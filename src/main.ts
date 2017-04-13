@@ -13,8 +13,8 @@ function init() {
     map = new Map();
     logo = new Logo();
 
-	makeNPCs(map);
-	makeEnemies(map, 5);
+	makeNPCs(map, config.count.npcs);
+	makeEnemies(map, config.count.enemies);
 
     player = new Player(map);
 
