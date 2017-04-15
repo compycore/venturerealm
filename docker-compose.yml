@@ -1,0 +1,18 @@
+version: '3'
+services:
+    venturerealm_server:
+        build: .
+        ports:
+            - "8000:8000"
+        network_mode: "host"
+        restart: always
+    venturerealm_database:
+        image: mongo:latest
+        ports:
+            - "9999:9999"
+        environment:
+            MONGODB_USER: "${db_user_env}"
+            MONGODB_DATABASE: "${dbname_env}"
+            MONGODB_PASS: "${db_pass}"
+        network_mode: "host"
+        restart: always

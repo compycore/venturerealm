@@ -19,7 +19,7 @@ function makeNPCs(map: Map, replicas: number) {
                 "If you go to the Academy for basic training, you could be this buff too.",
             ],
             [
-                new Item("Thumping Gloves", "Loose-fitting gloves made of a magical material that amplifies your blows. ", "weapon", 40, 1),
+                new Item("Gloves of Thumping", "Loose-fitting gloves made of a magical material that amplifies your blows. ", "weapon", 40, 1),
             ],
             70, 45, 100, "beast",
         ),

@@ -435,6 +435,7 @@ var NPC = (function () {
         this.description = description;
         this.inventory = inventory;
         this.item = random(this.inventory);
+        console.log(this.name, this.inventory, this.item.name);
         this.spawn(map);
     }
     NPC.prototype.spawn = function (map) {
@@ -1082,7 +1083,7 @@ function makeNPCs(map, replicas) {
         new NPC(map, "Michael the Strong", "Before you is the most muscular beast you've ever seen. His meaty fists look strong enough to crush boulders and his well-kempt goatee fills you with feelings of power. ", [
             "If you go to the Academy for basic training, you could be this buff too.",
         ], [
-            new Item("Thumping Gloves", "Loose-fitting gloves made of a magical material that amplifies your blows. ", "weapon", 40, 1),
+            new Item("Gloves of Thumping", "Loose-fitting gloves made of a magical material that amplifies your blows. ", "weapon", 40, 1),
         ], 70, 45, 100, "beast"),
     ];
     for (var i = 0; i < npcCollection.length; i++) {

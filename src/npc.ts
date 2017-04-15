@@ -43,6 +43,7 @@ class NPC implements INPC {
         this.inventory = inventory;
 
         this.item = random(this.inventory);
+		console.log(this.name, this.inventory, this.item.name);
 
         this.spawn(map);
     }
