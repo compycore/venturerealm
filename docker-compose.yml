@@ -1,12 +1,12 @@
 version: '3'
 services:
-    venturerealm_server:
+    server:
         build: .
         ports:
             - "8000:8000"
         network_mode: "host"
         restart: always
-    venturerealm_database:
+    database:
         image: mongo:latest
         ports:
             - "9999:9999"
