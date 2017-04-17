@@ -1,4 +1,5 @@
 var express = require("express");
+var MongoClient = require("mongodb").MongoClient;
 var path = require("path");
 var favicon = require("serve-favicon");
 var logger = require("morgan");
@@ -63,38 +64,56 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", routes);
-app.use("/game", game);
+connectToMongo();
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-	var err = new Error("Not Found");
-	err.status = 404;
-	next(err);
-});
+function connectToMongo() {
+	console.log("Attempting to connect to Mongo");
 
-// error handlers
+	MongoClient.connect("mongodb://localhost:27017/venturerealm", function(err, db) {
+		if (err) {
+			setTimeout(function() {
+				connectToMongo();
+			}, 1000);
 
-// development error handler
-// will print stacktrace
-if (app.get("env") === "development") {
-	app.use(function(err, req, res, next) {
-		res.status(err.status || 500);
-		res.render("error", {
-			message: err.message,
-			error: err
+			return;
+		}
+
+		console.log("Connected to server");
+
+		app.use("/", routes);
+		app.use("/game", game);
+
+		// catch 404 and forward to error handler
+		app.use(function(req, res, next) {
+			var err = new Error("Not Found");
+			err.status = 404;
+			next(err);
+		});
+
+		// error handlers
+
+		// development error handler
+		// will print stacktrace
+		if (app.get("env") === "development") {
+			app.use(function(err, req, res, next) {
+				res.status(err.status || 500);
+				res.render("error", {
+					message: err.message,
+					error: err
+				});
+			});
+		}
+
+		// production error handler
+		// no stacktraces leaked to user
+		app.use(function(err, req, res, next) {
+			res.status(err.status || 500);
+			res.render("error", {
+				message: err.message,
+				error: {}
+			});
 		});
 	});
 }
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-	res.status(err.status || 500);
-	res.render("error", {
-		message: err.message,
-		error: {}
-	});
-});
 
 module.exports = app;
