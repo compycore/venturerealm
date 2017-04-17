@@ -33,7 +33,7 @@ router.get("/callback",
 		failureRedirect: "/url-if-something-fails"
 	}),
 	function(req, res) {
-		res.redirect(req.session.returnTo || "/user");
+		res.redirect(req.session.returnTo || "/game");
 	});
 
 module.exports = router;
