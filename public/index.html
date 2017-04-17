@@ -31,13 +31,10 @@
 <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-<script src="//cdn.auth0.com/js/lock/10.13.0/lock.min.js"></script>
 <script src="scripts/pathfinding-browser.min.js"></script>
 <script src="scripts/tsc.js"></script>
 
 <script>
-	var lock;
-
 	$(function() {
 		$(".window").draggable({
 			cursor: "move",
@@ -50,31 +47,6 @@
 			my: "center",
 			at: "center",
 			of: "body"
-		});
-	});
-
-	$(document).ready(function() {
-		lock = new Auth0Lock('QUFivS41MF6xH1aZ00m1NPD60n6bYMGD', 'jessemillar.auth0.com', {
-			auth: {
-				params: {
-					scope: 'openid email'
-				}
-			}
-		});
-
-		lock.show();
-	});
-
-	lock.on("authenticated", function(authResult) {
-		lock.getProfile(authResult.idToken, function(error, profile) {
-			if (error) {
-				console.log(error);
-				return;
-			}
-
-			localStorage.setItem('id_token', authResult.idToken);
-
-			console.log(profile);
 		});
 	});
 </script>
