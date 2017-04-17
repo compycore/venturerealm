@@ -9,12 +9,12 @@ var session = require("express-session");
 var dotenv = require("dotenv");
 var passport = require("passport");
 var Auth0Strategy = require("passport-auth0");
+var ensureLoggedIn = require("connect-ensure-login").ensureLoggedIn();
 var cors = require("cors");
 
 dotenv.load();
 
 var routes = require("./routes/index");
-var game = require("./routes/game");
 
 // This will configure Passport to use Auth0
 var strategy = new Auth0Strategy({
@@ -80,6 +80,7 @@ function connectToMongo() {
 		console.log("Connected to server");
 
 		app.use("/", routes);
+		app.use("/game", ensureLoggedIn);
 		app.use("/game", express.static("public"));
 
 		// catch 404 and forward to error handler
