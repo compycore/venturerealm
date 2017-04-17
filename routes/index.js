@@ -11,7 +11,7 @@ var env = {
 /* GET home page. */
 router.get("/", function(req, res, next) {
 	res.render("index", {
-		title: "Express",
+		title: "VentureRealm",
 		env: env
 	});
 });
@@ -30,7 +30,7 @@ router.get("/logout", function(req, res) {
 
 router.get("/callback",
 	passport.authenticate("auth0", {
-		failureRedirect: "/url-if-something-fails"
+		failureRedirect: "/error"
 	}),
 	function(req, res) {
 		res.redirect(req.session.returnTo || "/game");
