@@ -8,7 +8,6 @@ var env = {
 	AUTH0_CALLBACK_URL: process.env.AUTH0_CALLBACK_URL || "http://localhost:3000/callback"
 };
 
-/* GET home page. */
 router.get("/", function(req, res, next) {
 	res.render("index", {
 		title: "VentureRealm",
@@ -21,7 +20,8 @@ router.get("/login",
 		res.render("login", {
 			env: env
 		});
-	});
+	}
+);
 
 router.get("/logout", function(req, res) {
 	req.logout();
@@ -34,6 +34,7 @@ router.get("/callback",
 	}),
 	function(req, res) {
 		res.redirect(req.session.returnTo || "/game");
-	});
+	}
+);
 
 module.exports = router;

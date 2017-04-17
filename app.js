@@ -77,9 +77,30 @@ function connectToMongo() {
 			return;
 		}
 
+		db.close();
+
 		console.log("Connected to server");
 
 		app.use("/", routes);
+		app.use("/user", ensureLoggedIn);
+
+		app.use("/user", function(req, res) {
+			MongoClient.connect("mongodb://localhost:27017/venturerealm", function(err, db) {
+				var collection = db.collection("users", function(err, collection) {});
+
+				collection.insert({
+					a: 2
+				}, function(err, docs) {
+					collection.count(function(err, count) {
+						res.send(format("count = %s", count));
+						db.close();
+					});
+				});
+			});
+
+			res.send("An error occured");
+		});
+
 		app.use("/game", ensureLoggedIn);
 		app.use("/game", express.static("public"));
 
