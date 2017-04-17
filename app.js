@@ -81,7 +81,7 @@ function connectToMongo() {
 		console.log("Connected to server");
 
 		app.use("/", routes);
-		app.use("/game", game);
+		app.use("/game", express.static("public"));
 
 		// catch 404 and forward to error handler
 		app.use(function(req, res, next) {
