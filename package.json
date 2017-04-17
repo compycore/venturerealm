@@ -1,9 +1,9 @@
 {
-  "name": "auth0-nodejs-regular-webapp-sample",
+  "name": "VentureRealm",
   "version": "1.0.0",
-  "description": "Auth0 + NodeJS Regular WebApp seed",
-  "repository": "git://github.com/auth0/node-auth0",
-  "author": "Auth0",
+  "description": "",
+  "repository": "git://github.com/jessemillar/venturerealm",
+  "author": "Jesse Millar",
   "license": "MIT",
   "scripts": {
     "start": "node ./bin/www"
