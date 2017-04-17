@@ -1,27 +1,31 @@
 var MongoClient = require("mongodb").MongoClient;
 var express = require("express");
+var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
 var cors = require("cors");
 var process = require("process");
 var waitForMongo = require("wait-for-mongo");
+var router = express.Router();
 
 var Auth0Strategy = require("passport-auth0");
 var passport = require("passport");
 
-var strategy = new Auth0Strategy({
-		domain: process.env.AUTH0_DOMAIN,
-		clientID: process.env.AUTH0_CLIENT_ID,
-		clientSecret: process.env.AUTH0_CLIENT_SECRET,
-		callbackURL: "/callback"
-	},
-	function(accessToken, refreshToken, extraParams, profile, done) {
-		// accessToken is the token to call Auth0 API (not needed in the most cases)
-		// extraParams.id_token has the JSON Web Token
-		// profile has all the information from the user
-		return done(null, profile);
-	}
-);
+console.log(process.env.AUTH0_DOMAIN);
 
-// This is not a best practice, but we want to keep things simple for now
+var strategy = new Auth0Strategy({
+	domain: process.env.AUTH0_DOMAIN,
+	clientID: process.env.AUTH0_CLIENT_ID,
+	clientSecret: process.env.AUTH0_CLIENT_SECRET,
+	callbackURL: process.env.AUTH0_CALLBACK_URL || 'http://localhost:8000/callback'
+}, function(accessToken, refreshToken, extraParams, profile, done) {
+	// accessToken is the token to call Auth0 API (not needed in the most cases)
+	// extraParams.id_token has the JSON Web Token
+	// profile has all the information from the user
+	return done(null, profile);
+});
+
+passport.use(strategy);
+
+// This can be used to keep a smaller payload
 passport.serializeUser(function(user, done) {
 	done(null, user);
 });
@@ -35,15 +39,8 @@ passport.use(strategy);
 var app = express();
 app.use(cors());
 
-app.use(express.session({
-	secret: "poots"
-}));
-
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Serve static files
-app.use(express.static(__dirname + '/public'));
 
 connectToMongo();
 
@@ -65,22 +62,39 @@ function connectToMongo() {
 			console.log("Listening on :8000");
 		});
 
-		app.get("/callback",
-			passport.authenticate("auth0", {
-				failureRedirect: "/login"
+		// Serve static files
+		app.use(ensureLoggedIn, express.static(__dirname + '/public'));
+
+		var router = express.Router();
+
+		/*
+// Get the user profile
+router.get('/', ensureLoggedIn, function(req, res, next) {
+  res.render('user', { user: req.user });
+});
+*/
+
+		// Render the login template
+		router.get('/login',
+			function(req, res) {
+				res.render('login', {
+					env: process.env
+				});
+			});
+
+		// Perform session logout and redirect to homepage
+		router.get('/logout', function(req, res) {
+			req.logout();
+			res.redirect('/');
+		});
+
+		// Perform the final stage of authentication and redirect to '/user'
+		router.get('/callback',
+			passport.authenticate('auth0', {
+				failureRedirect: '/url-if-something-fails'
 			}),
 			function(req, res) {
-				if (!req.user) {
-					throw new Error("User null");
-				}
-				res.redirect("/");
-			}
-		);
-
-		app.get("/login",
-			passport.authenticate("auth0", {}),
-			function(req, res) {
-				res.redirect("/");
+				res.redirect(req.session.returnTo || '/user');
 			});
 
 		// db.close();
