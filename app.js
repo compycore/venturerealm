@@ -85,7 +85,9 @@ function connectToMongo() {
 			var collection = db.collection("users");
 
 			collection.insert({
-				name: req.user.displayName
+				name: req.user.displayName,
+				map: [],
+				player: {}
 			}, function(err, docs) {
 				if (err) {
 					res.send(err);
@@ -100,6 +102,28 @@ function connectToMongo() {
 
 					res.send(result);
 				});
+			});
+		});
+
+		app.put("/user", ensureLoggedIn, function(req, res) {
+			var collection = db.collection("users");
+
+			collection.update({
+				name: req.user.displayName
+			}, {
+				$set: {
+					map: req.body.payload
+				}
+			});
+
+			collection.findOne({
+				"name": req.user.displayName
+			}, function(err, result) {
+				if (err) {
+					res.send(err);
+				}
+
+				res.send(result);
 			});
 		});
 

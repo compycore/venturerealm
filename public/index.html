@@ -10,6 +10,7 @@
 </head>
 
 <body onload="init()">
+	<button onclick="testPut()">Poots</button>
 	<digital-clock></digital-clock>
 
 	<div class="window" style="width: 550px; min-width: 400px; height: 450px; min-height: 200px;" onclick="$('#player_input').focus()">
@@ -50,7 +51,29 @@
 			at: "center",
 			of: "body"
 		});
+
+		$.ajax({
+			url: "/user",
+			type: "GET",
+			success: function(result) {
+				console.log(result);
+			}
+		});
 	});
+
+	function testPut() {
+		$.ajax({
+			url: "/user",
+			type: "PUT",
+			dataType: "json",
+			data: {
+				payload: ["poots", "poots"]
+			},
+			success: function(result) {
+				console.log(result);
+			}
+		});
+	};
 </script>
 
 </html>
