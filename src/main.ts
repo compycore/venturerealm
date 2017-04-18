@@ -19,23 +19,51 @@ function init() {
     player = new Player(map);
 
     getFromURL("/user", function(result: any) {
-        console.log(result.map);
+        console.log(result.player.inventory);
 
         if (result.player.x && result.player.y) {
-            console.log("Loading player");
             player.x = result.player.x;
             player.y = result.player.y;
-            player.inCombat = result.player.inCombat;
             player.attack = result.player.attack;
             player.defense = result.player.defense;
             player.health = result.player.health;
-            player.inventory = result.player.inventory;
+
+            for (let i = 0; i < result.player.inventory.length; i++) {
+                let item = result.player.inventory[i];
+
+                player.inventory.push(new Item(item.name, item.description, item.itemType, item.attack, item.defense, item.healing, item.plural, item.count, item.equipped));
+
+				console.log(player.inventory);
+            }
+
+            console.log("Player loaded");
         }
 
         if (result.map.grid && result.map.paths) {
-            console.log("Loading map");
-            map.grid = result.map.grid;
+            for (let y = 0; y < config.map.height; y++) {
+                map.grid[y] = [];
+
+                for (let x = 0; x < config.map.width; x++) {
+                    let tile = result.map.grid[y][x];
+
+                    tile.description.enemy = "";
+                    tile.description.character = "";
+
+                    map.grid[y][x] = new Tile(tile.x, tile.y, tile.character, tile.background, tile.backgroundOverlay, tile.description);
+                }
+            }
+
             map.paths = result.map.paths;
+
+            map.generate(characters.treasure, config.map.count.treasure);
+
+            console.log("Regenerating NPCs");
+            makeNPCs(map, config.map.count.npcs);
+
+            console.log("Regenerating enemies");
+            makeEnemies(map, config.map.count.enemies);
+
+            console.log("Map loaded");
         }
 
         log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");

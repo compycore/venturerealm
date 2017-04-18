@@ -1,7 +1,7 @@
 var config = {
     map: {
-        width: 400,
-        height: 200,
+        width: 200,
+        height: 100,
         draw: {
             width: 39,
             height: 19
@@ -211,12 +211,41 @@ function init() {
     makeEnemies(map, config.map.count.enemies);
     player = new Player(map);
     getFromURL("/user", function (result) {
-        console.log(result);
+        console.log(result.map);
+        if (result.player.x && result.player.y) {
+            player.x = result.player.x;
+            player.y = result.player.y;
+            player.attack = result.player.attack;
+            player.defense = result.player.defense;
+            player.health = result.player.health;
+            for (var i = 0; i < result.player.inventory; i++) {
+                var item = result.player.inventory[i];
+                player.inventory.push(new Item(item.name, item.description, item.itemType, item.attack, item.defense, item.healing, item.plural, item.count, item.equipped));
+            }
+            console.log("Player loaded");
+        }
+        if (result.map.grid && result.map.paths) {
+            for (var y = 0; y < config.map.height; y++) {
+                map.grid[y] = [];
+                for (var x = 0; x < config.map.width; x++) {
+                    var tile = result.map.grid[y][x];
+                    tile.description.enemy = "";
+                    tile.description.character = "";
+                    map.grid[y][x] = new Tile(tile.x, tile.y, tile.character, tile.background, tile.backgroundOverlay, tile.description);
+                }
+            }
+            map.paths = result.map.paths;
+            map.generate(characters.treasure, config.map.count.treasure);
+            console.log("Regenerating NPCs");
+            makeNPCs(map, config.map.count.npcs);
+            console.log("Regenerating enemies");
+            makeEnemies(map, config.map.count.enemies);
+            console.log("Map loaded");
+        }
+        log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
+        logo.draw();
+        console.log("Loaded");
     });
-    console.log(map, player);
-    log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
-    logo.draw();
-    console.log("Loaded");
 }
 var Point = (function () {
     function Point(xValue, yValue) {
@@ -238,7 +267,6 @@ var Map = (function () {
         }
         this.applyPaths();
         this.generate(characters.treasure, config.map.count.treasure);
-        this.generate(characters.portal, 1);
     }
     Map.prototype.generate = function (character, count) {
         var currentCount = 0;
@@ -760,10 +788,11 @@ var characters = {
     npc: String.fromCharCode(9650)
 };
 var Tile = (function () {
-    function Tile(x, y, character, background, backgroundOverlay) {
+    function Tile(x, y, character, background, backgroundOverlay, description) {
         if (character === void 0) { character = characters.gray; }
         if (background === void 0) { background = "grass"; }
         if (backgroundOverlay === void 0) { backgroundOverlay = null; }
+        if (description === void 0) { description = { enemy: "", character: "", direction: "", interest: "" }; }
         this.x = x;
         this.y = y;
         this.character = character;
@@ -776,12 +805,7 @@ var Tile = (function () {
             s: false,
             w: false
         };
-        this.description = {
-            enemy: "",
-            character: "",
-            direction: "",
-            interest: ""
-        };
+        this.description = description;
         if (this.character == characters.n) {
             this.road = true;
             this.direction.n = true;
@@ -1070,10 +1094,14 @@ function sendToURL(url, ajaxType, data, callback) {
 ;
 function save() {
     var payload = {
-        player: Player,
-        map: Map
+        player: player,
+        map: {
+            paths: map.paths,
+            grid: map.grid
+        }
     };
     sendToURL("/user", "PUT", payload, function (result) {
+        console.log(result);
         log("Progress saved!");
     });
 }

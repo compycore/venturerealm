@@ -74,7 +74,7 @@ class Tile implements ITile {
         interest: string
     };
 
-    constructor(x: number, y: number, character = characters.gray, background = "grass", backgroundOverlay: string = null) {
+    constructor(x: number, y: number, character = characters.gray, background = "grass", backgroundOverlay: string = null, description = { enemy: "", character: "", direction: "", interest: "" }) {
         this.x = x;
         this.y = y;
         this.character = character;
@@ -87,12 +87,7 @@ class Tile implements ITile {
             s: false,
             w: false
         };
-        this.description = {
-            enemy: "",
-            character: "",
-            direction: "",
-            interest: ""
-        };
+        this.description = description;
 
         // Set the direction array for path addition
         if (this.character == characters.n) {
@@ -290,9 +285,9 @@ class Tile implements ITile {
         for (let i = 0; i < allEnemies.length; i++) {
             if (allEnemies[i].x == this.x && allEnemies[i].y == this.y) {
                 log(allEnemies[i].description);
-				return;
-			}
-		}
+                return;
+            }
+        }
 
         for (let i = 0; i < allNPCs.length; i++) {
             if (allNPCs[i].x == this.x && allNPCs[i].y == this.y) {

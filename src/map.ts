@@ -32,7 +32,6 @@ class Map {
         this.applyPaths();
 
         this.generate(characters.treasure, config.map.count.treasure);
-        this.generate(characters.portal, 1);
     }
 
     generate(character: string, count: number) {
