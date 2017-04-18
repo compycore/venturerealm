@@ -207,6 +207,9 @@ function init() {
     makeNPCs(map, config.map.count.npcs);
     makeEnemies(map, config.map.count.enemies);
     player = new Player(map);
+    getFromURL("/user", function (result) {
+        console.log(result);
+    });
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
     console.log("Loaded");
@@ -435,7 +438,6 @@ var NPC = (function () {
         this.description = description;
         this.inventory = inventory;
         this.item = random(this.inventory);
-        console.log(this.name, this.inventory, this.item.name);
         this.spawn(map);
     }
     NPC.prototype.spawn = function (map) {
@@ -1036,6 +1038,34 @@ function asciiBar(current, max) {
 function changeBackground(image) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
+function getFromURL(url, callback) {
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (result) {
+            console.log(result);
+            if (callback) {
+                callback(result);
+            }
+        }
+    });
+}
+function sendToURL(url, ajaxType, data, callback) {
+    $.ajax({
+        url: url,
+        type: ajaxType,
+        processData: false,
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify(data),
+        success: function (result) {
+            console.log(result);
+            if (callback) {
+                callback(result);
+            }
+        }
+    });
+}
+;
 var enemiesCollection;
 var allEnemies;
 function makeEnemies(map, enemyCount) {

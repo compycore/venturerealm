@@ -38,6 +38,7 @@
 <script src="scripts/tsc.js"></script>
 
 <script>
+	// Make the window draggable, resizable, and positioned in the center
 	$(function() {
 		$(".window").draggable({
 			cursor: "move",
@@ -51,30 +52,7 @@
 			at: "center",
 			of: "body"
 		});
-
-		$.ajax({
-			url: "/user",
-			type: "GET",
-			success: function(result) {
-				console.log(result);
-			}
-		});
 	});
-
-	function testPut() {
-		$.ajax({
-			url: "/user",
-			type: "PUT",
-			processData: false,
-			contentType: "application/json; charset=UTF-8",
-			data: JSON.stringify({
-				payload: ["poots", "poots"]
-			}),
-			success: function(result) {
-				console.log(result);
-			}
-		});
-	};
 </script>
 
 </html>

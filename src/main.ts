@@ -5,7 +5,7 @@ let player: Player;
 let logo: Logo;
 
 function init() {
-	gameOver = false;
+    gameOver = false;
 
     document.getElementById("player_input").focus();
 
@@ -13,10 +13,16 @@ function init() {
     map = new Map();
     logo = new Logo();
 
-	makeNPCs(map, config.map.count.npcs);
-	makeEnemies(map, config.map.count.enemies);
+    makeNPCs(map, config.map.count.npcs);
+    makeEnemies(map, config.map.count.enemies);
 
     player = new Player(map);
+
+    getFromURL("/user", function(result: any) {
+        console.log(result);
+    });
+
+	console.log(map, player);
 
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();

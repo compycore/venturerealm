@@ -46,3 +46,30 @@ function asciiBar(current: number, max = 100): string {
 function changeBackground(image: string) {
     document.body.style.backgroundImage = "url('images/" + image + ".png')";
 }
+
+function getFromURL(url: string, callback: any): any {
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function(result) {
+			if (callback) {
+				callback(result);
+			}
+        }
+    });
+}
+
+function sendToURL(url: string, ajaxType: string, data: any, callback: any): any {
+    $.ajax({
+        url: url,
+        type: ajaxType,
+        processData: false,
+        contentType: "application/json; charset=UTF-8",
+        data: JSON.stringify(data),
+        success: function(result) {
+			if (callback) {
+				callback(result);
+			}
+        }
+    });
+};
