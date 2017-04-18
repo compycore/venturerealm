@@ -65,10 +65,11 @@
 		$.ajax({
 			url: "/user",
 			type: "PUT",
-			dataType: "json",
-			data: {
+			processData: false,
+			contentType: "application/json; charset=UTF-8",
+			data: JSON.stringify({
 				payload: ["poots", "poots"]
-			},
+			}),
 			success: function(result) {
 				console.log(result);
 			}

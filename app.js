@@ -108,6 +108,8 @@ function connectToMongo() {
 		app.put("/user", ensureLoggedIn, function(req, res) {
 			var collection = db.collection("users");
 
+			console.log(req.body);
+
 			collection.update({
 				name: req.user.displayName
 			}, {
