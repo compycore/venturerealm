@@ -49,7 +49,9 @@ app.set("view engine", "pug");
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 app.use(logger("dev"));
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+	limit: "50mb"
+}));
 app.use(bodyParser.urlencoded({
 	extended: false
 }));
@@ -86,7 +88,7 @@ function connectToMongo() {
 
 			collection.insert({
 				name: req.user.displayName,
-				map: [],
+				map: {},
 				player: {}
 			}, function(err, docs) {
 				if (err) {
@@ -114,7 +116,8 @@ function connectToMongo() {
 				name: req.user.displayName
 			}, {
 				$set: {
-					map: req.body.payload
+					map: req.body.map,
+					player: req.body.player
 				}
 			});
 

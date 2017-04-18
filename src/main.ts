@@ -19,12 +19,27 @@ function init() {
     player = new Player(map);
 
     getFromURL("/user", function(result: any) {
-        console.log(result);
+        console.log(result.map);
+
+        if (result.player.x && result.player.y) {
+            console.log("Loading player");
+            player.x = result.player.x;
+            player.y = result.player.y;
+            player.inCombat = result.player.inCombat;
+            player.attack = result.player.attack;
+            player.defense = result.player.defense;
+            player.health = result.player.health;
+            player.inventory = result.player.inventory;
+        }
+
+        if (result.map.grid && result.map.paths) {
+            console.log("Loading map");
+            map.grid = result.map.grid;
+            map.paths = result.map.paths;
+        }
+
+        log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
+        logo.draw();
+        console.log("Loaded");
     });
-
-	console.log(map, player);
-
-    log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
-    logo.draw();
-    console.log("Loaded");
 }

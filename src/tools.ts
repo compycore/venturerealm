@@ -52,9 +52,9 @@ function getFromURL(url: string, callback: any): any {
         url: url,
         type: "GET",
         success: function(result) {
-			if (callback) {
-				callback(result);
-			}
+            if (callback) {
+                callback(result);
+            }
         }
     });
 }
@@ -67,9 +67,24 @@ function sendToURL(url: string, ajaxType: string, data: any, callback: any): any
         contentType: "application/json; charset=UTF-8",
         data: JSON.stringify(data),
         success: function(result) {
-			if (callback) {
-				callback(result);
-			}
+            if (callback) {
+                callback(result);
+            }
         }
     });
 };
+
+function save() {
+    let payload = {
+        player: player,
+        map: {
+            paths: map.paths,
+            grid: map.grid
+        }
+    };
+
+    sendToURL("/user", "PUT", payload, function(result: any) {
+        console.log(result);
+        log("Progress saved!");
+    });
+}

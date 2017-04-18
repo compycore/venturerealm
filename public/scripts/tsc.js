@@ -53,7 +53,10 @@ function input(value) {
     }
     if (!gameOver) {
         if (command == "help") {
-            log("Available commands are:\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
+            log("Available commands are:\n'save'\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
+        }
+        else if (command == "save") {
+            save();
         }
         else if (command == "map") {
             map.draw();
@@ -210,6 +213,7 @@ function init() {
     getFromURL("/user", function (result) {
         console.log(result);
     });
+    console.log(map, player);
     log("Welcome to VentureRealm! A hyper-realistic digital simulation developed by CompyCore! Type 'help' to begin.");
     logo.draw();
     console.log("Loaded");
@@ -1043,7 +1047,6 @@ function getFromURL(url, callback) {
         url: url,
         type: "GET",
         success: function (result) {
-            console.log(result);
             if (callback) {
                 callback(result);
             }
@@ -1058,7 +1061,6 @@ function sendToURL(url, ajaxType, data, callback) {
         contentType: "application/json; charset=UTF-8",
         data: JSON.stringify(data),
         success: function (result) {
-            console.log(result);
             if (callback) {
                 callback(result);
             }
@@ -1066,6 +1068,15 @@ function sendToURL(url, ajaxType, data, callback) {
     });
 }
 ;
+function save() {
+    var payload = {
+        player: Player,
+        map: Map
+    };
+    sendToURL("/user", "PUT", payload, function (result) {
+        log("Progress saved!");
+    });
+}
 var enemiesCollection;
 var allEnemies;
 function makeEnemies(map, enemyCount) {

@@ -1,7 +1,7 @@
 let config = {
     map: {
-        width: 400,
-		height: 200,
+        width: 200,
+		height: 100,
 		draw: {
 			width: 39,
 			height: 19,
