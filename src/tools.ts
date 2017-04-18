@@ -88,3 +88,7 @@ function save() {
         log("Progress saved!");
     });
 }
+
+function logout() {
+	window.open("/logout", "_self");
+}

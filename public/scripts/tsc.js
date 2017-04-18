@@ -53,10 +53,13 @@ function input(value) {
     }
     if (!gameOver) {
         if (command == "help") {
-            log("Available commands are:\n'save'\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
+            log("Available commands are:\n'save'\n'logout'\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
         }
         else if (command == "save") {
             save();
+        }
+        else if (command == "logout") {
+            logout();
         }
         else if (command == "map") {
             map.draw();
@@ -211,16 +214,17 @@ function init() {
     makeEnemies(map, config.map.count.enemies);
     player = new Player(map);
     getFromURL("/user", function (result) {
-        console.log(result.map);
+        console.log(result.player.inventory);
         if (result.player.x && result.player.y) {
             player.x = result.player.x;
             player.y = result.player.y;
             player.attack = result.player.attack;
             player.defense = result.player.defense;
             player.health = result.player.health;
-            for (var i = 0; i < result.player.inventory; i++) {
+            for (var i = 0; i < result.player.inventory.length; i++) {
                 var item = result.player.inventory[i];
                 player.inventory.push(new Item(item.name, item.description, item.itemType, item.attack, item.defense, item.healing, item.plural, item.count, item.equipped));
+                console.log(player.inventory);
             }
             console.log("Player loaded");
         }
@@ -1104,6 +1108,9 @@ function save() {
         console.log(result);
         log("Progress saved!");
     });
+}
+function logout() {
+    window.open("/logout", "_self");
 }
 var enemiesCollection;
 var allEnemies;

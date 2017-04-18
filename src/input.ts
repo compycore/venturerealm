@@ -25,9 +25,11 @@ function input(value: string) {
 
     if (!gameOver) {
         if (command == "help") {
-            log("Available commands are:\n'save'\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
+            log("Available commands are:\n'save'\n'logout'\n'map'\n'north'/'n'\n'south'/'s'\n'east'/'e'\n'west'/'w'\n'inventory'\n'equip'\n'discard'\n'look'\n'open'/'get'\n'talk'\n'trade'\n'flee'\n'fight'/'attack'\n'use'");
         } else if (command == "save") {
             save();
+        } else if (command == "logout") {
+            logout();
         } else if (command == "map") {
             map.draw();
         } else if (["n", "s", "e", "w", "north", "south", "east", "west"].indexOf(command) > -1) { // Allow for player movement
