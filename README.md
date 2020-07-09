@@ -21,6 +21,7 @@ A hyper-realistic digital simulation developed by CompyCore.
 	```
 
 1. Navigate to [http://localhost:8080](http://localhost:8080)
+1. Login (or create an account
 1. Play!
 
 ## Notes
