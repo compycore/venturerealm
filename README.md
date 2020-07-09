@@ -6,7 +6,7 @@
 
 VentureRealm is a hyper-realistic digital simulation developed by CompyCore. Set out on an epic adventure into a land of magic, unknown, and danger!
 
-This project was created during [Jesse Millar's](https://jessemillar.com) college days for a class project that mandated a server backend and a web component frontend.
+VentureRealm was created during [Jesse Millar's](https://jessemillar.com) college days for a class project that mandated a server backend and a web component frontend.
 
 ## Setup
 
