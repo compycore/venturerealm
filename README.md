@@ -2,7 +2,11 @@
 
 [![Man Hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmh.jessemillar.com%2Fhours%3Frepo%3Dhttps%3A%2F%2Fgithub.com%2Fcompycore%2Fventurerealm.git)](https://jessemillar.com/r/man-hours)
 
-A hyper-realistic digital simulation developed by CompyCore.
+![VentureRealm Screenshot](screenshot.jpg)
+
+VentureRealm is a hyper-realistic digital simulation developed by CompyCore. Set out on an epic adventure into a land of magic, unknown, and danger!
+
+This project was created during [Jesse Millar's](https://jessemillar.com) college days for a class project that mandated a server backend and a web component frontend.
 
 ## Setup
 
