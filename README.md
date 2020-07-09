@@ -14,7 +14,7 @@ A hyper-realistic digital simulation developed by CompyCore.
 
 ## Usage
 
-1. Start the backend:
+1. Start the backend (add a `-d` flag if you don't care about server output):
 
 	```
 	docker-compose up
